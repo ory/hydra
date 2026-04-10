@@ -22,7 +22,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -tags sqlite -o /usr/bin/hydra
+RUN go build  -o /usr/bin/hydra
 
 VOLUME /mnt/sqlite
 

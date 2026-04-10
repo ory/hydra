@@ -224,7 +224,7 @@ serve:
     #
     # Hydra serves http instead of https when this option is set.
     #
-    # For more information head over to: https://www.ory.sh/docs/hydra/production#tls-termination
+    # For more information head over to: https://www.ory.com/docs/hydra/production#tls-termination
     allow_termination_from:
       - 127.0.0.1/32
   cookies:
@@ -246,7 +246,7 @@ serve:
 ## SQL databases
 #
 # Ory Hydra supports popular SQL databases. For more detailed configuration information go to:
-# https://www.ory.sh/docs/hydra/dependencies-environment#sql
+# https://www.ory.com/docs/hydra/dependencies-environment#sql
 #
 ### PostgreSQL (recommended)
 #
@@ -313,7 +313,7 @@ oidc:
   # subject_identifiers configures the Subject Identifier algorithm.
   #
   # For more information please head over to the documentation:
-  # -> https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms
+  # -> https://www.ory.com/docs/hydra/advanced#subject-identifier-algorithms
   subject_identifiers:
     # which algorithms to enable. Defaults to "public"
     supported_types:
@@ -365,7 +365,7 @@ strategies:
   # You may use JSON Web Tokens as access tokens.
   #
   # But seriously. Don't do that. It's not a great idea and has a ton of caveats and subtle security implications. Read more:
-  # -> https://www.ory.sh/docs/oauth2-oidc/jwt-access-token
+  # -> https://www.ory.com/docs/oauth2-oidc/jwt-access-token
   #
   #  access_token: jwt
 
@@ -417,7 +417,7 @@ oauth2:
 
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated,
 # for more information on this topic navigate to:
-# -> https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys
+# -> https://www.ory.com/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys
 secrets:
   # The system secret must be at least 16 characters long. If none is provided, one will be generated. They key
   #	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.

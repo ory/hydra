@@ -84,9 +84,9 @@ func TestAuthorizeCode_HandleAuthorizeEndpointRequest(t *testing.T) {
 							Client: &fosite.DefaultClient{
 								ResponseTypes: fosite.Arguments{"code"},
 								RedirectURIs:  []string{"https://asdf.com/cb"},
-								Audience:      []string{"https://www.ory.sh/api"},
+								Audience:      []string{"https://www.ory.com/api"},
 							},
-							RequestedAudience: []string{"https://www.ory.sh/not-api"},
+							RequestedAudience: []string{"https://www.ory.com/not-api"},
 						},
 						RedirectURI: parseUrl("https://asdf.com/cb"),
 					},
@@ -101,9 +101,9 @@ func TestAuthorizeCode_HandleAuthorizeEndpointRequest(t *testing.T) {
 							Client: &fosite.DefaultClient{
 								ResponseTypes: fosite.Arguments{"code"},
 								RedirectURIs:  []string{"https://asdf.de/cb"},
-								Audience:      []string{"https://www.ory.sh/api"},
+								Audience:      []string{"https://www.ory.com/api"},
 							},
-							RequestedAudience: []string{"https://www.ory.sh/api"},
+							RequestedAudience: []string{"https://www.ory.com/api"},
 							GrantedScope:      fosite.Arguments{"a", "b"},
 							Session: &fosite.DefaultSession{
 								ExpiresAt: map[fosite.TokenType]time.Time{fosite.AccessToken: time.Now().UTC().Add(time.Hour)},
@@ -139,9 +139,9 @@ func TestAuthorizeCode_HandleAuthorizeEndpointRequest(t *testing.T) {
 							Client: &fosite.DefaultClient{
 								ResponseTypes: fosite.Arguments{"code"},
 								RedirectURIs:  []string{"https://asdf.de/cb"},
-								Audience:      []string{"https://www.ory.sh/api"},
+								Audience:      []string{"https://www.ory.com/api"},
 							},
-							RequestedAudience: []string{"https://www.ory.sh/api"},
+							RequestedAudience: []string{"https://www.ory.com/api"},
 							GrantedScope:      fosite.Arguments{"a", "b"},
 							Session: &fosite.DefaultSession{
 								ExpiresAt: map[fosite.TokenType]time.Time{fosite.AccessToken: time.Now().UTC().Add(time.Hour)},

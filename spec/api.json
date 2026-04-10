@@ -669,18 +669,18 @@
         "type": "object"
       },
       "keysetPaginationRequestParameters": {
-        "description": "For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+        "description": "For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
         "properties": {
           "page_size": {
             "default": 250,
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "format": "int64",
             "maximum": 1000,
             "minimum": 1,
             "type": "integer"
           },
           "page_token": {
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "type": "string"
           }
         },
@@ -688,7 +688,7 @@
         "type": "object"
       },
       "keysetPaginationResponseHeaders": {
-        "description": "The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"first\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+        "description": "The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"first\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
         "properties": {
           "link": {
             "description": "The Link HTTP Header\n\nThe `Link` header contains a comma-delimited list of links to the following pages:\n\nfirst: The first page of results.\nnext: The next page of results.\n\nPages are omitted if they do not exist. For example, if there is no next page, the `next` link is omitted. Examples:\n\n\u003c/admin/sessions?page_size=250\u0026page_token={last_item_uuid}; rel=\"first\",/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"next\"",
@@ -716,7 +716,7 @@
         "description": "OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "properties": {
           "access_token_strategy": {
-            "description": "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is the strategy used to generate access tokens.\nValid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token\nSetting the strategy here overrides the global setting in `strategies.access_token`.",
+            "description": "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is the strategy used to generate access tokens.\nValid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.com/docs/oauth2-oidc/jwt-access-token\nSetting the strategy here overrides the global setting in `strategies.access_token`.",
             "type": "string"
           },
           "allowed_cors_origins": {
@@ -1522,14 +1522,14 @@
         "properties": {
           "page_size": {
             "default": 250,
-            "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "format": "int64",
             "maximum": 1000,
             "minimum": 1,
             "type": "integer"
           },
           "page_token": {
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "type": "string"
           }
         },
@@ -1538,7 +1538,7 @@
       "tokenPaginationHeaders": {
         "properties": {
           "link": {
-            "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
+            "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).\n\nin: header",
             "type": "string"
           },
           "x-total-count": {
@@ -1549,18 +1549,18 @@
         "type": "object"
       },
       "tokenPaginationRequestParameters": {
-        "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+        "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
         "properties": {
           "page_size": {
             "default": 250,
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "format": "int64",
             "maximum": 500,
             "minimum": 1,
             "type": "integer"
           },
           "page_token": {
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "type": "string"
           }
         },
@@ -1568,7 +1568,7 @@
         "type": "object"
       },
       "tokenPaginationResponseHeaders": {
-        "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+        "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
         "properties": {
           "link": {
             "description": "The Link HTTP Header\n\nThe `Link` header contains a comma-delimited list of links to the following pages:\n\nfirst: The first page of results.\nnext: The next page of results.\nprev: The previous page of results.\nlast: The last page of results.\n\nPages are omitted if they do not exist. For example, if there is no next page, the `next` link is omitted. Examples:\n\n\u003c/clients?page_size=5\u0026page_token=0\u003e; rel=\"first\",\u003c/clients?page_size=5\u0026page_token=15\u003e; rel=\"next\",\u003c/clients?page_size=5\u0026page_token=5\u003e; rel=\"prev\",\u003c/clients?page_size=5\u0026page_token=20\u003e; rel=\"last\"",
@@ -1846,7 +1846,7 @@
         "tags": [
           "wellknown"
         ],
-        "x-ory-ratelimit-bucket": "hydra-public-low"
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       }
     },
     "/.well-known/openid-configuration": {
@@ -1879,7 +1879,7 @@
         "tags": [
           "oidc"
         ],
-        "x-ory-ratelimit-bucket": "hydra-public-low"
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       }
     },
     "/admin/clients": {
@@ -1888,7 +1888,7 @@
         "operationId": "listOAuth2Clients",
         "parameters": [
           {
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_size",
             "schema": {
@@ -1900,7 +1900,7 @@
             }
           },
           {
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_token",
             "schema": {
@@ -1975,7 +1975,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/clients/{id}": {
@@ -2012,7 +2012,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "get": {
         "description": "Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -2047,7 +2047,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "patch": {
         "description": "Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -2097,7 +2097,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "put": {
         "description": "Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,\notherwise the existing secret is used.\n\nIf set, the secret is echoed in the response. It is not possible to retrieve it later on.\n\nOAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -2150,7 +2150,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/clients/{id}/lifespans": {
@@ -2204,7 +2204,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/keys/{set}": {
@@ -2241,7 +2241,7 @@
         "tags": [
           "jwk"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "get": {
         "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2336,7 +2336,7 @@
         "tags": [
           "jwk"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "put": {
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2388,7 +2388,7 @@
         "tags": [
           "jwk"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/keys/{set}/{kid}": {
@@ -2434,7 +2434,7 @@
         "tags": [
           "jwk"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "get": {
         "description": "This endpoint returns a singular JSON Web Key contained in a set. It is identified by the set and the specific key ID (kid).",
@@ -2546,7 +2546,7 @@
         "tags": [
           "jwk"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/consent": {
@@ -2600,7 +2600,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/consent/accept": {
@@ -2654,7 +2654,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/consent/reject": {
@@ -2708,7 +2708,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/device/accept": {
@@ -2761,7 +2761,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/login": {
@@ -2815,7 +2815,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/login/accept": {
@@ -2869,7 +2869,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/login/reject": {
@@ -2923,7 +2923,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/logout": {
@@ -2976,7 +2976,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/logout/accept": {
@@ -3020,7 +3020,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/logout/reject": {
@@ -3056,7 +3056,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/sessions/consent": {
@@ -3116,14 +3116,14 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "get": {
         "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.",
         "operationId": "listOAuth2ConsentSessions",
         "parameters": [
           {
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_size",
             "schema": {
@@ -3135,7 +3135,7 @@
             }
           },
           {
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_token",
             "schema": {
@@ -3186,7 +3186,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/sessions/login": {
@@ -3230,7 +3230,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/introspect": {
@@ -3290,7 +3290,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/tokens": {
@@ -3327,7 +3327,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/trust/grants/jwt-bearer/issuers": {
@@ -3336,7 +3336,7 @@
         "operationId": "listTrustedOAuth2JwtGrantIssuers",
         "parameters": [
           {
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_size",
             "schema": {
@@ -3348,7 +3348,7 @@
             }
           },
           {
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_token",
             "schema": {
@@ -3431,7 +3431,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/trust/grants/jwt-bearer/issuers/{id}": {
@@ -3468,7 +3468,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-high"
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "get": {
         "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
@@ -3701,7 +3701,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-public-low"
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       }
     },
     "/oauth2/device/verify": {
@@ -3727,7 +3727,7 @@
         "tags": [
           "oAuth2"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/oauth2/register": {
@@ -3768,7 +3768,7 @@
         "tags": [
           "oidc"
         ],
-        "x-ory-ratelimit-bucket": "hydra-public-high"
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/oauth2/register/{id}": {
@@ -3810,7 +3810,7 @@
         "tags": [
           "oidc"
         ],
-        "x-ory-ratelimit-bucket": "hydra-public-high"
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       },
       "get": {
         "description": "This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.",
@@ -3850,7 +3850,7 @@
         "tags": [
           "oidc"
         ],
-        "x-ory-ratelimit-bucket": "hydra-admin-low"
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "put": {
         "description": "This endpoint behaves like the administrative counterpart (`setOAuth2Client`) but is capable of facing the\npublic internet directly to be used by third parties. It implements the OpenID Connect\nDynamic Client Registration Protocol.\n\nThis feature is disabled per default. It can be enabled by a system administrator.\n\nIf you pass `client_secret` the secret is used, otherwise the existing secret is used. If set, the secret is echoed in the response.\nIt is not possible to retrieve it later on.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -3905,7 +3905,7 @@
         "tags": [
           "oidc"
         ],
-        "x-ory-ratelimit-bucket": "hydra-public-high"
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/oauth2/revoke": {

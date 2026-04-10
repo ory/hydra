@@ -4,21 +4,21 @@
 package httprouterx
 
 import (
+	"fmt"
 	"net/http"
 	"path"
 	"strings"
 	"testing"
 
-	"github.com/ory/x/prometheusx"
+	"github.com/urfave/negroni"
 )
 
 const AdminPrefix = "/admin"
 
 type (
 	router struct {
-		mux     *http.ServeMux
-		prefix  string
-		metrics *prometheusx.HTTPMetrics
+		mux    *http.ServeMux
+		prefix string
 	}
 	RouterAdmin  struct{ router }
 	RouterPublic struct{ router }
@@ -32,44 +32,44 @@ type (
 		PATCH(route string, handle http.HandlerFunc)
 		DELETE(route string, handle http.HandlerFunc)
 		Handler(method, route string, handler http.Handler)
+		Handle(pattern string, handler http.Handler)
+		HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
 	}
 )
 
-func newRouter(metrics *prometheusx.HTTPMetrics) *router {
+func newRouter() *router {
 	return &router{
-		mux:     http.NewServeMux(),
-		metrics: metrics,
+		mux: http.NewServeMux(),
 	}
 }
 
 // NewRouter creates a new general purpose router. It should only be used when neither the admin nor the public router is applicable.
-func NewRouter(metrics *prometheusx.HTTPMetrics) Router { return newRouter(metrics) }
+func NewRouter() Router { return newRouter() }
 
 // NewRouterAdmin creates a new admin router.
-func NewRouterAdmin(metrics *prometheusx.HTTPMetrics) *RouterAdmin {
-	return &RouterAdmin{router: *newRouter(metrics)}
+func NewRouterAdmin() *RouterAdmin {
+	return &RouterAdmin{router: *newRouter()}
 }
 
-func NewTestRouterAdmin(_ testing.TB) *RouterAdmin           { return NewRouterAdmin(nil) }
-func NewTestRouterAdminWithPrefix(_ testing.TB) *RouterAdmin { return NewRouterAdminWithPrefix(nil) }
-func NewTestRouterPublic(_ testing.TB) *RouterPublic         { return NewRouterPublic(nil) }
+func NewTestRouterAdmin(_ testing.TB) *RouterAdmin           { return NewRouterAdmin() }
+func NewTestRouterAdminWithPrefix(_ testing.TB) *RouterAdmin { return NewRouterAdminWithPrefix() }
+func NewTestRouterPublic(_ testing.TB) *RouterPublic         { return NewRouterPublic() }
 
 func (r *RouterAdmin) ToPublic() *RouterPublic {
 	return &RouterPublic{router: router{
-		mux:     r.mux,
-		metrics: r.metrics,
-		prefix:  "", // do not copy the admin prefix
+		mux:    r.mux,
+		prefix: "", // do not copy the admin prefix
 	}}
 }
 
 // NewRouterPublic returns a public router.
-func NewRouterPublic(metrics *prometheusx.HTTPMetrics) *RouterPublic {
-	return &RouterPublic{router: *newRouter(metrics)}
+func NewRouterPublic() *RouterPublic {
+	return &RouterPublic{router: *newRouter()}
 }
 
 // NewRouterAdminWithPrefix creates a new router with the admin prefix.
-func NewRouterAdminWithPrefix(metricsManager *prometheusx.HTTPMetrics) *RouterAdmin {
-	r := NewRouterAdmin(metricsManager)
+func NewRouterAdminWithPrefix() *RouterAdmin {
+	r := NewRouterAdmin()
 	r.prefix = AdminPrefix
 	return r
 }
@@ -104,10 +104,17 @@ func (r *router) Handler(method, route string, handler http.Handler) {
 
 func (r *router) handle(method string, route string, handler http.Handler) {
 	route = path.Join(r.prefix, route)
-	if r.metrics != nil {
-		handler = r.metrics.Instrument(handler, prometheusx.GetLabelForPattern(route))
-	}
 	r.mux.Handle(method+" "+route, handler)
+}
+
+// Handle registers the handler for the given pattern. It does not prepend the admin prefix, so the caller is responsible for ensuring that the pattern is correct.
+func (r *router) Handle(pattern string, handler http.Handler) {
+	r.mux.Handle(pattern, handler)
+}
+
+// HandleFunc registers the handler for the given pattern. It does not prepend the admin prefix, so the caller is responsible for ensuring that the pattern is correct.
+func (r *router) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
+	r.mux.HandleFunc(pattern, handler)
 }
 
 func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.mux.ServeHTTP(w, req) }
@@ -132,4 +139,25 @@ func AddAdminPrefixIfNotPresentNegroni(rw http.ResponseWriter, r *http.Request, 
 	}
 
 	next(rw, r)
+}
+
+func PopulatePatternNegroni[R http.Handler](r R) negroni.Handler {
+	var mux *http.ServeMux
+	switch v := any(r).(type) {
+	case *RouterPublic:
+		mux = v.mux
+	case *RouterAdmin:
+		mux = v.mux
+	case *router:
+		mux = v.mux
+	case *http.ServeMux:
+		mux = v
+	default:
+		panic(fmt.Sprintf("unsupported router type %T", r))
+	}
+	return negroni.HandlerFunc(func(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+		_, pattern := mux.Handler(req)
+		req.Pattern = pattern
+		next(rw, req)
+	})
 }

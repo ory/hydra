@@ -80,11 +80,11 @@ jobs:
           GOGC: 100
         with:
           args: --timeout 10m0s
-          version: "v2.10.1"
+          version: latest
           only-new-issues: "true"
       - name: Run go tests
         run: |
-          go test -coverprofile coverage.out -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension ./...
+          go test -coverprofile coverage.out -failfast -timeout=20m ./...
       - name: Submit to Codecov
         run: |
           bash <(curl -s https://codecov.io/bash)

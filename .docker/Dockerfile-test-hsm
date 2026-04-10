@@ -17,7 +17,7 @@ ENV CGO_ENABLED=1
 RUN go mod download
 COPY . .
 
-RUN go build -tags sqlite,hsm -o /usr/bin/hydra
+RUN go build -tags hsm -o /usr/bin/hydra
 
 ENV HSM_ENABLED=true
 ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
@@ -33,4 +33,4 @@ RUN go test -p 1 -failfast -short -tags=sqlite,hsm ./...
 
 FROM builder AS test-refresh-hsm
 
-RUN UPDATE_SNAPSHOTS=true go test -p 1 -failfast -short -tags=sqlite,hsm,refresh ./...
+RUN UPDATE_SNAPSHOTS=true go test -p 1 -failfast -short -tags=hsm,refresh ./...

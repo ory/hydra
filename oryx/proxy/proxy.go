@@ -99,7 +99,7 @@ func rewriter(o *options) func(*httputil.ProxyRequest) {
 		ctx, span := otel.GetTracerProvider().Tracer("").Start(ctx, "x.proxy")
 		defer span.End()
 
-		ctx, c, err := o.getHostConfig(ctx, r.In)
+		_, c, err := o.getHostConfig(ctx, r.In)
 		if err != nil {
 			o.onReqError(r.Out, err)
 			return

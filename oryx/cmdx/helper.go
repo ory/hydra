@@ -179,10 +179,7 @@ func ExecBackgroundCtx(ctx context.Context, cmd *cobra.Command, stdIn io.Reader,
 // Exec runs the provided cobra command with the given reader as STD_IN and the given args.
 // Returns STD_OUT, STD_ERR and the error from the execution.
 func Exec(t testing.TB, cmd *cobra.Command, stdIn io.Reader, args ...string) (string, string, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	return ExecCtx(ctx, cmd, stdIn, args...)
+	return ExecCtx(t.Context(), cmd, stdIn, args...)
 }
 
 func ExecCtx(ctx context.Context, cmd *cobra.Command, stdIn io.Reader, args ...string) (string, string, error) {
@@ -199,10 +196,7 @@ func ExecCtx(ctx context.Context, cmd *cobra.Command, stdIn io.Reader, args ...s
 // ExecNoErr is a helper that assumes a successful run from Exec.
 // Returns STD_OUT.
 func ExecNoErr(t testing.TB, cmd *cobra.Command, args ...string) string {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	return ExecNoErrCtx(ctx, t, cmd, args...)
+	return ExecNoErrCtx(t.Context(), t, cmd, args...)
 }
 
 func ExecNoErrCtx(ctx context.Context, t require.TestingT, cmd *cobra.Command, args ...string) string {
@@ -218,10 +212,7 @@ func ExecNoErrCtx(ctx context.Context, t require.TestingT, cmd *cobra.Command, a
 // ExecExpectedErr is a helper that assumes a failing run from Exec returning ErrNoPrintButFail
 // Returns STD_ERR.
 func ExecExpectedErr(t testing.TB, cmd *cobra.Command, args ...string) string {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	return ExecExpectedErrCtx(ctx, t, cmd, args...)
+	return ExecExpectedErrCtx(t.Context(), t, cmd, args...)
 }
 
 func ExecExpectedErrCtx(ctx context.Context, t require.TestingT, cmd *cobra.Command, args ...string) string {

@@ -55,7 +55,7 @@ func TestResourceOwnerFlow_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "should fail because audience missing",
 			setup: func(config *fosite.Config) {
-				areq.RequestedAudience = fosite.Arguments{"https://www.ory.sh/api"}
+				areq.RequestedAudience = fosite.Arguments{"https://www.ory.com/api"}
 				areq.Client = &fosite.DefaultClient{GrantTypes: fosite.Arguments{"password"}, Scopes: []string{"foo-scope"}}
 			},
 			expectErr: fosite.ErrInvalidRequest,
@@ -73,7 +73,7 @@ func TestResourceOwnerFlow_HandleTokenEndpointRequest(t *testing.T) {
 			setup: func(config *fosite.Config) {
 				areq.Form.Set("username", "peter")
 				areq.Form.Set("password", "pan")
-				areq.Client = &fosite.DefaultClient{GrantTypes: fosite.Arguments{"password"}, Scopes: []string{"foo-scope"}, Audience: []string{"https://www.ory.sh/api"}}
+				areq.Client = &fosite.DefaultClient{GrantTypes: fosite.Arguments{"password"}, Scopes: []string{"foo-scope"}, Audience: []string{"https://www.ory.com/api"}}
 
 				mockRopcgStorageProvider.EXPECT().ResourceOwnerPasswordCredentialsGrantStorage().Return(mockRopcgStorage).Times(1)
 				mockRopcgStorage.EXPECT().Authenticate(gomock.Any(), "peter", "pan").Return("", fosite.ErrNotFound)

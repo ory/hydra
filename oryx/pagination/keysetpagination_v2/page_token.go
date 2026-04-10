@@ -4,15 +4,17 @@
 package keysetpagination
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
+	"io"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
-	"github.com/ssoready/hyrumtoken"
-
 	"github.com/ory/herodot"
+	"github.com/pkg/errors"
+	"golang.org/x/crypto/nacl/secretbox"
 )
 
 var fallbackEncryptionKey = &[32]byte{}
@@ -58,7 +60,16 @@ func (t PageToken) Encrypt(keys [][32]byte) string {
 	if len(keys) > 0 {
 		key = &keys[0]
 	}
-	return hyrumtoken.Marshal(key, t)
+	enc, err := t.encrypt(key)
+	if err != nil {
+		// This should basically never happen, only if reading from the random source or marshaling the token fails.
+		// In both cases, we have a bigger problem than just not being able to generate the page token.
+		// Therefore, if we do get an error, there is no point in returning it to the client,
+		// as we already have a working result set. With this string, the next page will return an error,
+		// but that is better than breaking the current page.
+		return "internal error: failed to generate page token"
+	}
+	return enc
 }
 
 func (t PageToken) MarshalJSON() ([]byte, error) {
@@ -109,7 +120,7 @@ func (t PageToken) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toEncode)
 }
 
-var ErrPageTokenExpired = herodot.ErrBadRequest.WithReason("page token expired, do not persist page tokens")
+var ErrPageTokenExpired = herodot.ErrBadRequest.WithError("page token expired, do not persist page tokens")
 
 func (t *PageToken) UnmarshalJSON(data []byte) error {
 	rawToken := jsonPageToken{}
@@ -149,3 +160,46 @@ func (t *PageToken) UnmarshalJSON(data []byte) error {
 }
 
 func NewPageToken(cols ...Column) PageToken { return PageToken{cols: cols} }
+
+func (t *PageToken) encrypt(key *[32]byte) (string, error) {
+	var nonce [24]byte
+	if _, err := io.ReadFull(rand.Reader, nonce[:]); err != nil {
+		return "", errors.Wrap(err, "cannot seed nonce")
+	}
+
+	raw, err := json.Marshal(t)
+	if err != nil {
+		return "", errors.Wrap(err, "cannot marshal page token")
+	}
+
+	enc := secretbox.Seal(nonce[:], raw, &nonce, key)
+	return base64.URLEncoding.EncodeToString(enc), nil
+}
+
+func (t *PageToken) decrypt(key *[32]byte, s string) error {
+	if s == "" {
+		return errors.WithStack(ErrInvalidPaginationToken)
+	}
+
+	raw, err := base64.URLEncoding.DecodeString(s)
+	if err != nil || len(raw) < 24 {
+		return errors.WithStack(ErrInvalidPaginationToken)
+	}
+
+	var nonce [24]byte
+	copy(nonce[:], raw[:24])
+
+	dec, ok := secretbox.Open(nil, raw[24:], &nonce, key)
+	if !ok {
+		return errors.WithStack(ErrInvalidPaginationToken)
+	}
+
+	if err := json.Unmarshal(dec, t); err != nil {
+		if errors.As(err, new(*herodot.DefaultError)) {
+			return err
+		}
+		return errors.WithStack(herodot.ErrInternalServerError.WithReason("unable to unmarshal page token").WithDebug(err.Error()))
+	}
+
+	return nil
+}

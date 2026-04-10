@@ -23,7 +23,7 @@ func SetVirtualMemoryLimit(limitBytes uint64) error {
 	}
 	err := syscall.Setrlimit(syscall.RLIMIT_AS, &lim)
 	if err != nil {
-		return errors.WithStack(fmt.Errorf("failed to set virtual memory limit: %v\n", err))
+		return errors.WithStack(fmt.Errorf("failed to set virtual memory limit: %v", err))
 	}
 	return nil
 }

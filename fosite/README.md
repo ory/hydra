@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/ory/fosite/badge.svg?branch=master&service=github&foo)](https://coveralls.io/github/ory/fosite?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/ory/fosite)](https://goreportcard.com/report/ory/fosite)
 
-[![Join the chat at https://www.ory.sh/chat](https://img.shields.io/badge/join-chat-00cc99.svg)](https://www.ory.sh/chat)
+[![Join the chat at https://slack.ory.com](https://img.shields.io/badge/join-chat-00cc99.svg)](https://slack.ory.com)
 
 **The security first OAuth2 & OpenID Connect framework for
 [Go](https://golang.org).** Built simple, powerful and extensible. This library

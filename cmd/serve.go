@@ -14,7 +14,7 @@ var serveControls = `## Configuration
 Ory Hydra can be configured using environment variables as well as a configuration file. For more information
 on configuration options, open the configuration documentation:
 
->> https://www.ory.sh/hydra/docs/reference/configuration <<
+>> https://www.ory.com/hydra/docs/reference/configuration <<
 `
 
 // serveCmd represents the host command
@@ -43,7 +43,7 @@ All sub-commands share command line flags and configuration options.
 
 	configx.RegisterFlags(cmd.PersistentFlags())
 	cmd.PersistentFlags().Bool("dev", false, "Disables critical security checks to improve local development experience. Do not use in production.")
-	cmd.PersistentFlags().Bool("sqa-opt-out", false, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
+	cmd.PersistentFlags().Bool("sqa-opt-out", false, "Disable anonymized telemetry reports - for more information please visit https://www.ory.com/docs/ecosystem/sqa")
 
 	return cmd
 }

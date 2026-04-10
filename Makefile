@@ -36,7 +36,7 @@ lint: .bin/golangci-lint
 .PHONY: test
 test:
 	make test-resetdb
-	source scripts/test-env.sh && go test -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension ./...
+	source scripts/test-env.sh && go test -failfast -timeout=20m ./...
 	docker rm -f hydra_test_database_mysql
 	docker rm -f hydra_test_database_postgres
 	docker rm -f hydra_test_database_cockroach
@@ -68,7 +68,7 @@ e2e: node_modules test-resetdb
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
 quicktest:
-	go test -failfast -short -tags sqlite,sqlite_omit_load_extension ./...
+	go test -failfast -short ./...
 
 .PHONY: quicktest-hsm
 quicktest-hsm:
@@ -76,18 +76,21 @@ quicktest-hsm:
 
 .PHONY: test-refresh
 test-refresh:
-	UPDATE_SNAPSHOTS=true go test -short -tags sqlite,sqlite_omit_load_extension ./...
+	UPDATE_SNAPSHOTS=true go test -short ./...
 	DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-test-hsm --target test-refresh-hsm -t oryd/hydra:${IMAGE_TAG} --target test-refresh-hsm .
 
 authors:  # updates the AUTHORS file
 	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
 
+PRETTIER_VERSION=$(shell cat package.json | jq -r '.devDependencies["prettier"] // .dependencies["prettier"]')
+
 # Formats the code
 .PHONY: format
-format: .bin/ory node_modules
+format: .bin/ory
 	ory dev headers copyright --type=open-source --exclude=internal/httpclient --exclude=oryx
 	go tool goimports -w --local github.com/ory .
-	npm exec -- prettier --write .
+	@echo "Prettier Version: $(PRETTIER_VERSION)"
+	npx --package=prettier@$(PRETTIER_VERSION)  prettier . --write
 
 # Generates mocks
 .PHONY: mocks
@@ -169,14 +172,13 @@ install-stable:
 	HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 	git checkout $$HYDRA_LATEST
 	go install \
-		-tags sqlite,sqlite_omit_load_extension \
 		-ldflags "-X github.com/ory/hydra/v2/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/v2/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/v2/driver/config.Commit=`git rev-parse HEAD`" \
 		.
 	git checkout master
 
 .PHONY: install
 install:
-	go install -tags sqlite,sqlite_omit_load_extension .
+	go install .
 
 .PHONY: pre-release
 pre-release:

@@ -107,7 +107,7 @@ type trustOAuth2JwtGrantIssuer struct {
 //	  default: genericError
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	var grantRequest createGrantRequest
 
@@ -235,7 +235,7 @@ type deleteTrustedOAuth2JwtGrantIssuer struct {
 //	  default: genericError
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	rawID := r.PathValue("id")
 	id, err := uuid.FromString(rawID)

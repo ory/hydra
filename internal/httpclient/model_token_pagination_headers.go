@@ -20,7 +20,7 @@ var _ MappedNullable = &TokenPaginationHeaders{}
 
 // TokenPaginationHeaders struct for TokenPaginationHeaders
 type TokenPaginationHeaders struct {
-	// The link header contains pagination links.  For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).  in: header
+	// The link header contains pagination links.  For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).  in: header
 	Link *string `json:"link,omitempty"`
 	// The total number of clients.  in: header
 	XTotalCount *string `json:"x-total-count,omitempty"`

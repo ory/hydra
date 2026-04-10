@@ -45,7 +45,7 @@ func AreAllAssociatedIPsAllowed(pairs map[string]string) error {
 // to an internal IP
 func IsAssociatedIPAllowed(ipOrHostnameOrURL string) error {
 	lookup := func(hostname string) []net.IP {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		ctx, cancel := context.WithTimeoutCause(context.Background(), 2*time.Second, errors.Errorf("failed to resolve %s within 2s", ipOrHostnameOrURL))
 		defer cancel()
 
 		lookup, err := net.DefaultResolver.LookupIPAddr(ctx, hostname)

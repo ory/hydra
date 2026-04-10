@@ -279,7 +279,7 @@ func (ns *NullTime) Scan(value interface{}) error {
 	if err := (&v).Scan(value); err != nil {
 		return err
 	}
-	*ns = NullTime(v.Time)
+	*ns = NullTime(v.Time.UTC())
 	return nil
 }
 
@@ -305,7 +305,22 @@ func (ns *NullTime) UnmarshalJSON(data []byte) error {
 
 // Value implements the driver Valuer interface.
 func (ns NullTime) Value() (driver.Value, error) {
-	return sql.NullTime{Valid: !time.Time(ns).IsZero(), Time: time.Time(ns)}.Value()
+	return sql.NullTime{Valid: !time.Time(ns).IsZero(), Time: time.Time(ns).UTC()}.Value()
+}
+
+// DeepCopy implements github.com/mohae/deepcopy.Interface.
+//
+// NullTime wraps time.Time, whose fields are unexported. The default
+// reflection-based deep copy in mohae/deepcopy skips unexported fields, which
+// would zero out the timestamp. Returning a pointer to a copy preserves the
+// value. The method uses a pointer receiver so that mohae/deepcopy returns
+// the matching *NullTime type when it finds one as a struct field.
+func (ns *NullTime) DeepCopy() any {
+	if ns == nil {
+		return (*NullTime)(nil)
+	}
+	cpy := *ns
+	return &cpy
 }
 
 // MapStringInterface represents a map[string]interface that works well with JSON, SQL, and Swagger.

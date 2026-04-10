@@ -63,7 +63,7 @@ func (p *Provider) Serve(prefix string, isDev bool, defaults Serve) *Serve {
 		},
 		TLS: p.TLS(prefix+"tls", defaults.TLS),
 		RequestLog: ServeRequestLog{
-			DisableHealth: p.BoolF(prefix+"requestlog.disable_health", defaults.RequestLog.DisableHealth),
+			DisableHealth: p.BoolF(prefix+"request_log.disable_for_health", defaults.RequestLog.DisableHealth),
 		},
 	}
 

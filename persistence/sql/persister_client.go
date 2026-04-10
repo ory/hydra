@@ -135,9 +135,12 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (cs [
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetClients")
 	defer otelx.End(span, &err)
 
-	paginator := keysetpagination.NewPaginator(append(filters.PageOpts,
+	paginator, err := keysetpagination.NewPaginator(append(filters.PageOpts,
 		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "id", Value: ""})),
 	)...)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	query := p.QueryWithNetwork(ctx).Scope(
 		keysetpagination.Paginate[client.Client](paginator))

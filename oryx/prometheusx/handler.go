@@ -14,10 +14,10 @@ const (
 )
 
 type muxrouter interface {
-	GET(path string, handle http.HandlerFunc)
+	Handle(path string, handle http.Handler)
 }
 
 // SetMuxRoutes registers the prometheus handler.
 func SetMuxRoutes(mux muxrouter) {
-	mux.GET(MetricsPrometheusPath, promhttp.Handler().ServeHTTP)
+	mux.Handle("GET "+MetricsPrometheusPath, promhttp.Handler())
 }

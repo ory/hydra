@@ -222,7 +222,7 @@
     },
     "dsn": {
       "type": "string",
-      "description": "Sets the data source name. This configures the backend where Ory Hydra persists data. If dsn is `memory`, data will be written to memory and is lost when you restart this instance. Ory Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql"
+      "description": "Sets the data source name. This configures the backend where Ory Hydra persists data. If dsn is `memory`, data will be written to memory and is lost when you restart this instance. Ory Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.com/docs/hydra/dependencies-environment#sql"
     },
     "clients": {
       "title": "Global outgoing network settings",
@@ -389,7 +389,7 @@
         "subject_identifiers": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms",
+          "description": "Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.com/docs/hydra/advanced#subject-identifier-algorithms",
           "properties": {
             "supported_types": {
               "type": "array",
@@ -630,7 +630,7 @@
         },
         "access_token": {
           "type": "string",
-          "description": "Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token",
+          "description": "Defines access token type. jwt is a bad idea, see https://www.ory.com/docs/oauth2-oidc/jwt-access-token",
           "enum": ["opaque", "jwt"],
           "default": "opaque"
         },
@@ -769,6 +769,12 @@
           "description": "Set to false if you don't want to mirror custom claims under 'ext'",
           "default": true,
           "examples": [false]
+        },
+        "preserve_ext_claims": {
+          "type": "boolean",
+          "description": "Set to true to keep custom claims that are not promoted to the top level in the 'ext' claim. Only applies when mirror_top_level_claims is false.",
+          "default": false,
+          "examples": [true]
         },
         "hashers": {
           "type": "object",
@@ -985,7 +991,7 @@
     "secrets": {
       "type": "object",
       "additionalProperties": false,
-      "description": "The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys",
+      "description": "The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.com/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys",
       "properties": {
         "system": {
           "description": "The system secret must be at least 16 characters long. If none is provided, one will be generated. They key is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
@@ -1050,7 +1056,7 @@
       "properties": {
         "opt_out": {
           "type": "boolean",
-          "description": "Disables anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa",
+          "description": "Disables anonymized telemetry reports - for more information please visit https://www.ory.com/docs/ecosystem/sqa",
           "default": false,
           "examples": [true]
         }

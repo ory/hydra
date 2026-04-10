@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 
@@ -22,13 +23,21 @@ import (
 	"github.com/ory/x/errorsx"
 )
 
+// loggerConfig holds the mutable state that can change after construction via
+// UseConfig. It is accessed via a pointer so all shallow copies of Logger
+// (WithField, WithFields, WithContext, NewEntry) share and see the same config.
+type loggerConfig struct {
+	mu                        sync.RWMutex
+	leakSensitive             bool
+	redactionText             string
+	additionalRedactedHeaders map[string]struct{}
+}
+
 type (
 	Logger struct {
 		*logrus.Entry
-		leakSensitive             bool
-		redactionText             string
-		additionalRedactedHeaders map[string]struct{}
-		opts                      []Option
+		cfg  *loggerConfig
+		opts []Option
 	}
 	Provider interface {
 		Logger() *Logger
@@ -54,19 +63,27 @@ func (l *Logger) WithContext(ctx context.Context) *Logger {
 }
 
 func (l *Logger) HTTPHeadersRedacted(h http.Header) map[string]any {
+	// Snapshot the mutable config fields once under the read lock so we neither
+	// hold the lock during iteration nor risk a concurrent map write via UseConfig.
+	l.cfg.mu.RLock()
+	leakSensitive := l.cfg.leakSensitive
+	redactionText := l.cfg.redactionText
+	additionalHeaders := l.cfg.additionalRedactedHeaders
+	l.cfg.mu.RUnlock()
+
 	headers := map[string]any{}
 
 	for key, value := range h {
 		switch keyLower := strings.ToLower(key); keyLower {
 		case "authorization", "cookie", "set-cookie", "x-session-token":
-			headers[keyLower] = l.maybeRedact(value)
+			headers[keyLower] = maybeRedactWith(value, leakSensitive, redactionText)
 		case "location":
 			locationURL, err := url.Parse(h.Get("Location"))
 			if err != nil {
-				headers[keyLower] = l.maybeRedact(value)
+				headers[keyLower] = maybeRedactWith(value, leakSensitive, redactionText)
 				continue
 			}
-			if l.leakSensitive {
+			if leakSensitive {
 				headers[keyLower] = locationURL.String()
 			} else {
 				locationURL.RawQuery = ""
@@ -74,8 +91,8 @@ func (l *Logger) HTTPHeadersRedacted(h http.Header) map[string]any {
 				headers[keyLower] = locationURL.Redacted()
 			}
 		default:
-			if _, ok := l.additionalRedactedHeaders[keyLower]; ok {
-				headers[keyLower] = l.maybeRedact(value)
+			if _, ok := additionalHeaders[keyLower]; ok {
+				headers[keyLower] = maybeRedactWith(value, leakSensitive, redactionText)
 				continue
 			}
 			headers[keyLower] = h.Get(key)
@@ -140,7 +157,11 @@ func (l *Logger) WithSpanFromContext(ctx context.Context) *Logger {
 }
 
 func (l *Logger) Logf(level logrus.Level, format string, args ...any) {
-	if !l.leakSensitive {
+	l.cfg.mu.RLock()
+	leakSensitive := l.cfg.leakSensitive
+	l.cfg.mu.RUnlock()
+
+	if !leakSensitive {
 		for i, arg := range args {
 			switch urlArg := arg.(type) {
 			case url.URL:
@@ -198,14 +219,24 @@ func (l *Logger) WithField(key string, value any) *Logger {
 	return &ll
 }
 
-func (l *Logger) maybeRedact(value any) any {
+// maybeRedactWith is the lock-free redaction helper; callers must supply
+// pre-snapshotted values of leakSensitive and redactionText.
+func maybeRedactWith(value any, leakSensitive bool, redactionText string) any {
 	if fmt.Sprintf("%v", value) == "" || value == nil {
 		return nil
 	}
-	if !l.leakSensitive {
-		return l.redactionText
+	if !leakSensitive {
+		return redactionText
 	}
 	return value
+}
+
+func (l *Logger) maybeRedact(value any) any {
+	l.cfg.mu.RLock()
+	leak := l.cfg.leakSensitive
+	text := l.cfg.redactionText
+	l.cfg.mu.RUnlock()
+	return maybeRedactWith(value, leak, text)
 }
 
 func (l *Logger) WithSensitiveField(key string, value any) *Logger {

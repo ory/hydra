@@ -39,8 +39,8 @@ func TestCreateClient(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c,
 			"--secret", useSecret,
 			"--metadata", `{"foo":"bar"}`,
-			"--audience", "https://www.ory.sh/audience1",
-			"--audience", "https://www.ory.sh/audience2",
+			"--audience", "https://www.ory.com/audience1",
+			"--audience", "https://www.ory.com/audience2",
 		))
 		assert.NotEmpty(t, actual.Get("client_id").String())
 		assert.Equal(t, useSecret, actual.Get("client_secret").String())

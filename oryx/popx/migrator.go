@@ -293,7 +293,7 @@ func (mb *MigrationBox) isolatedTransaction(ctx context.Context, direction strin
 
 	if mb.perMigrationTimeout > 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, mb.perMigrationTimeout)
+		ctx, cancel = context.WithTimeoutCause(ctx, mb.perMigrationTimeout, errors.Errorf("failed to run all SQL migrations: direction=%s timeout=%s", direction, mb.perMigrationTimeout))
 		defer cancel()
 	}
 

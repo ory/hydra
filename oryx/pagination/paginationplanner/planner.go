@@ -42,7 +42,7 @@ func NewPaginationPlanner(fallbackPlan PaginationPlan, plans []PaginationPlan) (
 // GetPaginator selects the first eligible plan for the given queriedColumns constraints.
 // Eligibility requires an exact ColumnSet match and (if set) Condition match.
 // If none match, the FallbackPlan is used for building the Paginator.
-func (p *PaginationPlanner) GetPaginator(q Query, pageOpts ...keysetpagination.Option) *keysetpagination.Paginator {
+func (p *PaginationPlanner) GetPaginator(q Query, pageOpts ...keysetpagination.Option) (*keysetpagination.Paginator, error) {
 	if len(q) == 0 {
 		return keysetpagination.NewPaginator(append(pageOpts, keysetpagination.WithDefaultToken(p.FallbackPlan.DefaultPageToken))...)
 	}
@@ -94,11 +94,6 @@ type PaginationPlan struct {
 	// Condition further restricts the Plan eligibility for given queriedColumns.
 	// This can be used for plan-specific logic, e.g. verifying partial-index predicates match.
 	Condition func(q Query) bool
-}
-
-func (pp *PaginationPlan) GetPaginator(pageOpts ...keysetpagination.Option) *keysetpagination.Paginator {
-	defaultToken := keysetpagination.WithDefaultToken(pp.DefaultPageToken)
-	return keysetpagination.NewPaginator(append(pageOpts, defaultToken)...)
 }
 
 func (pp *PaginationPlan) populateInternals() {

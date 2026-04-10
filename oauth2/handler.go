@@ -507,7 +507,7 @@ type CredentialSupportedDraft00 struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-public-low
+//	  x-ory-ratelimit-bucket: hydra-public-high
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	key, err := h.r.OpenIDJWTSigner().GetPublicKey(ctx)
@@ -742,7 +742,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request) {
 	var (
 		ctx = r.Context()
@@ -881,7 +881,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-public-low
+//	  x-ory-ratelimit-bucket: hydra-public-high
 func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -999,7 +999,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
@@ -1356,7 +1356,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) deleteOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {

@@ -8,6 +8,7 @@ import (
 	"cmp"
 	_ "embed"
 	"io"
+	"maps"
 	"net/http"
 	"os"
 	"strings"
@@ -81,42 +82,45 @@ func newLogger(parent *logrus.Logger, o *options) *logrus.Logger {
 
 func setLevel(l *logrus.Logger, o *options) {
 	if o.level != nil {
-		l.Level = *o.level
+		l.SetLevel(*o.level)
 	} else {
-		var err error
-		l.Level, err = logrus.ParseLevel(cmp.Or(
+		level, err := logrus.ParseLevel(cmp.Or(
 			o.c.String("log.level"),
 			os.Getenv("LOG_LEVEL")))
 		if err != nil {
-			l.Level = logrus.InfoLevel
+			level = logrus.InfoLevel
 		}
+		l.SetLevel(level)
 	}
 }
 
 func setFormatter(l *logrus.Logger, o *options) {
 	if o.formatter != nil {
-		l.Formatter = o.formatter
+		l.SetFormatter(o.formatter)
 	} else {
 		var unknownFormat bool // we first have to set the formatter before we can complain about the unknown format
+		var formatter logrus.Formatter
 
 		format := stringsx.SwitchExact(cmp.Or(o.format, o.c.String("log.format"), os.Getenv("LOG_FORMAT")))
 		switch {
 		case format.AddCase("json"):
-			l.Formatter = &logrus.JSONFormatter{PrettyPrint: false, TimestampFormat: time.RFC3339Nano, DisableHTMLEscape: true}
+			formatter = &logrus.JSONFormatter{PrettyPrint: false, TimestampFormat: time.RFC3339Nano, DisableHTMLEscape: true}
 		case format.AddCase("json_pretty"):
-			l.Formatter = &logrus.JSONFormatter{PrettyPrint: true, TimestampFormat: time.RFC3339Nano, DisableHTMLEscape: true}
+			formatter = &logrus.JSONFormatter{PrettyPrint: true, TimestampFormat: time.RFC3339Nano, DisableHTMLEscape: true}
 		case format.AddCase("gelf"):
-			l.Formatter = new(gelf.GelfFormatter)
+			formatter = new(gelf.GelfFormatter)
 		default:
 			unknownFormat = true
 			fallthrough
 		case format.AddCase("text", ""):
-			l.Formatter = &logrus.TextFormatter{
+			formatter = &logrus.TextFormatter{
 				DisableQuote:     true,
 				DisableTimestamp: false,
 				FullTimestamp:    true,
 			}
 		}
+
+		l.SetFormatter(formatter)
 
 		if unknownFormat {
 			l.WithError(format.ToUnknownCaseErr()).Warn("got unknown \"log.format\", falling back to \"text\"")
@@ -215,15 +219,17 @@ func newOptions(opts []Option) *options {
 func New(name string, version string, opts ...Option) *Logger {
 	o := newOptions(opts)
 	return &Logger{
-		opts:          opts,
-		leakSensitive: o.leakSensitive || o.c.Bool("log.leak_sensitive_values"),
-		redactionText: cmp.Or(o.redactionText, `Value is sensitive and has been redacted. To see the value set config key "log.leak_sensitive_values = true" or environment variable "LOG_LEAK_SENSITIVE_VALUES=true".`),
-		additionalRedactedHeaders: toHeaderMap(func() []string {
-			if len(o.additionalRedactedHeaders) > 0 {
-				return o.additionalRedactedHeaders
-			}
-			return o.c.Strings("log.additional_redacted_headers")
-		}()),
+		opts: opts,
+		cfg: &loggerConfig{
+			leakSensitive: o.leakSensitive || o.c.Bool("log.leak_sensitive_values"),
+			redactionText: cmp.Or(o.redactionText, `Value is sensitive and has been redacted. To see the value set config key "log.leak_sensitive_values = true" or environment variable "LOG_LEAK_SENSITIVE_VALUES=true".`),
+			additionalRedactedHeaders: toHeaderMap(func() []string {
+				if len(o.additionalRedactedHeaders) > 0 {
+					return o.additionalRedactedHeaders
+				}
+				return o.c.Strings("log.additional_redacted_headers")
+			}()),
+		},
 		Entry: newLogger(o.l, o).WithFields(logrus.Fields{
 			"audience": "application", "service_name": name, "service_version": version,
 		}),
@@ -235,20 +241,28 @@ func NewT(t testing.TB, opts ...Option) *Logger {
 		t.Fatalf("Logger exited with code %d", code)
 	}))
 	l := New(t.Name(), "test", opts...)
-	l.Logger.Out = t.Output()
+	l.Logger.SetOutput(t.Output())
 	return l
 }
 
 func (l *Logger) UseConfig(c configurator) {
-	l.leakSensitive = l.leakSensitive || c.Bool("log.leak_sensitive_values")
-	l.redactionText = cmp.Or(c.String("log.redaction_text"), l.redactionText)
-	newHeaders := toHeaderMap(c.Strings("log.additional_redacted_headers"))
-	for k := range newHeaders {
-		l.additionalRedactedHeaders[k] = struct{}{}
-	}
+	// Update logrus level and formatter first, using their mutex-safe methods,
+	// before acquiring our own lock to avoid any lock ordering issues.
 	o := newOptions(append(l.opts, WithConfigurator(c)))
 	setLevel(l.Entry.Logger, o)
 	setFormatter(l.Entry.Logger, o)
+
+	l.cfg.mu.Lock()
+	defer l.cfg.mu.Unlock()
+	l.cfg.leakSensitive = l.cfg.leakSensitive || c.Bool("log.leak_sensitive_values")
+	l.cfg.redactionText = cmp.Or(c.String("log.redaction_text"), l.cfg.redactionText)
+	// Replace the map rather than mutating it in-place so that readers holding
+	// a snapshot of the old pointer can iterate it safely without a lock.
+	newHeaders := maps.Clone(l.cfg.additionalRedactedHeaders)
+	for k := range toHeaderMap(c.Strings("log.additional_redacted_headers")) {
+		newHeaders[k] = struct{}{}
+	}
+	l.cfg.additionalRedactedHeaders = newHeaders
 }
 
 func (l *Logger) ReportError(r *http.Request, code int, err error, args ...interface{}) {

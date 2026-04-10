@@ -19,17 +19,17 @@
   },
   "devDependencies": {
     "cypress": "9.7.0",
-    "dayjs": "1.11.19",
-    "doctoc": "2.3.0",
+    "dayjs": "1.11.20",
+    "doctoc": "2.4.0",
     "jsonwebtoken": "8.5.1",
     "license-checker": "25.0.1",
-    "prettier": "3.8.1",
+    "prettier": "3.8.2",
     "standard": "17.1.2",
     "uuid": "8.3.2",
     "wait-on": "9.0.1"
   },
   "overrides": {
-    "axios": ">=1.13.5",
+    "axios": ">=1.15.0",
     "glob": ">=11.1.0"
   }
 }

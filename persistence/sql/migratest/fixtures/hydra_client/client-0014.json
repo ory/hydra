@@ -109,6 +109,7 @@
   "ResponseTypes": [
     "response-0014_1"
   ],
+  "RotatedSecrets": "",
   "Scope": "scope-0014",
   "Secret": "secret-0014",
   "SecretExpiresAt": 0,

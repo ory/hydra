@@ -900,6 +900,11 @@
                       "$ref": "#/definitions/duration"
                     }
                   ]
+                },
+                "omit_assertion_audience": {
+                  "type": "boolean",
+                  "description": "Configures whether the audience from the assertion JWT in the jwt-bearer grant type is omitted from the resulting access token. When set to `true`, the audience values from the inbound assertion JWT are not granted in the access token. Defaults to `false` for backwards compatibility.",
+                  "default": false
                 }
               }
             }

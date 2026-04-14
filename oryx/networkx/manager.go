@@ -21,7 +21,7 @@ var Migrations embed.FS
 func Determine(c *pop.Connection) (*Network, error) {
 	var p Network
 	if err := sqlcon.HandleError(c.Q().Order("created_at ASC").First(&p)); err != nil {
-		if errors.Is(err, sqlcon.ErrNoRows) {
+		if errors.Is(err, sqlcon.ErrNoRows()) {
 			np := NewNetwork()
 			if err := c.Create(np); err != nil {
 				return nil, err

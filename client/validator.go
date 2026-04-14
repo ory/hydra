@@ -221,7 +221,7 @@ func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) 
 		return errors.WithStack(ErrInvalidClientMetadata.WithHint(`"metadata" cannot be set for dynamic client registration`))
 	}
 	if c.AccessTokenStrategy != "" {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own access token strategy."))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf("It is not allowed to choose your own access token strategy."))
 	}
 	if c.SkipConsent {
 		return errors.WithStack(ErrInvalidRequest.WithDescription(`"skip_consent" cannot be set for dynamic client registration`))

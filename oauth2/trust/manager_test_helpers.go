@@ -125,7 +125,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		require.NoError(t, t1.DeleteGrant(t.Context(), grant.ID))
 
 		_, err = t1.GetConcreteGrant(t.Context(), grant.ID)
-		require.ErrorIs(t, err, sqlcon.ErrNoRows)
+		require.ErrorIs(t, err, sqlcon.ErrNoRows())
 
 		require.NoError(t, t1.FlushInactiveGrants(t.Context(), grant2.ExpiresAt, 1000, 100))
 
@@ -133,7 +133,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		assert.NoError(t, err)
 
 		_, err = t1.GetConcreteGrant(t.Context(), grant3.ID)
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 	}
 }
 
@@ -171,7 +171,7 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager) func(t *testin
 
 		grant.ID = uuid.Must(uuid.NewV4())
 		err = m.CreateGrant(t.Context(), grant, pubKey1)
-		require.ErrorIs(t, err, sqlcon.ErrUniqueViolation, "error expected, because combination of issuer + subject + key_id must be unique")
+		require.ErrorIs(t, err, sqlcon.ErrUniqueViolation(), "error expected, because combination of issuer + subject + key_id must be unique")
 
 		grant2 := grant
 		grant2.PublicKey = PublicKey{

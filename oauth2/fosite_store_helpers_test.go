@@ -104,7 +104,7 @@ var flushRequests = []*fosite.Request{
 
 func mockRequestForeignKey(t *testing.T, _ string, x *driver.RegistrySQL) {
 	cl := &client.Client{ID: "foobar"}
-	if _, err := x.ClientManager().GetClient(t.Context(), cl.ID); errors.Is(err, sqlcon.ErrNoRows) {
+	if _, err := x.ClientManager().GetClient(t.Context(), cl.ID); errors.Is(err, sqlcon.ErrNoRows()) {
 		require.NoError(t, x.ClientManager().CreateClient(t.Context(), cl))
 	}
 }
@@ -911,7 +911,7 @@ func testFositeStoreSetClientAssertionJWT(m *driver.RegistrySQL) func(*testing.T
 			require.NoError(t, store.SetClientAssertionJWT(context.Background(), newJTI.JTI, newJTI.Expiry))
 
 			_, err := store.GetClientAssertionJWT(context.Background(), expiredJTI.JTI)
-			assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
+			assert.True(t, errors.Is(err, sqlcon.ErrNoRows()))
 			cmp, err := store.GetClientAssertionJWT(context.Background(), newJTI.JTI)
 			require.NoError(t, err)
 			require.NotEqual(t, cmp.NID, uuid.Nil)

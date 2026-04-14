@@ -458,7 +458,7 @@ func (s *defaultStrategy) verifyAuthentication(
 			Remember:                  f.LoginRemember,
 			ExpiresAt:                 sqlxx.NullTime(time.Now().Add(rememberFor).UTC()),
 		}); err != nil {
-			if errors.Is(err, sqlcon.ErrUniqueViolation) {
+			if errors.Is(err, sqlcon.ErrUniqueViolation()) {
 				return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used."))
 			}
 			return nil, err
@@ -621,7 +621,7 @@ func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	defer otelx.End(span, &err)
 
 	f, err := flow.DecodeAndInvalidateConsentVerifier(ctx, s.r, verifier)
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	if errors.Is(err, sqlcon.ErrNoRows()) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
@@ -634,9 +634,9 @@ func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 		return nil, errors.WithStack(f.ConsentError.ToRFCError())
 	}
 
-	if err := s.r.ConsentManager().CreateConsentSession(ctx, f); errors.Is(err, sqlcon.ErrUniqueViolation) {
+	if err := s.r.ConsentManager().CreateConsentSession(ctx, f); errors.Is(err, sqlcon.ErrUniqueViolation()) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used."))
-	} else if errors.Is(err, sqlcon.ErrNoRows) {
+	} else if errors.Is(err, sqlcon.ErrNoRows()) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
@@ -965,7 +965,7 @@ func (s *defaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.C
 	//
 	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
 	// even if an upstream URL fails!
-	if session, err := s.r.LoginManager().DeleteLoginSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows) {
+	if session, err := s.r.LoginManager().DeleteLoginSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows()) {
 		// This is ok (session probably already revoked), do nothing!
 	} else if err != nil {
 		return err

@@ -301,7 +301,7 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 		return err
 	}
 
-	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate()) {
 		return fosite.ErrSerializationFailure.WithWrap(err)
 	} else if err != nil {
 		return err
@@ -337,10 +337,10 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 		p.QueryWithNetwork(ctx).
 			Where("signature = ?", signature).
 			Delete(OAuth2RequestSQL{Table: table}.TableName()))
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	if errors.Is(err, sqlcon.ErrNoRows()) {
 		return errors.WithStack(fosite.ErrNotFound)
 	}
-	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate()) {
 		return fosite.ErrSerializationFailure.WithWrap(err)
 	}
 	return err
@@ -357,7 +357,7 @@ func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, tab
 		return errors.WithStack(fosite.ErrNotFound)
 	}
 	if err := sqlcon.HandleError(err); err != nil {
-		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		if errors.Is(err, sqlcon.ErrConcurrentUpdate()) {
 			return fosite.ErrSerializationFailure.WithWrap(err)
 		}
 		if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
@@ -421,7 +421,7 @@ func handleRetryError(err error) error {
 		return nil
 	}
 
-	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate()) {
 		return fosite.ErrSerializationFailure.WithWrap(err)
 	}
 	if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock
@@ -442,7 +442,7 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) (er
 	defer otelx.End(span, &err)
 
 	j, err := p.GetClientAssertionJWT(ctx, jti)
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	if errors.Is(err, sqlcon.ErrNoRows()) {
 		// the jti is not known => valid
 		return nil
 	} else if err != nil {
@@ -466,7 +466,7 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 		return sqlcon.HandleError(err)
 	}
 
-	if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
+	if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation()) {
 		// found a jti
 		return errors.WithStack(fosite.ErrJTIKnown)
 	} else if err != nil {
@@ -589,7 +589,7 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 		p.QueryWithNetwork(ctx).
 			Where("signature = ?", x.SignatureHash(signature)).
 			Delete(OAuth2RequestSQL{Table: sqlTableAccess}.TableName()))
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	if errors.Is(err, sqlcon.ErrNoRows()) {
 		// Backwards compatibility: we previously did not always hash the
 		// signature before inserting. In case there are still very old (but
 		// valid) access tokens in the database, this should get them.
@@ -597,11 +597,11 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 			p.QueryWithNetwork(ctx).
 				Where("signature = ?", signature).
 				Delete(OAuth2RequestSQL{Table: sqlTableAccess}.TableName()))
-		if errors.Is(err, sqlcon.ErrNoRows) {
+		if errors.Is(err, sqlcon.ErrNoRows()) {
 			return errors.WithStack(fosite.ErrNotFound)
 		}
 	}
-	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate()) {
 		return fosite.ErrSerializationFailure.WithWrap(err)
 	}
 	return err
@@ -631,7 +631,7 @@ func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature str
 	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, &OAuth2RefreshTable{
 		OAuth2RequestSQL:     *req,
 		AccessTokenSignature: sig,
-	})); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	})); errors.Is(err, sqlcon.ErrConcurrentUpdate()) {
 		return fosite.ErrSerializationFailure.WithWrap(err)
 	} else if err != nil {
 		return err

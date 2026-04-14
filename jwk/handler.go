@@ -294,7 +294,7 @@ func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var set = r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -347,7 +347,7 @@ func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var set = r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -406,7 +406,7 @@ func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request) 
 	var set = r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 

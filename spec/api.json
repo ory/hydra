@@ -67,7 +67,10 @@
         "title": "CreateVerifiableCredentialRequestBody contains the request body to request a verifiable credential.",
         "type": "object"
       },
-      "DefaultError": {},
+      "DefaultError": {
+        "description": "From https://go.dev/wiki/CodeReviewComments#receiver-type:\n\u003e Can function or methods, either concurrently or when called from this method, be mutating the receiver? A value type creates a copy of the receiver when the method is invoked, so outside updates will not be applied to this receiver. If changes must be visible in the original receiver, the receiver must be a pointer.\n\u003e If the receiver is a struct, array or slice and any of its elements is a pointer to something that might be mutating,\n\u003e prefer a pointer receiver, as it will make the intention clearer to the reader.\n\u003e Don’t mix receiver types. Choose either pointers or struct types for all available methods.",
+        "title": "DefaultError is not safe to shallow copy because it contains\nfields which are not value types, e.g. maps.\nA shallow copy would inadvertently share these underlying fields,\nleading to incorrect behavior and data races in a concurrent context.\nConsequently, all methods take the type by pointer and not by value."
+      },
       "DeviceUserAuthRequest": {
         "properties": {
           "challenge": {

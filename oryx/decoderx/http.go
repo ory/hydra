@@ -219,16 +219,16 @@ func validateRequest(r *http.Request, c *httpDecoderOptions) error {
 	method := strings.ToUpper(r.Method)
 
 	if !slices.Contains(c.allowedHTTPMethods, method) {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf(`Unable to decode body because HTTP Request Method was "%s" but only %v are supported.`, method, c.allowedHTTPMethods))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf(`Unable to decode body because HTTP Request Method was "%s" but only %v are supported.`, method, c.allowedHTTPMethods))
 	}
 
 	if method != "GET" {
 		if r.ContentLength == 0 {
-			return errors.WithStack(herodot.ErrBadRequest.WithReasonf(`Unable to decode HTTP Request Body because its HTTP Header "Content-Length" is zero.`))
+			return errors.WithStack(herodot.ErrBadRequest().WithReasonf(`Unable to decode HTTP Request Body because its HTTP Header "Content-Length" is zero.`))
 		}
 
 		if !httpx.HasContentType(r, c.allowedContentTypes...) {
-			return errors.WithStack(herodot.ErrBadRequest.WithReasonf(`HTTP %s Request used unknown HTTP Header "Content-Type: %s", only %v are supported.`, method, r.Header.Get("Content-Type"), c.allowedContentTypes))
+			return errors.WithStack(herodot.ErrBadRequest().WithReasonf(`HTTP %s Request used unknown HTTP Header "Content-Type: %s", only %v are supported.`, method, r.Header.Get("Content-Type"), c.allowedContentTypes))
 		}
 	}
 
@@ -241,19 +241,19 @@ func validatePayload(ctx context.Context, raw json.RawMessage, c *httpDecoderOpt
 	}
 
 	if c.jsonSchemaCompiler == nil {
-		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("JSON Schema Validation is required but no compiler was provided."))
+		return errors.WithStack(herodot.ErrInternalServerError().WithReasonf("JSON Schema Validation is required but no compiler was provided."))
 	}
 
 	schema, err := c.jsonSchemaCompiler.Compile(ctx, c.jsonSchemaRef)
 	if err != nil {
-		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to load JSON Schema from location: %s", c.jsonSchemaRef).WithDebug(err.Error()))
+		return errors.WithStack(herodot.ErrInternalServerError().WithReasonf("Unable to load JSON Schema from location: %s", c.jsonSchemaRef).WithDebug(err.Error()))
 	}
 
 	if err := schema.Validate(bytes.NewBuffer(raw)); err != nil {
 		if errors.As(err, new(*jsonschema.ValidationError)) {
 			return errors.WithStack(err)
 		}
-		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to process JSON Schema and input: %s", err).WithDebug(err.Error()))
+		return errors.WithStack(herodot.ErrInternalServerError().WithReasonf("Unable to process JSON Schema and input: %s", err).WithDebug(err.Error()))
 	}
 
 	return nil
@@ -277,7 +277,7 @@ func Decode(r *http.Request, destination any, opts ...HTTPDecoderOption) error {
 		return decodeForm(r, destination, c)
 	}
 
-	return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to determine decoder for content type: %s", r.Header.Get("Content-Type")))
+	return errors.WithStack(herodot.ErrInternalServerError().WithReasonf("Unable to determine decoder for content type: %s", r.Header.Get("Content-Type")))
 }
 
 func requestBody(r *http.Request, o *httpDecoderOptions) (reader io.ReadCloser, err error) {
@@ -302,12 +302,12 @@ func requestBody(r *http.Request, o *httpDecoderOptions) (reader io.ReadCloser, 
 
 func decodeJSONForm(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
 	if o.jsonSchemaCompiler == nil {
-		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to decode HTTP Form Body because no validation schema was provided. This is a code bug."))
+		return errors.WithStack(herodot.ErrInternalServerError().WithReasonf("Unable to decode HTTP Form Body because no validation schema was provided. This is a code bug."))
 	}
 
 	paths, err := jsonschemax.ListPathsWithRecursion(r.Context(), o.jsonSchemaRef, o.jsonSchemaCompiler, o.maxCircularReferenceDepth)
 	if err != nil {
-		return errors.WithStack(herodot.ErrInternalServerError.WithTrace(err).WithReasonf("Unable to prepare JSON Schema for HTTP Post Body Form parsing: %s", err).WithDebugf("%+v", err))
+		return errors.WithStack(herodot.ErrInternalServerError().WithTrace(err).WithReasonf("Unable to prepare JSON Schema for HTTP Post Body Form parsing: %s", err).WithDebugf("%+v", err))
 	}
 
 	reader, err := requestBody(r, o)
@@ -317,12 +317,12 @@ func decodeJSONForm(r *http.Request, destination interface{}, o *httpDecoderOpti
 
 	var interim json.RawMessage
 	if err := json.NewDecoder(reader).Decode(&interim); err != nil {
-		return errors.WithStack(herodot.ErrBadRequest.WithError(err.Error()).WithReason("Unable to decode form as JSON."))
+		return errors.WithStack(herodot.ErrBadRequest().WithError(err.Error()).WithReason("Unable to decode form as JSON."))
 	}
 
 	parsed := gjson.ParseBytes(interim)
 	if !parsed.IsObject() {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("Expected JSON sent in request body to be an object but got: %s", parsed.Type.String()))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf("Expected JSON sent in request body to be an object but got: %s", parsed.Type.String()))
 	}
 
 	values := url.Values{}
@@ -352,7 +352,7 @@ func decodeJSONForm(r *http.Request, destination interface{}, o *httpDecoderOpti
 
 func decodeForm(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
 	if o.jsonSchemaCompiler == nil {
-		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to decode HTTP Form Body because no validation schema was provided. This is a code bug."))
+		return errors.WithStack(herodot.ErrInternalServerError().WithReasonf("Unable to decode HTTP Form Body because no validation schema was provided. This is a code bug."))
 	}
 
 	reader, err := requestBody(r, o)
@@ -365,12 +365,12 @@ func decodeForm(r *http.Request, destination interface{}, o *httpDecoderOptions)
 	}()
 
 	if err := r.ParseForm(); err != nil {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode HTTP %s form body: %s", strings.ToUpper(r.Method), err).WithDebug(err.Error()))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode HTTP %s form body: %s", strings.ToUpper(r.Method), err).WithDebug(err.Error()))
 	}
 
 	paths, err := jsonschemax.ListPathsWithRecursion(r.Context(), o.jsonSchemaRef, o.jsonSchemaCompiler, o.maxCircularReferenceDepth)
 	if err != nil {
-		return errors.WithStack(herodot.ErrInternalServerError.WithTrace(err).WithReasonf("Unable to prepare JSON Schema for HTTP Post Body Form parsing: %s", err).WithDebugf("%+v", err))
+		return errors.WithStack(herodot.ErrInternalServerError().WithTrace(err).WithReasonf("Unable to prepare JSON Schema for HTTP Post Body Form parsing: %s", err).WithDebugf("%+v", err))
 	}
 
 	values := r.PostForm
@@ -384,7 +384,7 @@ func decodeForm(r *http.Request, destination interface{}, o *httpDecoderOptions)
 	}
 
 	if err := json.NewDecoder(bytes.NewReader(raw)).Decode(destination); err != nil {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode JSON payload: %s", err))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode JSON payload: %s", err))
 	}
 
 	return validatePayload(r.Context(), raw, o)
@@ -409,7 +409,7 @@ func decodeURLValues(values url.Values, paths []jsonschemax.Path, o *httpDecoder
 							case ParseErrorUseEmptyValueOnConversionErrors:
 								raw, err = sjson.SetBytes(raw, path.Name+"."+strconv.Itoa(k), f)
 							case ParseErrorReturnOnConversionErrors:
-								return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Expected value to be a number.").
+								return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Expected value to be a number.").
 									WithDetail("parse_error", err.Error()).
 									WithDetail("name", key).
 									WithDetailf("index", "%d", k).
@@ -429,7 +429,7 @@ func decodeURLValues(values url.Values, paths []jsonschemax.Path, o *httpDecoder
 							case ParseErrorUseEmptyValueOnConversionErrors:
 								raw, err = sjson.SetBytes(raw, path.Name+"."+strconv.Itoa(k), b)
 							case ParseErrorReturnOnConversionErrors:
-								return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Expected value to be a boolean.").
+								return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Expected value to be a boolean.").
 									WithDetail("parse_error", err.Error()).
 									WithDetail("name", key).
 									WithDetailf("index", "%d", k).
@@ -458,7 +458,7 @@ func decodeURLValues(values url.Values, paths []jsonschemax.Path, o *httpDecoder
 						case ParseErrorUseEmptyValueOnConversionErrors:
 							raw, err = sjson.SetBytes(raw, path.Name, b)
 						case ParseErrorReturnOnConversionErrors:
-							return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Expected value to be a boolean.").
+							return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Expected value to be a boolean.").
 								WithDetail("parse_error", err.Error()).
 								WithDetail("name", key).
 								WithDetail("value", values.Get(key)))
@@ -483,7 +483,7 @@ func decodeURLValues(values url.Values, paths []jsonschemax.Path, o *httpDecoder
 						case ParseErrorUseEmptyValueOnConversionErrors:
 							raw, err = sjson.SetBytes(raw, path.Name, f)
 						case ParseErrorReturnOnConversionErrors:
-							return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Expected value to be a number.").
+							return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Expected value to be a number.").
 								WithDetail("parse_error", err.Error()).
 								WithDetail("name", key).
 								WithDetail("value", values.Get(key)))
@@ -510,7 +510,7 @@ func decodeURLValues(values url.Values, paths []jsonschemax.Path, o *httpDecoder
 				}
 
 				if err != nil {
-					return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to type assert values from HTTP Post Body: %s", err))
+					return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to type assert values from HTTP Post Body: %s", err))
 				}
 				break
 			}
@@ -542,12 +542,12 @@ func decodeJSON(r *http.Request, destination interface{}, o *httpDecoderOptions)
 
 	raw, err := io.ReadAll(reader)
 	if err != nil {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to read HTTP POST body: %s", err))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to read HTTP POST body: %s", err))
 	}
 
 	dc := json.NewDecoder(bytes.NewReader(raw))
 	if err := dc.Decode(destination); err != nil {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode JSON payload: %s", err).WithDebugf("Received request body: %s", string(raw)))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode JSON payload: %s", err).WithDebugf("Received request body: %s", string(raw)))
 	}
 
 	if err := validatePayload(r.Context(), raw, o); err != nil {

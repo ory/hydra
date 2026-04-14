@@ -478,7 +478,7 @@ func (s *PersisterTestSuite) TestDeleteLoginSession() {
 			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, &ls))
 
 			deletedLS, err := r.Persister().DeleteLoginSession(s.t2, ls.ID)
-			require.ErrorIs(t, err, sqlcon.ErrNoRows)
+			require.ErrorIs(t, err, sqlcon.ErrNoRows())
 			assert.Nil(t, deletedLS)
 			_, err = r.Persister().GetRememberedLoginSession(s.t1, ls.ID)
 			require.NoError(t, err)
@@ -664,7 +664,7 @@ func (s *PersisterTestSuite) TestGenerateAndPersistKeySet() {
 			require.NoError(t, r.KeyManager().AddKey(s.t1, "ks", new(key.Keys[0].Public())))
 
 			err = sqlcon.HandleError(r.Persister().Connection(t.Context()).Where("sid = ? AND kid = ? AND nid = ?", "ks", "kid", s.t2NID).First(actual))
-			require.ErrorIs(t, err, sqlcon.ErrNoRows)
+			require.ErrorIs(t, err, sqlcon.ErrNoRows())
 			require.NoError(t, r.Persister().Connection(t.Context()).Where("sid = ? AND kid = ? AND nid = ?", "ks", "kid", s.t1NID).First(actual))
 		})
 	}
@@ -1646,7 +1646,7 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 			require.NoError(t, f.InvalidateConsentRequest())
 
 			err := r.ConsentManager().CreateConsentSession(s.t2, f)
-			require.ErrorIs(t, err, sqlcon.ErrNoRows)
+			require.ErrorIs(t, err, sqlcon.ErrNoRows())
 
 			err = r.ConsentManager().CreateConsentSession(s.t1, f)
 			require.NoError(t, err)

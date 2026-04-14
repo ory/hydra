@@ -96,7 +96,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		if err != nil {
 			return sqlcon.HandleError(err)
 		} else if count == 0 {
-			return sqlcon.HandleError(sqlcon.ErrNoRows)
+			return sqlcon.HandleError(sqlcon.ErrNoRows())
 		}
 
 		events.Trace(ctx, events.ClientUpdated,

@@ -83,7 +83,7 @@ func LoginNIDTest(t1ValidNID, t2InvalidNID consent.LoginManager) func(t *testing
 		require.ErrorContains(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS), "foreign key constraint")
 		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS))
 		ls, err := t2InvalidNID.DeleteLoginSession(ctx, testLS.ID)
-		require.ErrorIs(t, err, sqlcon.ErrNoRows)
+		require.ErrorIs(t, err, sqlcon.ErrNoRows())
 		assert.Nil(t, ls)
 		ls, err = t1ValidNID.DeleteLoginSession(ctx, testLS.ID)
 		require.NoError(t, err)
@@ -227,7 +227,7 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 				require.NoError(t, m.CreateConsentSession(t.Context(), f))
 
 				t.Run("sub=detect double-submit for consent verifier", func(t *testing.T) {
-					require.ErrorIs(t, m.CreateConsentSession(t.Context(), f), sqlcon.ErrUniqueViolation)
+					require.ErrorIs(t, m.CreateConsentSession(t.Context(), f), sqlcon.ErrUniqueViolation())
 				})
 
 				t.Run("sub=find granted and remembered consent", func(t *testing.T) {
@@ -522,7 +522,7 @@ func LogoutManagerTest(t *testing.T, m consent.LogoutManager, clientManager clie
 	for _, withClient := range []bool{true, false} {
 		t.Run("get with random challenge", func(t *testing.T) {
 			_, err := m.GetLogoutRequest(t.Context(), uuidx.NewV4().String())
-			assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+			assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 		})
 
 		t.Run(fmt.Sprintf("with client=%v", withClient), func(t *testing.T) {
@@ -579,7 +579,7 @@ func LogoutManagerTest(t *testing.T, m consent.LogoutManager, clientManager clie
 
 				require.NoError(t, m.RejectLogoutRequest(t.Context(), expected.ID))
 				_, err := m.GetLogoutRequest(t.Context(), expected.ID)
-				assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+				assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 			})
 		})
 	}

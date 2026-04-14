@@ -114,7 +114,7 @@ func ParseQueryParams(keys [][32]byte, q url.Values) ([]Option, error) {
 func ParsePageToken(keys [][32]byte, raw string) (t PageToken, err error) {
 	for i := range keys {
 		err = errors.WithStack(t.decrypt(&keys[i], raw))
-		if errors.Is(err, ErrInvalidPaginationToken) {
+		if errors.Is(err, ErrInvalidPaginationToken()) {
 			continue
 		}
 		// either we successfully decrypted the token, or we got an error that is not ErrInvalidPaginationToken, in both cases we should return immediately

@@ -78,7 +78,7 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// add key, if it doesn't exist
 		if _, err := p.d.KeyManager().GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
-			if !errors.Is(err, sqlcon.ErrNoRows) {
+			if !errors.Is(err, sqlcon.ErrNoRows()) {
 				return sqlcon.HandleError(err)
 			}
 

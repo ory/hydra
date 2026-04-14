@@ -12,7 +12,9 @@ import (
 	"github.com/ory/herodot"
 )
 
-var ErrInvalidPaginationToken = herodot.ErrBadRequest.WithError("invalid pagination token")
+func ErrInvalidPaginationToken() *herodot.DefaultError {
+	return herodot.ErrBadRequest().WithError("invalid pagination token")
+}
 
 type (
 	Paginator struct {
@@ -173,7 +175,7 @@ func (p *Paginator) validatePageToken() error {
 	if columnsMatch(tokenCols, p.defaultToken.Columns()) {
 		return nil
 	}
-	return ErrInvalidPaginationToken
+	return ErrInvalidPaginationToken()
 }
 
 func columnsMatch(tokenCols, templateCols []Column) bool {

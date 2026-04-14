@@ -31,7 +31,7 @@ func TestDeleteClient(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf(`"%s"`, expected.GetID()), strings.TrimSpace(stdout))
 
 		_, err := reg.ClientManager().GetClient(t.Context(), expected.GetID())
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 	})
 
 	t.Run("case=deletes multiple clients", func(t *testing.T) {
@@ -40,10 +40,10 @@ func TestDeleteClient(t *testing.T) {
 		assertx.EqualAsJSON(t, []string{expected1.GetID(), expected2.GetID()}, json.RawMessage(cmdx.ExecNoErr(t, c, expected1.GetID(), expected2.GetID())))
 
 		_, err := reg.ClientManager().GetClient(t.Context(), expected1.GetID())
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 
 		_, err = reg.ClientManager().GetClient(t.Context(), expected2.GetID())
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 	})
 
 	t.Run("case=one client deletion fails", func(t *testing.T) {
@@ -54,6 +54,6 @@ func TestDeleteClient(t *testing.T) {
 		snapshotx.SnapshotT(t, stderr)
 
 		_, err = reg.ClientManager().GetClient(t.Context(), expected.GetID())
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 	})
 }

@@ -39,17 +39,17 @@ type MiddlewareOption func(*middlewareOptions)
 func SessionFromContext(ctx context.Context) (json.RawMessage, error) {
 	raw := ctx.Value(jwtmiddleware.ContextKey{})
 	if raw == nil {
-		return nil, errors.WithStack(herodot.ErrUnauthorized.WithReasonf("Could not find credentials in the request."))
+		return nil, errors.WithStack(herodot.ErrUnauthorized().WithReasonf("Could not find credentials in the request."))
 	}
 
 	token, ok := raw.(*jwt.Token)
 	if !ok {
-		return nil, errors.WithStack(herodot.ErrInternalServerError.WithDebugf(`Expected context key "%T" to transport value of type *jwt.MapClaims but got type: %T`, jwtmiddleware.ContextKey{}, raw))
+		return nil, errors.WithStack(herodot.ErrInternalServerError().WithDebugf(`Expected context key "%T" to transport value of type *jwt.MapClaims but got type: %T`, jwtmiddleware.ContextKey{}, raw))
 	}
 
 	session, err := json.Marshal(token.Claims)
 	if err != nil {
-		return nil, errors.WithStack(herodot.ErrInternalServerError.WithDebugf("Unable to encode session data: %s", err))
+		return nil, errors.WithStack(herodot.ErrInternalServerError().WithDebugf("Unable to encode session data: %s", err))
 	}
 
 	return session, nil
@@ -116,7 +116,7 @@ func NewMiddleware(
 				// wrapping the extractor to get a herodot.ErrorContainer
 				token, err := jwtmiddleware.AuthHeaderTokenExtractor(r)
 				if err != nil {
-					return "", herodot.ErrUnauthorized.WithReason(err.Error())
+					return "", herodot.ErrUnauthorized().WithReason(err.Error())
 				}
 				return token, nil
 			}),
@@ -127,9 +127,9 @@ func NewMiddleware(
 					if err := errors.Unwrap(err); err != nil {
 						reason = err.Error()
 					}
-					c.ErrorWriter.WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.WithReason(reason)))
+					c.ErrorWriter.WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized().WithReason(reason)))
 				case errors.Is(err, jwtmiddleware.ErrJWTMissing):
-					c.ErrorWriter.WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.WithReason("The token is missing.")))
+					c.ErrorWriter.WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized().WithReason("The token is missing.")))
 				default:
 					c.ErrorWriter.WriteError(w, r, err)
 				}

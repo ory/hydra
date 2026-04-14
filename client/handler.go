@@ -162,12 +162,12 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err))
+		return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err))
 	}
 
 	if isDynamic {
 		if c.Secret != "" {
-			return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
+			return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
 		}
 		// We do not allow to set the client ID for dynamic clients.
 		c.ID = uuidx.NewV4().String()
@@ -258,7 +258,7 @@ type setOAuth2Client struct {
 func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -360,12 +360,12 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
 		return
 	}
 
 	if c.Secret != "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrForbidden.WithReasonf("It is not allowed to choose your own OAuth2 Client secret.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrForbidden().WithReasonf("It is not allowed to choose your own OAuth2 Client secret.")))
 		return
 	}
 
@@ -528,7 +528,7 @@ func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request) {
 	pageKeys := h.r.Config().GetPaginationEncryptionKeys(r.Context())
 	pagination, err := keysetpagination.ParseQueryParams(pageKeys, r.URL.Query())
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse pagination parameters: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to parse pagination parameters: %s", err)))
 		return
 	}
 	filters := Filter{
@@ -659,7 +659,7 @@ func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), client.GetID())
 	if err != nil {
-		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
+		err = herodot.ErrUnauthorized().WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -760,7 +760,7 @@ func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Reques
 
 	var ls Lifespans
 	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -838,13 +838,13 @@ func (h *Handler) deleteOidcDynamicClient(w http.ResponseWriter, r *http.Request
 func (h *Handler) ValidDynamicAuth(r *http.Request, id string) (fosite.Client, error) {
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
-		return nil, herodot.ErrUnauthorized.
+		return nil, herodot.ErrUnauthorized().
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
 	}
 
 	if len(c.RegistrationAccessTokenSignature) == 0 {
-		return nil, errors.WithStack(herodot.ErrUnauthorized.
+		return nil, errors.WithStack(herodot.ErrUnauthorized().
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("The OAuth2 Client does not have a registration access token."))
 	}
 
@@ -863,14 +863,14 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, id string) (fosite.Client, e
 		},
 		token,
 	); err != nil {
-		return nil, herodot.ErrUnauthorized.
+		return nil, herodot.ErrUnauthorized().
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
 	}
 
 	signature := h.r.OAuth2EnigmaStrategy().Signature(token)
 	if subtle.ConstantTimeCompare([]byte(c.RegistrationAccessTokenSignature), []byte(signature)) == 0 {
-		return nil, errors.WithStack(herodot.ErrUnauthorized.
+		return nil, errors.WithStack(herodot.ErrUnauthorized().
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("Registration access tokens do not match."))
 	}
 
@@ -879,7 +879,7 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, id string) (fosite.Client, e
 
 func (h *Handler) requireDynamicAuth(r *http.Request) *herodot.DefaultError {
 	if !h.r.Config().PublicAllowDynamicRegistration(r.Context()) {
-		return herodot.ErrNotFound.WithReason("Dynamic registration is not enabled.")
+		return herodot.ErrNotFound().WithReason("Dynamic registration is not enabled.")
 	}
 	return nil
 }

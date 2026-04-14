@@ -88,7 +88,7 @@ func Transaction(ctx context.Context, connection *pop.Connection, callback func(
 			if err == nil {
 				return nil
 			}
-			if !errors.Is(sqlcon.HandleError(err), sqlcon.ErrConcurrentUpdate) {
+			if !errors.Is(sqlcon.HandleError(err), sqlcon.ErrConcurrentUpdate()) {
 				return err
 			}
 			remaining := time.Until(deadline)

@@ -181,7 +181,7 @@ func (p *ConsentPersister) CreateConsentSession(ctx context.Context, f *flow.Flo
 	defer otelx.End(span, &err)
 
 	if f.NID != p.NetworkID(ctx) {
-		return errors.WithStack(sqlcon.ErrNoRows)
+		return errors.WithStack(sqlcon.ErrNoRows())
 	}
 	return sqlcon.HandleError(p.Connection(ctx).Create(f))
 }
@@ -589,7 +589,7 @@ func (p *Persister) mySQLConfirmLoginSession(ctx context.Context, session *flow.
 			return nil
 		}
 
-		if !errors.Is(err, sqlcon.ErrUniqueViolation) {
+		if !errors.Is(err, sqlcon.ErrUniqueViolation()) {
 			return err
 		}
 

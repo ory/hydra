@@ -12,9 +12,10 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/nacl/secretbox"
+
+	"github.com/ory/herodot"
 )
 
 var fallbackEncryptionKey = &[32]byte{}
@@ -120,7 +121,9 @@ func (t PageToken) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toEncode)
 }
 
-var ErrPageTokenExpired = herodot.ErrBadRequest.WithError("page token expired, do not persist page tokens")
+func ErrPageTokenExpired() *herodot.DefaultError {
+	return herodot.ErrBadRequest().WithError("page token expired, do not persist page tokens")
+}
 
 func (t *PageToken) UnmarshalJSON(data []byte) error {
 	rawToken := jsonPageToken{}
@@ -154,7 +157,7 @@ func (t *PageToken) UnmarshalJSON(data []byte) error {
 		now = t.testNow
 	}
 	if rawToken.ExpiresAt.Before(now().UTC()) {
-		return errors.WithStack(ErrPageTokenExpired)
+		return errors.WithStack(ErrPageTokenExpired())
 	}
 	return nil
 }
@@ -178,12 +181,12 @@ func (t *PageToken) encrypt(key *[32]byte) (string, error) {
 
 func (t *PageToken) decrypt(key *[32]byte, s string) error {
 	if s == "" {
-		return errors.WithStack(ErrInvalidPaginationToken)
+		return errors.WithStack(ErrInvalidPaginationToken())
 	}
 
 	raw, err := base64.URLEncoding.DecodeString(s)
 	if err != nil || len(raw) < 24 {
-		return errors.WithStack(ErrInvalidPaginationToken)
+		return errors.WithStack(ErrInvalidPaginationToken())
 	}
 
 	var nonce [24]byte
@@ -191,14 +194,14 @@ func (t *PageToken) decrypt(key *[32]byte, s string) error {
 
 	dec, ok := secretbox.Open(nil, raw[24:], &nonce, key)
 	if !ok {
-		return errors.WithStack(ErrInvalidPaginationToken)
+		return errors.WithStack(ErrInvalidPaginationToken())
 	}
 
 	if err := json.Unmarshal(dec, t); err != nil {
 		if errors.As(err, new(*herodot.DefaultError)) {
 			return err
 		}
-		return errors.WithStack(herodot.ErrInternalServerError.WithReason("unable to unmarshal page token").WithDebug(err.Error()))
+		return errors.WithStack(herodot.ErrInternalServerError().WithReason("unable to unmarshal page token").WithDebug(err.Error()))
 	}
 
 	return nil

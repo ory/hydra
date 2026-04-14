@@ -19,22 +19,22 @@ func handleSqlite(err error) error {
 		switch e.Code() {
 		case sqlite3lib.SQLITE_CONSTRAINT_UNIQUE,
 			sqlite3lib.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return errors.WithStack(ErrUniqueViolation.WithWrap(err))
+			return errors.WithStack(ErrUniqueViolation().WithWrap(err))
 		case sqlite3lib.SQLITE_ERROR:
 			if strings.Contains(err.Error(), "no such table") {
-				return errors.WithStack(ErrNoSuchTable.WithWrap(err))
+				return errors.WithStack(ErrNoSuchTable().WithWrap(err))
 			}
 		case sqlite3lib.SQLITE_LOCKED,
 			sqlite3lib.SQLITE_BUSY,
 			sqlite3lib.SQLITE_BUSY_RECOVERY,
 			sqlite3lib.SQLITE_BUSY_SNAPSHOT,
 			sqlite3lib.SQLITE_BUSY_TIMEOUT:
-			return errors.WithStack(ErrConcurrentUpdate.WithWrap(err))
+			return errors.WithStack(ErrConcurrentUpdate().WithWrap(err))
 		}
 
 		if strings.HasPrefix(e.Error(), "no such column:") ||
 			strings.Contains(e.Error(), "has no column named") {
-			return errors.WithStack(ErrNoSuchColumn.WithWrap(err))
+			return errors.WithStack(ErrNoSuchColumn().WithWrap(err))
 		}
 
 		return errors.WithStack(err)

@@ -758,8 +758,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	// - The device auth session is updated (user_code is marked as accepted)
 	// - The OpenID session is created
 	// If there were multiple flows created for the same user_code then we may end up with multiple flow objects
-	// persisted to the database, while only one of them was actually used to validate the user_code
-	// (see https://github.com/ory/hydra/pull/3851#discussion_r1843678761)
+	// persisted to the database, while only one of them was actually used to validate the user_code.
 	f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogError(r, err, h.r.Logger())

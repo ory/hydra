@@ -43,6 +43,7 @@ func (ns *Duration) UnmarshalJSON(data []byte) error {
 }
 
 // StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.
+// swagger:type array
 type StringSliceJSONFormat []string
 
 // Scan implements the Scanner interface.
@@ -457,6 +458,33 @@ func (m *NullJSONRawMessage) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// NullJSONObject represents a nullable JSON object (always key-value pairs).
+// Use this for fields that are always objects (e.g., HTTP headers).
+// For arbitrary JSON that can be strings, arrays, or objects, use NullJSONRawMessage.
+//
+// swagger:type object
+type NullJSONObject json.RawMessage
+
+// Scan implements the Scanner interface.
+func (m *NullJSONObject) Scan(value any) error {
+	return (*NullJSONRawMessage)(m).Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (m NullJSONObject) Value() (driver.Value, error) {
+	return NullJSONRawMessage(m).Value()
+}
+
+// MarshalJSON returns m as the JSON encoding of m.
+func (m NullJSONObject) MarshalJSON() ([]byte, error) {
+	return NullJSONRawMessage(m).MarshalJSON()
+}
+
+// UnmarshalJSON sets *m to a copy of data.
+func (m *NullJSONObject) UnmarshalJSON(data []byte) error {
+	return (*NullJSONRawMessage)(m).UnmarshalJSON(data)
+}
+
 // JSONScan is a generic helper for retrieving a SQL JSON-encoded value.
 func JSONScan(dst, value any) error {
 	// Note: raw is a string (not []byte) because the MySQL driver reuses byte slices across scans.
@@ -479,6 +507,7 @@ func JSONScan(dst, value any) error {
 }
 
 // NullInt64 represents an int64 that may be null.
+// swagger:type int64
 // swagger:model nullInt64
 type NullInt64 struct {
 	Int   int64

@@ -85,10 +85,18 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "required": [
@@ -150,13 +158,6 @@
         "title": "RFC6749ErrorJson is a helper struct for JSON encoding/decoding of RFC6749Error.",
         "type": "object"
       },
-      "StringSliceJSONFormat": {
-        "items": {
-          "type": "string"
-        },
-        "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
-        "type": "array"
-      },
       "Time": {
         "format": "date-time",
         "type": "string"
@@ -192,10 +193,18 @@
             "$ref": "#/components/schemas/JSONRawMessage"
           },
           "grant_access_token_audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "grant_scope": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "remember": {
             "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -232,7 +241,11 @@
             "type": "string"
           },
           "amr": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "AMR sets the Authentication Methods References value for this\nauthentication session. You can use it to specify the method a user used to\nauthenticate. For example, if the acr indicates a user used two-factor\nauthentication, the amr can express they used a software-secured key.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "context": {
             "$ref": "#/components/schemas/JSONRawMessage"
@@ -720,10 +733,19 @@
             "type": "string"
           },
           "allowed_cors_origins": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "OAuth 2.0 Client Allowed CORS Origins\n\nOne or more URLs (scheme://host[:port]) which are allowed to make CORS requests\nto the /oauth/token endpoint. If this array is empty, the server's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)\nwill be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.\nBe aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "OAuth 2.0 Client Audience\n\nAn allow-list defining the audiences this client is allowed to request tokens for. An audience limits\nthe applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list\nof URLs. URLs MUST NOT contain whitespaces.",
+            "example": "https://mydomain.com/api/users, https://mydomain.com/api/posts",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "authorization_code_grant_access_token_lifespan": {
             "$ref": "#/components/schemas/NullDuration"
@@ -767,7 +789,12 @@
             "type": "string"
           },
           "contacts": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "OAuth 2.0 Client Contact\n\nAn array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
+            "example": "help@example.org",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "created_at": {
             "description": "OAuth 2.0 Client Creation Date\n\nCreatedAt returns the timestamp of the client's creation.",
@@ -792,7 +819,11 @@
             "type": "string"
           },
           "grant_types": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "OAuth 2.0 Client Grant Types\n\nAn array of OAuth 2.0 grant types the client is allowed to use. Can be one\nof:\n\nClient Credentials Grant: `client_credentials`\nAuthorization Code Grant: `authorization_code`\nOpenID Connect Implicit Grant (deprecated!): `implicit`\nRefresh Token Grant: `refresh_token`\nOAuth 2.0 Token Exchange: `urn:ietf:params:oauth:grant-type:jwt-bearer`\nOAuth 2.0 Device Code Grant: `urn:ietf:params:oauth:grant-type:device_code`",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "implicit_grant_access_token_lifespan": {
             "$ref": "#/components/schemas/NullDuration"
@@ -826,10 +857,19 @@
             "type": "string"
           },
           "post_logout_redirect_uris": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "Allowed Post-Redirect Logout URIs\n\nArray of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the\npost_logout_redirect_uri parameter after a logout has been performed.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "redirect_uris": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "OAuth 2.0 Client Redirect URIs\n\nRedirectURIs is an array of allowed redirect urls for the client.",
+            "example": "http://mydomain/oauth/callback",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "refresh_token_grant_access_token_lifespan": {
             "$ref": "#/components/schemas/NullDuration"
@@ -853,10 +893,18 @@
             "type": "string"
           },
           "request_uris": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "OpenID Connect Request URIs\n\nArray of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the\ncontents of the files referenced by these URIs and not retrieve them at the time they are used in a request.\nOPs can require that request_uri values used be pre-registered with the require_request_uri_registration\ndiscovery parameter.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "response_types": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "OAuth 2.0 Client Response Types\n\nAn array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint. Can be one of:\n\nNeeded for OpenID Connect Implicit Grant:\nReturns ID Token to redirect URI: `id_token`\nReturns Access token redirect URI: `token`\nNeeded for Authorization Code Grant: `code`",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "scope": {
             "description": "OAuth 2.0 Client Scope\n\nScope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
@@ -958,7 +1006,11 @@
             "type": "string"
           },
           "amr": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "AMR is the Authentication Methods References value for this\nauthentication session. You can use it to specify the method a user used to\nauthenticate. For example, if the acr indicates a user used two factor\nauthentication, the amr can express they used a software-secured key.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "challenge": {
             "description": "Challenge is used to retrieve/accept/deny the consent request.",
@@ -990,10 +1042,18 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "skip": {
             "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
@@ -1057,10 +1117,18 @@
             "$ref": "#/components/schemas/JSONRawMessage"
           },
           "grant_access_token_audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "Audience Granted\n\nGrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "grant_scope": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "Scope Granted\n\nGrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "handled_at": {
             "$ref": "#/components/schemas/nullTime"
@@ -1105,10 +1173,18 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "session_id": {
             "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
@@ -1759,10 +1835,18 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
+            "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "title": "HandledDeviceUserAuthRequest is the request payload used to accept a device user_code.",

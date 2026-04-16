@@ -79,8 +79,23 @@ func ssrfTransport(opt ...ssrf.Option) *http.Transport {
 		}
 
 		if dnsErr, ok := errors.AsType[*net.DNSError](err); ok {
-			dnsErr.Server = "" // mask our DNS server's IP address
-			return nil, err
+			// Copy the `*net.DNSError` before masking `Server` to avoid a data
+			// race: the DNS resolver uses `singleflight` to deduplicate
+			// concurrent lookups, so multiple goroutines may receive the same
+			// `*net.DNSError` pointer. Mutating it in place races with concurrent
+			// readers (e.g. the `otelhttp` `dnsDone` trace hook).
+			maskedDNS := *dnsErr
+			maskedDNS.Server = "" // Mask our DNS server's IP address.
+			// Also copy the outer `*net.OpError` (if present) to preserve the
+			// full error chain that callers depend on, replacing its `Err` field
+			// with the masked copy.
+			// Surprisingly Go does not have a good way of manipulating error chains.
+			if opErr, ok := errors.AsType[*net.OpError](err); ok {
+				maskedOp := *opErr
+				maskedOp.Err = &maskedDNS
+				return nil, &maskedOp
+			}
+			return nil, &maskedDNS
 		}
 
 		if !errors.Is(err, ssrf.ErrProhibitedIP) {

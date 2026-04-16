@@ -7,6 +7,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/pkg/errors"
@@ -46,17 +47,25 @@ func WatchDirectory(ctx context.Context, dir string, c EventChannel) (Watcher, e
 
 type directoryWatcher struct {
 	*dispatcher
-	c       EventChannel
-	dir     string
-	subDirs map[string]struct{}
+	c   EventChannel
+	dir string
+	// subDirsMtx guards subDirs, which is read by the watcher goroutine and
+	// potentially by external callers (e.g. tests) concurrently.
+	subDirsMtx sync.RWMutex
+	subDirs    map[string]struct{}
 	w       *fsnotify.Watcher
 }
 
 func (w *directoryWatcher) handleEvent(ctx context.Context, e fsnotify.Event) {
 	if e.Has(fsnotify.Remove) {
-		if _, ok := w.subDirs[e.Name]; ok {
+		w.subDirsMtx.Lock()
+		_, isSubDir := w.subDirs[e.Name]
+		if isSubDir {
 			// we do not want any event on deletion of a directory
 			delete(w.subDirs, e.Name)
+		}
+		w.subDirsMtx.Unlock()
+		if isSubDir {
 			return
 		}
 		w.maybeSend(ctx, &RemoveEvent{
@@ -77,7 +86,9 @@ func (w *directoryWatcher) handleEvent(ctx context.Context, e fsnotify.Event) {
 					source: source(e.Name),
 				})
 			}
+			w.subDirsMtx.Lock()
 			w.subDirs[e.Name] = struct{}{}
+			w.subDirsMtx.Unlock()
 			return
 		}
 

@@ -42,6 +42,7 @@ require (
 	github.com/laher/mergefs v0.1.1
 	github.com/lestrrat-go/jwx v1.2.31
 	github.com/lib/pq v1.12.0
+	github.com/mailhog/data v1.0.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/ory/analytics-go/v5 v5.0.1
 	github.com/ory/dockertest/v4 v4.0.0-beta.4

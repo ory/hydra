@@ -1,4 +1,4 @@
--- migrations hash: 36ad8390f65c43551e28df0dcf92b0fdeb823b774eecda791f5979deafce2f6cc6ff57fccdfa41cbaa4403fd4ced8a9dfd7b725d1bb51fd6b0fabdccd51338aa
+-- migrations hash: 16ef05c97f69a58dae1fbc1980820b16bdd03df402264a27fc4bb751a9f78f5952dc5a651cbd853fb1b48766a1667e0662c8125e505d93cb6d1bc2f9effb0336
 
 CREATE TABLE "hydra_client"
 (
@@ -88,6 +88,7 @@ CREATE TABLE "hydra_oauth2_access" (
 );
 CREATE INDEX hydra_oauth2_access_challenge_id_idx ON hydra_oauth2_access (challenge_id, nid);
 CREATE INDEX hydra_oauth2_access_client_id_idx ON hydra_oauth2_access (client_id, nid);
+CREATE INDEX hydra_oauth2_access_nid_subject_idx ON hydra_oauth2_access (nid ASC, subject ASC, client_id ASC);
 CREATE INDEX hydra_oauth2_access_request_id_idx ON hydra_oauth2_access (request_id, nid);
 CREATE INDEX hydra_oauth2_access_requested_at_idx ON hydra_oauth2_access (requested_at, nid);
 CREATE TABLE "hydra_oauth2_authentication_session" (
@@ -302,6 +303,7 @@ CREATE TABLE "hydra_oauth2_refresh" (
 );
 CREATE INDEX hydra_oauth2_refresh_challenge_id_idx ON hydra_oauth2_refresh (challenge_id, nid);
 CREATE INDEX hydra_oauth2_refresh_client_id_idx ON hydra_oauth2_refresh (client_id, nid);
+CREATE INDEX hydra_oauth2_refresh_nid_subject_idx ON hydra_oauth2_refresh (nid ASC, subject ASC, client_id ASC);
 CREATE INDEX hydra_oauth2_refresh_request_id_idx ON hydra_oauth2_refresh (request_id, nid);
 CREATE INDEX hydra_oauth2_refresh_requested_at_idx ON hydra_oauth2_refresh (nid, requested_at);
 CREATE TABLE "hydra_oauth2_trusted_jwt_bearer_issuer" (

@@ -780,7 +780,7 @@ func (s *AuthorizeJWTGrantRequestHandlerTestSuite) TestValidAssertionDoesNotCopy
 	s.NoError(err, "no error expected, because assertion must be valid")
 	s.Empty(
 		s.accessRequest.GetGrantedAudience(),
-		"audience from assertion JWT should NOT be copied when CopyAssertionAudience is false",
+		"audience from assertion JWT should NOT be copied when GrantTypeJWTBearerOmitAssertionAudience is true",
 	)
 }
 

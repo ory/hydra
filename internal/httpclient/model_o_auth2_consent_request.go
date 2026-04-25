@@ -23,7 +23,8 @@ var _ MappedNullable = &OAuth2ConsentRequest{}
 // OAuth2ConsentRequest struct for OAuth2ConsentRequest
 type OAuth2ConsentRequest struct {
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication.
-	Acr *string  `json:"acr,omitempty"`
+	Acr *string `json:"acr,omitempty"`
+	// AMR is the Authentication Methods References value for this authentication session. You can use it to specify the method a user used to authenticate. For example, if the acr indicates a user used two factor authentication, the amr can express they used a software-secured key.
 	Amr []string `json:"amr,omitempty"`
 	// Challenge is used to retrieve/accept/deny the consent request.
 	Challenge string        `json:"challenge"`
@@ -37,9 +38,11 @@ type OAuth2ConsentRequest struct {
 	LoginSessionId *string                                   `json:"login_session_id,omitempty"`
 	OidcContext    *OAuth2ConsentRequestOpenIDConnectContext `json:"oidc_context,omitempty"`
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.
-	RequestUrl                   *string  `json:"request_url,omitempty"`
+	RequestUrl *string `json:"request_url,omitempty"`
+	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
-	RequestedScope               []string `json:"requested_scope,omitempty"`
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	RequestedScope []string `json:"requested_scope,omitempty"`
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the consent request using the usual API call.
 	Skip *bool `json:"skip,omitempty"`
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client.

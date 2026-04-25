@@ -1940,16 +1940,16 @@ components:
           description: RequestURL is the original Device Authorization URL requested.
           type: string
         requested_access_token_audience:
+          description: RequestedAudience contains the access token audience as requested
+            by the OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         requested_scope:
+          description: RequestedScope contains the OAuth 2.0 Scope requested by the
+            OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
       required:
       - challenge
@@ -1995,12 +1995,6 @@ components:
           type: integer
       title: RFC6749ErrorJson is a helper struct for JSON encoding/decoding of RFC6749Error.
       type: object
-    StringSliceJSONFormat:
-      items:
-        type: string
-      title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-        \ JSON for SQL storage."
-      type: array
     Time:
       format: date-time
       type: string
@@ -2030,16 +2024,16 @@ components:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
         grant_access_token_audience:
+          description: GrantedAudience sets the audience the user authorized the client
+            to use. Should be a subset of `requested_access_token_audience`.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         grant_scope:
+          description: GrantScope sets the scope the user authorized the client to
+            use. Should be a subset of `requested_scope`.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         remember:
           description: |-
@@ -2081,10 +2075,13 @@ components:
             to express that, for example, a user authenticated using two-factor authentication.
           type: string
         amr:
+          description: |-
+            AMR sets the Authentication Methods References value for this
+            authentication session. You can use it to specify the method a user used to
+            authenticate. For example, if the acr indicates a user used two-factor
+            authentication, the amr can express they used a software-secured key.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         context:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
@@ -2762,18 +2759,14 @@ components:
         client_secret: client_secret
         backchannel_logout_session_required: true
         backchannel_logout_uri: backchannel_logout_uri
-        audience:
-        - audience
-        - audience
+        audience: "https://mydomain.com/api/users, https://mydomain.com/api/posts"
         post_logout_redirect_uris:
         - post_logout_redirect_uris
         - post_logout_redirect_uris
         device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
         device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
         refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
-        redirect_uris:
-        - redirect_uris
-        - redirect_uris
+        redirect_uris: http://mydomain/oauth/callback
         sector_identifier_uri: sector_identifier_uri
         frontchannel_logout_session_required: true
         frontchannel_logout_uri: frontchannel_logout_uri
@@ -2850,9 +2843,7 @@ components:
         client_secret_expires_at: 0
         implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
         jwks_uri: jwks_uri
-        contacts:
-        - contacts
-        - contacts
+        contacts: help@example.org
       properties:
         access_token_strategy:
           description: |-
@@ -2863,16 +2854,26 @@ components:
             Setting the strategy here overrides the global setting in `strategies.access_token`.
           type: string
         allowed_cors_origins:
+          description: |-
+            OAuth 2.0 Client Allowed CORS Origins
+
+            One or more URLs (scheme://host[:port]) which are allowed to make CORS requests
+            to the /oauth/token endpoint. If this array is empty, the server's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)
+            will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.
+            Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         audience:
+          description: |-
+            OAuth 2.0 Client Audience
+
+            An allow-list defining the audiences this client is allowed to request tokens for. An audience limits
+            the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list
+            of URLs. URLs MUST NOT contain whitespaces.
+          example: "https://mydomain.com/api/users, https://mydomain.com/api/posts"
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         authorization_code_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
@@ -2948,10 +2949,14 @@ components:
             a clickable fashion.
           type: string
         contacts:
+          description: |-
+            OAuth 2.0 Client Contact
+
+            An array of strings representing ways to contact people responsible
+            for this client, typically email addresses.
+          example: help@example.org
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         created_at:
           description: |-
@@ -2996,10 +3001,20 @@ components:
             included, both MUST be.
           type: string
         grant_types:
+          description: |-
+            OAuth 2.0 Client Grant Types
+
+            An array of OAuth 2.0 grant types the client is allowed to use. Can be one
+            of:
+
+            Client Credentials Grant: `client_credentials`
+            Authorization Code Grant: `authorization_code`
+            OpenID Connect Implicit Grant (deprecated!): `implicit`
+            Refresh Token Grant: `refresh_token`
+            OAuth 2.0 Token Exchange: `urn:ietf:params:oauth:grant-type:jwt-bearer`
+            OAuth 2.0 Device Code Grant: `urn:ietf:params:oauth:grant-type:device_code`
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         implicit_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
@@ -3058,16 +3073,22 @@ components:
             retains, and discloses personal data.
           type: string
         post_logout_redirect_uris:
+          description: |-
+            Allowed Post-Redirect Logout URIs
+
+            Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the
+            post_logout_redirect_uri parameter after a logout has been performed.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         redirect_uris:
+          description: |-
+            OAuth 2.0 Client Redirect URIs
+
+            RedirectURIs is an array of allowed redirect urls for the client.
+          example: http://mydomain/oauth/callback
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         refresh_token_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
@@ -3108,16 +3129,29 @@ components:
             from this Client MUST be rejected, if not signed with this algorithm.
           type: string
         request_uris:
+          description: |-
+            OpenID Connect Request URIs
+
+            Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the
+            contents of the files referenced by these URIs and not retrieve them at the time they are used in a request.
+            OPs can require that request_uri values used be pre-registered with the require_request_uri_registration
+            discovery parameter.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         response_types:
+          description: |-
+            OAuth 2.0 Client Response Types
+
+            An array of the OAuth 2.0 response type strings that the client can
+            use at the authorization endpoint. Can be one of:
+
+            Needed for OpenID Connect Implicit Grant:
+            Returns ID Token to redirect URI: `id_token`
+            Returns Access token redirect URI: `token`
+            Needed for Authorization Code Grant: `code`
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         scope:
           description: |-
@@ -3322,18 +3356,14 @@ components:
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
-          audience:
-          - audience
-          - audience
+          audience: "https://mydomain.com/api/users, https://mydomain.com/api/posts"
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
           device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
           device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
           refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
-          redirect_uris:
-          - redirect_uris
-          - redirect_uris
+          redirect_uris: http://mydomain/oauth/callback
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
@@ -3410,9 +3440,7 @@ components:
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
-          contacts:
-          - contacts
-          - contacts
+          contacts: help@example.org
         login_session_id: login_session_id
         requested_scope:
         - requested_scope
@@ -3424,10 +3452,13 @@ components:
             to express that, for example, a user authenticated using two factor authentication.
           type: string
         amr:
+          description: |-
+            AMR is the Authentication Methods References value for this
+            authentication session. You can use it to specify the method a user used to
+            authenticate. For example, if the acr indicates a user used two factor
+            authentication, the amr can express they used a software-secured key.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         challenge:
           description: Challenge is used to retrieve/accept/deny the consent request.
@@ -3461,16 +3492,16 @@ components:
             might come in handy if you want to deal with additional request parameters.
           type: string
         requested_access_token_audience:
+          description: RequestedAudience contains the access token audience as requested
+            by the OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         requested_scope:
+          description: RequestedScope contains the OAuth 2.0 Scope requested by the
+            OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         skip:
           description: |-
@@ -3597,18 +3628,14 @@ components:
             client_secret: client_secret
             backchannel_logout_session_required: true
             backchannel_logout_uri: backchannel_logout_uri
-            audience:
-            - audience
-            - audience
+            audience: "https://mydomain.com/api/users, https://mydomain.com/api/posts"
             post_logout_redirect_uris:
             - post_logout_redirect_uris
             - post_logout_redirect_uris
             device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
             device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
             refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
-            redirect_uris:
-            - redirect_uris
-            - redirect_uris
+            redirect_uris: http://mydomain/oauth/callback
             sector_identifier_uri: sector_identifier_uri
             frontchannel_logout_session_required: true
             frontchannel_logout_uri: frontchannel_logout_uri
@@ -3685,9 +3712,7 @@ components:
             client_secret_expires_at: 0
             implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
             jwks_uri: jwks_uri
-            contacts:
-            - contacts
-            - contacts
+            contacts: help@example.org
           login_session_id: login_session_id
           requested_scope:
           - requested_scope
@@ -3715,16 +3740,20 @@ components:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
         grant_access_token_audience:
+          description: |-
+            Audience Granted
+
+            GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         grant_scope:
+          description: |-
+            Scope Granted
+
+            GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         handled_at:
           format: date-time
@@ -3788,18 +3817,14 @@ components:
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
-          audience:
-          - audience
-          - audience
+          audience: "https://mydomain.com/api/users, https://mydomain.com/api/posts"
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
           device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
           device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
           refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
-          redirect_uris:
-          - redirect_uris
-          - redirect_uris
+          redirect_uris: http://mydomain/oauth/callback
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
@@ -3876,9 +3901,7 @@ components:
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
-          contacts:
-          - contacts
-          - contacts
+          contacts: help@example.org
         session_id: session_id
         skip: true
         request_url: request_url
@@ -3900,16 +3923,16 @@ components:
             might come in handy if you want to deal with additional request parameters.
           type: string
         requested_access_token_audience:
+          description: RequestedAudience contains the access token audience as requested
+            by the OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         requested_scope:
+          description: RequestedScope contains the OAuth 2.0 Scope requested by the
+            OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         session_id:
           description: |-
@@ -3960,18 +3983,14 @@ components:
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
-          audience:
-          - audience
-          - audience
+          audience: "https://mydomain.com/api/users, https://mydomain.com/api/posts"
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
           device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
           device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
           refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
-          redirect_uris:
-          - redirect_uris
-          - redirect_uris
+          redirect_uris: http://mydomain/oauth/callback
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
@@ -4048,9 +4067,7 @@ components:
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
-          contacts:
-          - contacts
-          - contacts
+          contacts: help@example.org
         rp_initiated: true
         request_url: request_url
         requested_at: 2000-01-23T04:56:07.000+00:00
@@ -4899,16 +4916,16 @@ components:
           description: RequestURL is the original Device Authorization URL requested.
           type: string
         requested_access_token_audience:
+          description: RequestedAudience contains the access token audience as requested
+            by the OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
         requested_scope:
+          description: RequestedScope contains the OAuth 2.0 Scope requested by the
+            OAuth 2.0 Client.
           items:
             type: string
-          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
-            \ JSON for SQL storage."
           type: array
       title: HandledDeviceUserAuthRequest is the request payload used to accept a
         device user_code.

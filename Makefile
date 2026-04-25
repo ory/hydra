@@ -102,7 +102,7 @@ mocks:
 # Generates the SDKs
 .PHONY: sdk
 sdk: .bin/ory node_modules
-	go tool swagger generate spec -m -o spec/swagger.json \
+	../../.bin/swagger generate spec -m -o spec/swagger.json \
 		-c github.com/ory/hydra/v2/client \
 		-c github.com/ory/hydra/v2/consent \
 		-c github.com/ory/hydra/v2/flow \
@@ -115,7 +115,7 @@ sdk: .bin/ory node_modules
 		-c github.com/ory/x/pagination \
 		-c github.com/ory/herodot
 	ory dev swagger sanitize ./spec/swagger.json
-	go tool swagger validate ./spec/swagger.json
+	../../.bin/swagger validate ./spec/swagger.json
 	CIRCLE_PROJECT_USERNAME=ory CIRCLE_PROJECT_REPONAME=hydra \
 			ory dev openapi migrate \
 				--health-path-tags metadata \

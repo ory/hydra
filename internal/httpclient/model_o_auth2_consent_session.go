@@ -23,11 +23,13 @@ var _ MappedNullable = &OAuth2ConsentSession{}
 type OAuth2ConsentSession struct {
 	ConsentRequest *OAuth2ConsentRequest `json:"consent_request,omitempty"`
 	// ConsentRequestID is the identifier of the consent request that initiated this consent session.
-	ConsentRequestId         *string     `json:"consent_request_id,omitempty"`
-	Context                  interface{} `json:"context,omitempty"`
-	GrantAccessTokenAudience []string    `json:"grant_access_token_audience,omitempty"`
-	GrantScope               []string    `json:"grant_scope,omitempty"`
-	HandledAt                *time.Time  `json:"handled_at,omitempty"`
+	ConsentRequestId *string     `json:"consent_request_id,omitempty"`
+	Context          interface{} `json:"context,omitempty"`
+	// Audience Granted  GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+	GrantAccessTokenAudience []string `json:"grant_access_token_audience,omitempty"`
+	// Scope Granted  GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
+	GrantScope []string   `json:"grant_scope,omitempty"`
+	HandledAt  *time.Time `json:"handled_at,omitempty"`
 	// Remember Consent  Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.
 	Remember *bool `json:"remember,omitempty"`
 	// Remember Consent For  RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.

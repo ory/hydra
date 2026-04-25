@@ -8,8 +8,8 @@ Name | Type | Description | Notes
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
 **HandledAt** | Pointer to **time.Time** |  | [optional] 
 **RequestUrl** | Pointer to **string** | RequestURL is the original Device Authorization URL requested. | [optional] 
-**RequestedAccessTokenAudience** | Pointer to **[]string** |  | [optional] 
-**RequestedScope** | Pointer to **[]string** |  | [optional] 
+**RequestedAccessTokenAudience** | Pointer to **[]string** | RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client. | [optional] 
+**RequestedScope** | Pointer to **[]string** | RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client. | [optional] 
 
 ## Methods
 

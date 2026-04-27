@@ -15,7 +15,7 @@ COPY internal/httpclient/go.* ./internal/httpclient/
 RUN go mod download
 
 COPY . .
-RUN go build -ldflags="-extldflags=-static" -o /usr/bin/hydra
+RUN CGO_ENABLED=0 go build -o /usr/bin/hydra
 
 #########################
 

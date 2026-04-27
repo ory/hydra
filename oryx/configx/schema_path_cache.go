@@ -22,7 +22,7 @@ var schemaPathCacheConfig = &ristretto.Config[[]byte, []jsonschemax.Path]{
 	IgnoreInternalCost: true,
 }
 
-var schemaPathCache, _ = ristretto.NewCache[[]byte, []jsonschemax.Path](schemaPathCacheConfig)
+var schemaPathCache, _ = ristretto.NewCache(schemaPathCacheConfig)
 
 func getSchemaPaths(rawSchema []byte, schema *jsonschema.Schema) ([]jsonschemax.Path, error) {
 	key := sha256.Sum256(rawSchema)

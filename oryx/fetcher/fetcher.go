@@ -9,9 +9,11 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	stderrors "errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -20,22 +22,23 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/httpx"
-	"github.com/ory/x/stringsx"
 )
 
 // Fetcher is able to load file contents from http, https, file, and base64 locations.
 type Fetcher struct {
-	hc    *retryablehttp.Client
-	limit int64
-	cache *ristretto.Cache[[]byte, []byte]
-	ttl   time.Duration
+	hc      *retryablehttp.Client
+	limit   int64
+	cache   *ristretto.Cache[[]byte, []byte]
+	ttl     time.Duration
+	schemes []string
 }
 
 type opts struct {
-	hc    *retryablehttp.Client
-	limit int64
-	cache *ristretto.Cache[[]byte, []byte]
-	ttl   time.Duration
+	hc      *retryablehttp.Client
+	limit   int64
+	cache   *ristretto.Cache[[]byte, []byte]
+	ttl     time.Duration
+	schemes []string
 }
 
 var ErrUnknownScheme = stderrors.New("unknown scheme")
@@ -65,9 +68,16 @@ func WithCache(cache *ristretto.Cache[[]byte, []byte], ttl time.Duration) Modifi
 	}
 }
 
+func WithAllowedSchemes(schemes ...string) Modifier {
+	return func(o *opts) {
+		o.schemes = slices.Clone(schemes)
+	}
+}
+
 func newOpts() *opts {
 	return &opts{
-		hc: httpx.NewResilientClient(),
+		hc:      httpx.NewResilientClient(),
+		schemes: []string{"http", "https", "file", "base64"},
 	}
 }
 
@@ -79,7 +89,7 @@ func NewFetcher(opts ...Modifier) *Fetcher {
 	for _, f := range opts {
 		f(o)
 	}
-	return &Fetcher{hc: o.hc, limit: o.limit, cache: o.cache, ttl: o.ttl}
+	return &Fetcher{hc: o.hc, limit: o.limit, cache: o.cache, ttl: o.ttl, schemes: o.schemes}
 }
 
 // FetchContext fetches the file contents from the source and allows to pass a
@@ -95,19 +105,28 @@ func (f *Fetcher) FetchContext(ctx context.Context, source string) (*bytes.Buffe
 // FetchBytes fetches the file contents from the source and allows to pass a
 // context that is used for HTTP requests.
 func (f *Fetcher) FetchBytes(ctx context.Context, source string) ([]byte, error) {
-	switch s := stringsx.SwitchPrefix(source); {
-	case s.HasPrefix("http://", "https://"):
+	if !slices.ContainsFunc(f.schemes, func(scheme string) bool {
+		return strings.HasPrefix(source, scheme+"://")
+	}) {
+		return nil, errors.WithStack(fmt.Errorf("%w: in source %q: allowed schemes: %s", ErrUnknownScheme, source, strings.Join(f.schemes, ", ")))
+	}
+	switch {
+	case strings.HasPrefix(source, "http://"), strings.HasPrefix(source, "https://"):
 		return f.fetchRemote(ctx, source)
-	case s.HasPrefix("file://"):
-		return f.fetchFile(strings.TrimPrefix(source, "file://"))
-	case s.HasPrefix("base64://"):
+	case strings.HasPrefix(source, "file://"):
+		b, err := os.ReadFile(strings.TrimPrefix(source, "file://"))
+		if err != nil {
+			return nil, errors.Wrapf(err, "read file: %s", source)
+		}
+		return b, nil
+	case strings.HasPrefix(source, "base64://"):
 		src, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(source, "base64://"))
 		if err != nil {
 			return nil, errors.Wrapf(err, "base64decode: %s", source)
 		}
 		return src, nil
 	default:
-		return nil, errors.Wrap(ErrUnknownScheme, s.ToUnknownPrefixErr().Error())
+		return nil, errors.Wrap(ErrUnknownScheme, "unknown scheme in source: "+source)
 	}
 }
 
@@ -154,20 +173,4 @@ func (f *Fetcher) fetchRemote(ctx context.Context, source string) (b []byte, err
 		return buf.Bytes(), nil
 	}
 	return io.ReadAll(res.Body)
-}
-
-func (f *Fetcher) fetchFile(source string) ([]byte, error) {
-	fp, err := os.Open(source) // #nosec:G304
-	if err != nil {
-		return nil, errors.Wrapf(err, "unable to open file: %s", source)
-	}
-	defer fp.Close()
-	b, err := io.ReadAll(fp)
-	if err != nil {
-		return nil, errors.Wrapf(err, "unable to read file: %s", source)
-	}
-	if err := fp.Close(); err != nil {
-		return nil, errors.Wrapf(err, "unable to close file: %s", source)
-	}
-	return b, nil
 }

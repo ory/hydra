@@ -40,8 +40,8 @@ func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	t.Parallel()
 
 	ts := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		t.Fatal("Should not be called")
-		writer.WriteHeader(http.StatusOK)
+		t.Error("Should not be called")
+		writer.WriteHeader(http.StatusInternalServerError)
 	}))
 	t.Cleanup(ts.Close)
 

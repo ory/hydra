@@ -33,6 +33,7 @@ type (
 		cacheTTL   time.Duration
 		useCache   bool
 		httpClient *retryablehttp.Client
+		schemes    []string
 	}
 	// FetcherNext is a JWK fetcher that can be used to fetch JWKs from multiple locations.
 	FetcherNext struct {
@@ -67,6 +68,12 @@ func WithCacheTTL(ttl time.Duration) FetcherNextOption {
 func WithCacheEnabled() FetcherNextOption {
 	return func(o *fetcherNextOptions) {
 		o.useCache = true
+	}
+}
+
+func WithAllowedSchemes(schemes ...string) FetcherNextOption {
+	return func(o *fetcherNextOptions) {
+		o.schemes = schemes
 	}
 }
 
@@ -149,6 +156,9 @@ func (f *FetcherNext) fetch(ctx context.Context, location string, opts *fetcherN
 	var fopts []fetcher.Modifier
 	if opts.httpClient != nil {
 		fopts = append(fopts, fetcher.WithClient(opts.httpClient))
+	}
+	if len(opts.schemes) > 0 {
+		fopts = append(fopts, fetcher.WithAllowedSchemes(opts.schemes...))
 	}
 
 	result, err := fetcher.NewFetcher(fopts...).FetchContext(ctx, location)

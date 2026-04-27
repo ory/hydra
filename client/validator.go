@@ -76,16 +76,21 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if v.r.Config().ClientHTTPNoPrivateIPRanges() {
-		values := map[string]string{
-			"jwks_uri":               c.JSONWebKeysURI,
-			"backchannel_logout_uri": c.BackChannelLogoutURI,
+		values := map[string]string{}
+		if c.JSONWebKeysURI != "" {
+			values["jwks_uri"] = c.JSONWebKeysURI
+		}
+		if c.BackChannelLogoutURI != "" {
+			values["backchannel_logout_uri"] = c.BackChannelLogoutURI
 		}
 
 		for k, v := range c.RequestURIs {
-			values[fmt.Sprintf("request_uris.%d", k)] = v
+			if v != "" {
+				values[fmt.Sprintf("request_uris.%d", k)] = v
+			}
 		}
 
-		if err := ipx.AreAllAssociatedIPsAllowed(values); err != nil {
+		if err := ipx.AreAllAssociatedIPsAllowed(ctx, values); err != nil {
 			return errors.WithStack(ErrInvalidClientMetadata.WithHintf("Client IP address is not allowed: %s", err))
 		}
 	}

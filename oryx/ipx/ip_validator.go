@@ -5,10 +5,13 @@ package ipx
 
 import (
 	"context"
+	stderrors "errors"
 	"net"
+	"net/netip"
 	"net/url"
 	"time"
 
+	"code.dny.dev/ssrf"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/pkg/errors"
@@ -16,21 +19,19 @@ import (
 
 // IsAssociatedIPAllowedWhenSet is a wrapper for IsAssociatedIPAllowed which returns valid
 // when ipOrHostnameOrURL is empty.
-func IsAssociatedIPAllowedWhenSet(ipOrHostnameOrURL string) error {
+func IsAssociatedIPAllowedWhenSet(ctx context.Context, ipOrHostnameOrURL string) error {
 	if ipOrHostnameOrURL == "" {
 		return nil
 	}
-	return IsAssociatedIPAllowed(ipOrHostnameOrURL)
+	return IsAssociatedIPAllowed(ctx, ipOrHostnameOrURL)
 }
 
 // AreAllAssociatedIPsAllowed fails if one of the pairs is failing.
-func AreAllAssociatedIPsAllowed(pairs map[string]string) error {
-	g := new(errgroup.Group)
+func AreAllAssociatedIPsAllowed(ctx context.Context, pairs map[string]string) error {
+	g, ctx := errgroup.WithContext(ctx)
 	for key, ipOrHostnameOrURL := range pairs {
-		key := key
-		ipOrHostnameOrURL := ipOrHostnameOrURL
 		g.Go(func() error {
-			return errors.Wrapf(IsAssociatedIPAllowed(ipOrHostnameOrURL), "key %s validation is failing", key)
+			return errors.Wrapf(IsAssociatedIPAllowed(ctx, ipOrHostnameOrURL), "key %s validation is failing", key)
 		})
 	}
 	return g.Wait()
@@ -43,58 +44,85 @@ func AreAllAssociatedIPsAllowed(pairs map[string]string) error {
 // Please keep in mind that validations for domains is valid only when looking up.
 // A malicious actor could easily update the DSN record post validation to point
 // to an internal IP
-func IsAssociatedIPAllowed(ipOrHostnameOrURL string) error {
-	lookup := func(hostname string) []net.IP {
-		ctx, cancel := context.WithTimeoutCause(context.Background(), 2*time.Second, errors.Errorf("failed to resolve %s within 2s", ipOrHostnameOrURL))
-		defer cancel()
-
-		lookup, err := net.DefaultResolver.LookupIPAddr(ctx, hostname)
-		if err != nil {
-			return nil
-		}
-		ips := make([]net.IP, len(lookup))
-		for i, ip := range lookup {
-			ips[i] = ip.IP
-		}
-		return ips
+func IsAssociatedIPAllowed(ctx context.Context, ipOrHostnameOrURL string) error {
+	ipOrHostname := ipOrHostnameOrURL
+	if parsed, err := url.ParseRequestURI(ipOrHostnameOrURL); err == nil {
+		ipOrHostname = parsed.Hostname()
 	}
 
-	var ips []net.IP
-	ip := net.ParseIP(ipOrHostnameOrURL)
-	if ip == nil {
-		if result := lookup(ipOrHostnameOrURL); result != nil {
-			ips = append(ips, result...)
+	if ip, err := netip.ParseAddr(ipOrHostname); err == nil {
+		if !allowed(ip) {
+			return errors.Errorf("ip %s is not a permitted destination", ip)
 		}
-
-		if parsed, err := url.Parse(ipOrHostnameOrURL); err == nil {
-			if result := lookup(parsed.Hostname()); result != nil {
-				ips = append(ips, result...)
-			}
-		}
-	} else {
-		ips = append(ips, ip)
+		return nil
 	}
 
-	for _, disabled := range []string{
-		"127.0.0.0/8",
-		"10.0.0.0/8",
-		"172.16.0.0/12",
-		"192.168.0.0/16",
-		"fd47:1ed0:805d:59f0::/64",
-		"fc00::/7",
-		"::1/128",
-	} {
-		_, cidr, err := net.ParseCIDR(disabled)
-		if err != nil {
-			return err
+	if addr, err := netip.ParseAddrPort(ipOrHostnameOrURL); err == nil {
+		if !allowed(addr.Addr()) {
+			return errors.Errorf("ip %s is not a permitted destination", addr.Addr())
 		}
+		return nil
+	}
 
-		for _, ip := range ips {
-			if cidr.Contains(ip) {
-				return errors.Errorf("ip %s is in the %s range", ip, disabled)
-			}
+	ctx, cancel := context.WithTimeoutCause(ctx, 2*time.Second, errors.New("DNS lookup timed out"))
+	defer cancel()
+	ips, err := resolver.LookupNetIP(ctx, "ip", ipOrHostname)
+	if err != nil {
+		if dnsErr, ok := stderrors.AsType[*net.DNSError](err); ok {
+			// Copy the `*net.DNSError` before masking `Server` to avoid a data
+			// race: the DNS resolver uses `singleflight` to deduplicate
+			// concurrent lookups, so multiple goroutines may receive the same
+			// `*net.DNSError` pointer. Mutating it in place races with concurrent
+			// readers (e.g. the `otelhttp` `dnsDone` trace hook).
+			maskedDNS := *dnsErr
+			maskedDNS.Server = "" // Mask our DNS server's IP address.
+			return errors.Wrapf(&maskedDNS, "failed to resolve %s", ipOrHostnameOrURL)
+		}
+	}
+
+	for _, ip := range ips {
+		if !allowed(ip) {
+			return errors.Wrapf(&net.DNSError{
+				Err:         "no such host",
+				Name:        ipOrHostname,
+				Server:      "",
+				IsTimeout:   false,
+				IsTemporary: false,
+				IsNotFound:  true,
+			}, "failed to resolve %s", ipOrHostnameOrURL)
 		}
 	}
 
 	return nil
+}
+
+var resolver = &net.Resolver{PreferGo: true}
+
+func allowed(ip netip.Addr) bool {
+	if !ip.IsGlobalUnicast() {
+		return false
+	}
+
+	if ip.Is4() {
+		for _, net := range ssrf.IPv4DeniedPrefixes {
+			if net.Contains(ip) {
+				return false
+			}
+		}
+	} else { // IPv6
+		// ip.IsGlobalUnicast returns true for IPv6 addresses which fall outside
+		// of the current IANA-allocated 2000::/3 global unicast space. Hence,
+		// we need to check for ourselves if the IPv6 address is within the
+		// currently allocated block.
+		if !ssrf.IPv6GlobalUnicast.Contains(ip) {
+			return false
+		}
+		for _, net := range ssrf.IPv6DeniedPrefixes {
+			if net.Contains(ip) {
+				return false
+			}
+		}
+	}
+
+	return true
 }

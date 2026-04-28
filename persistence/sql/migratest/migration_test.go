@@ -106,7 +106,8 @@ func TestMigrations(t *testing.T) {
 			tm, err := popx.NewMigrationBox(
 				sql.Migrations,
 				c, l,
-				popx.WithTestdata(t, os.DirFS("./testdata")))
+				popx.WithTestdata(t, os.DirFS("./testdata")),
+				popx.WithoutGoldenDatabase())
 			require.NoError(t, err)
 			if !assert.NoError(t, tm.Up(t.Context())) {
 				_ = tm.DumpMigrationSchema(t.Context())

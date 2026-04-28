@@ -43,5 +43,5 @@ func NewSQLiteTestDatabase(t testing.TB) string {
 //
 // In tests, use [NewSQLiteTestDatabase] instead.
 func NewSQLiteDatabase(name string) string {
-	return fmt.Sprintf("sqlite://file:%s/db.sqlite?_fk=true&_busy_timeout=100000&_pragma=journal_mode(WAL)&_time_format=sqlite", name)
+	return fmt.Sprintf("sqlite://%s/db.sqlite?_fk=true&_busy_timeout=100000&_pragma=journal_mode(WAL)&_time_format=sqlite", name)
 }

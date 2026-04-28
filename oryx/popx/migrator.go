@@ -5,24 +5,32 @@ package popx
 
 import (
 	"context"
+	"crypto/sha256"
+	"database/sql"
+	"database/sql/driver"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	moderncsqlite "modernc.org/sqlite"
 
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 )
 
 const (
@@ -41,6 +49,65 @@ func (mb *MigrationBox) Up(ctx context.Context) error {
 	return errors.WithStack(err)
 }
 
+// goldenDatabasePath computes the path of the golden database for this
+// migration set. The path is deterministic: it is the SHA-256 hash of the
+// concatenated content of all migrations, hex-encoded, stored in the OS temp
+// directory. If the migration set changes, the hash changes and the old golden
+// database is ignored automatically.
+func (mb *MigrationBox) goldenDatabasePath() string {
+	mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name())
+	h := sha256.New()
+	for _, mi := range mfs {
+		h.Write([]byte(mi.Content))
+	}
+	return filepath.Join(os.TempDir(), hex.EncodeToString(h.Sum(nil)))
+}
+
+// restoreSQLiteOnline streams the contents of srcPath into the database
+// represented by db using SQLite's online backup API. The destination
+// connection stays open throughout, so the *sql.DB and any pop.Connection
+// holding it remain valid.
+//
+// pop wraps the modernc.org/sqlite driver with otelsql for tracing; we
+// unwrap via the otelsql Raw() accessor before reaching the driver-specific
+// NewRestore method on the underlying *sqlite.conn.
+func restoreSQLiteOnline(ctx context.Context, db *sql.DB, srcPath string) error {
+	conn, err := db.Conn(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to acquire sql.Conn for restore")
+	}
+	defer conn.Close()
+
+	return conn.Raw(func(driverConn any) error {
+		if w, ok := driverConn.(interface{ Raw() driver.Conn }); ok {
+			driverConn = w.Raw()
+		}
+		restorer, ok := driverConn.(interface {
+			NewRestore(srcUri string) (*moderncsqlite.Backup, error)
+		})
+		if !ok {
+			return errors.Errorf("driver %T does not support online restore", driverConn)
+		}
+		// See: https://sqlite.org/backup.html .
+		backup, err := restorer.NewRestore(srcPath)
+		if err != nil {
+			return errors.Wrap(err, "NewRestore failed")
+		}
+		// Step(-1) copies all remaining pages in one call.
+		for {
+			more, stepErr := backup.Step(-1)
+			if stepErr != nil {
+				_ = backup.Finish()
+				return errors.Wrap(stepErr, "backup.Step failed")
+			}
+			if !more {
+				break
+			}
+		}
+		return errors.Wrap(backup.Finish(), "backup.Finish failed")
+	})
+}
+
 // UpTo runs up to step "up" migrations and applies them to the database.
 // If step <= 0 all pending migrations are run.
 func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err error) {
@@ -48,6 +115,49 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 	defer otelx.End(span, &err)
 
 	c := mb.c.WithContext(ctx)
+
+	rawDbFileName := sqlxx.StripQueryParamsFromDSN(mb.c.URL())
+	// Resolve the database file path: strip the leading "sqlite://" scheme so
+	// we get a plain absolute path like /tmp/.../db.sqlite. We only apply the
+	// golden-database optimisation to on-disk SQLite files (absolute paths); in-
+	// memory databases (DSNs that contain ":memory:" or are not absolute paths)
+	// are skipped because file operations do not apply to them.
+	newDbFileName := strings.TrimPrefix(rawDbFileName, "sqlite://")
+	isSQLite := mb.c.Dialect.Name() == "sqlite3"
+	isOnDiskSQLite := isSQLite && filepath.IsAbs(newDbFileName)
+
+	// For test SQLite databases, try to restore a pre-migrated golden database
+	// using SQLite's online backup API. The restore streams pages directly into
+	// the open connection, so mb.c stays valid throughout and any holders of
+	// it (including WithContext copies) keep working.
+	if testing.Testing() && isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase {
+		goldenDbPath := mb.goldenDatabasePath()
+		if _, statErr := os.Stat(goldenDbPath); statErr == nil {
+			// Only restore onto a fresh (uninitialized) database. If the
+			// migration table already exists, migrations were previously
+			// applied — either directly or via an earlier golden-DB restore.
+			// Overwriting an already-migrated file with the golden DB would
+			// wipe data written since migration and cause SQLITE_BUSY errors
+			// when concurrent goroutines share the same file (e.g. racy tests
+			// that call NewRegistryDefaultWithDSN in parallel).
+			mtn := sanitizedMigrationTableName(mb.c)
+			var existingTableCount int
+			alreadyMigrated := mb.c.Store.SQLDB().QueryRow(
+				"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?", mtn,
+			).Scan(&existingTableCount) == nil && existingTableCount > 0
+			if !alreadyMigrated {
+				if restoreErr := restoreSQLiteOnline(ctx, mb.c.Store.SQLDB(), goldenDbPath); restoreErr != nil {
+					// Restore failed; log and fall through to the normal migration path.
+					mb.l.Errorf("Failed to restore golden database, applying migrations: src=%s dst=%s err=%v", goldenDbPath, newDbFileName, restoreErr)
+				} else {
+					mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name())
+					mb.l.Infof("Skipped applying %d migrations using golden database: path=%s", len(mfs), goldenDbPath)
+					return len(mfs), nil
+				}
+			}
+		}
+	}
+
 	err = mb.exec(ctx, func() error {
 		mtn := sanitizedMigrationTableName(c)
 		mfs := mb.migrationsUp.sortAndFilter(c.Dialect.Name())
@@ -132,6 +242,41 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 			mb.l.Infof("Migrations already up to date, nothing to apply")
 		} else {
 			mb.l.Infof("Successfully applied %d migrations.", applied)
+		}
+
+		// Save a golden database after applying all migrations (not for
+		// partial step runs) so future test runs can skip migrations.
+		//
+		// Only save when at least one migration was applied. Saving when
+		// applied == 0 either captures an empty DB or an already-migrated
+		// one that may contain test data inserted by an earlier registry
+		// (e.g. the Hydra janitor reuses the same DSN), which would
+		// pollute the shared golden file.
+		//
+		// Use VACUUM INTO to produce a clean, fully-checkpointed copy
+		// without a separate wal_checkpoint step. Write to a temp path
+		// unique to this test's database, then atomically rename to the
+		// shared golden path. This prevents concurrent saves from
+		// multiple parallel tests from corrupting the golden database:
+		// os.Rename is atomic on the same filesystem, so the last writer
+		// wins with valid content and no reader ever sees a partial file.
+		if isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase && applied > 0 {
+			goldenDbPath := mb.goldenDatabasePath()
+			// tmpPath is unique per test (derived from the per-test DB
+			// path) so concurrent saves never write to the same temp file.
+			tmpPath := newDbFileName + ".vacuum-tmp"
+			// #nosec G201 - tmpPath is under os.TempDir() with a
+			// hex-hash filename, never derived from user input.
+			vacuumSQL := fmt.Sprintf("VACUUM INTO '%s'", tmpPath)
+			if err := mb.c.RawQuery(vacuumSQL).Exec(); err != nil {
+				mb.l.Errorf("Failed to create golden database copy: err=%v", err)
+			} else if err := os.Rename(tmpPath, goldenDbPath); err != nil {
+				_ = os.Remove(tmpPath)
+				mb.l.Errorf("Failed to install golden database: src=%s dst=%s err=%v", tmpPath, goldenDbPath, err)
+			} else {
+				mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name())
+				mb.l.Infof("Golden database saved, subsequent test runs will skip %d migrations: path=%s", len(mfs), goldenDbPath)
+			}
 		}
 		return nil
 	})

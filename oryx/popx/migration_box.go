@@ -26,12 +26,13 @@ import (
 type (
 	// MigrationBox is a embed migration box.
 	MigrationBox struct {
-		c                   *pop.Connection
-		migrationsUp        Migrations
-		migrationsDown      Migrations
-		perMigrationTimeout time.Duration
-		l                   *logrusx.Logger
-		migrationContent    MigrationContent
+		c                     *pop.Connection
+		migrationsUp          Migrations
+		migrationsDown        Migrations
+		perMigrationTimeout   time.Duration
+		l                     *logrusx.Logger
+		migrationContent      MigrationContent
+		disableGoldenDatabase bool
 	}
 	MigrationContent   func(mf Migration, c *pop.Connection, r []byte, usingTemplate bool) (string, error)
 	MigrationBoxOption func(*MigrationBox)
@@ -73,6 +74,15 @@ func WithGoMigrations(migrations Migrations) MigrationBoxOption {
 func WithPerMigrationTimeout(timeout time.Duration) MigrationBoxOption {
 	return func(m *MigrationBox) {
 		m.perMigrationTimeout = timeout
+	}
+}
+
+// WithoutGoldenDatabase disables the golden database optimisation for SQLite
+// test databases. Use this when the caller asserts on migration execution
+// side-effects (e.g. exact timing, call counts, or intermediate schema state).
+func WithoutGoldenDatabase() MigrationBoxOption {
+	return func(m *MigrationBox) {
+		m.disableGoldenDatabase = true
 	}
 }
 

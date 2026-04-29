@@ -24,7 +24,7 @@ func TestJWKSDK(t *testing.T) {
 	ctx := context.Background()
 	reg := testhelpers.NewRegistryMemory(t)
 
-	router := httprouterx.NewTestRouterAdminWithPrefix(t)
+	router := httprouterx.NewRouterAdminWithPrefix()
 	h := NewHandler(reg)
 	h.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

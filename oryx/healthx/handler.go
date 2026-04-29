@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/ory/herodot"
+	"github.com/ory/x/httprouterx"
 )
 
 const (
@@ -64,12 +65,8 @@ func NewHandler(
 	}
 }
 
-type router interface {
-	Handler(method, path string, handler http.Handler)
-}
-
 // SetHealthRoutes registers this handler's routes for health checking.
-func (h *Handler) SetHealthRoutes(r router, shareErrors bool, opts ...Options) {
+func (h *Handler) SetHealthRoutes(r httprouterx.Router, shareErrors bool, opts ...Options) {
 	o := &options{}
 	aliveHandler := h.Alive()
 	readyHandler := h.Ready(shareErrors)
@@ -83,12 +80,12 @@ func (h *Handler) SetHealthRoutes(r router, shareErrors bool, opts ...Options) {
 		readyHandler = o.middleware(readyHandler)
 	}
 
-	r.Handler("GET", AliveCheckPath, aliveHandler)
-	r.Handler("GET", ReadyCheckPath, readyHandler)
+	r.GET(AliveCheckPath, aliveHandler.ServeHTTP)
+	r.GET(ReadyCheckPath, readyHandler.ServeHTTP)
 }
 
 // SetVersionRoutes registers this handler's routes for health checking.
-func (h *Handler) SetVersionRoutes(r router, opts ...Options) {
+func (h *Handler) SetVersionRoutes(r httprouterx.Router, opts ...Options) {
 	o := &options{}
 	versionHandler := h.Version()
 
@@ -100,7 +97,7 @@ func (h *Handler) SetVersionRoutes(r router, opts ...Options) {
 		versionHandler = o.middleware(versionHandler)
 	}
 
-	r.Handler("GET", VersionPath, versionHandler)
+	r.GET(VersionPath, versionHandler.ServeHTTP)
 }
 
 // Alive returns an ok status if the instance is ready to handle HTTP requests.

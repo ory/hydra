@@ -1883,7 +1883,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				n.UseFunc(httprouterx.NoCacheNegroni)
 				n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-				router := httprouterx.NewTestRouterAdminWithPrefix(t)
+				router := httprouterx.NewRouterAdminWithPrefix()
 				handler.SetAdminRoutes(router)
 				n.UseHandler(router)
 
@@ -1897,7 +1897,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 				n.UseFunc(httprouterx.NoCacheNegroni)
 
-				router := httprouterx.NewTestRouterPublic(t)
+				router := httprouterx.NewRouterPublic()
 				router.GET("/callback", func(w http.ResponseWriter, r *http.Request) {
 					callbackHandler(w, r)
 				})

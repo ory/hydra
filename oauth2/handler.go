@@ -85,8 +85,8 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetPublicRoutes(public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
-	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)))
+	public.OPTIONS(TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)).ServeHTTP)
+	public.POST(TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)).ServeHTTP)
 
 	public.GET(AuthPath, h.oAuth2Authorize)
 	public.POST(AuthPath, h.oAuth2Authorize)
@@ -111,18 +111,18 @@ func (h *Handler) SetPublicRoutes(public *httprouterx.RouterPublic, corsMiddlewa
 	))
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
 
-	public.Handler("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.revokeOAuth2Token)))
-	public.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
-	public.Handler("OPTIONS", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
-	public.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
-	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
+	public.OPTIONS(RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)).ServeHTTP)
+	public.POST(RevocationPath, corsMiddleware(http.HandlerFunc(h.revokeOAuth2Token)).ServeHTTP)
+	public.OPTIONS(WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)).ServeHTTP)
+	public.GET(WellKnownPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)).ServeHTTP)
+	public.OPTIONS(OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.handleOptions)).ServeHTTP)
+	public.GET(OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)).ServeHTTP)
+	public.OPTIONS(UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)).ServeHTTP)
+	public.GET(UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)).ServeHTTP)
+	public.POST(UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)).ServeHTTP)
 
-	public.Handler("OPTIONS", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.createVerifiableCredential)))
+	public.OPTIONS(VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.handleOptions)).ServeHTTP)
+	public.POST(VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.createVerifiableCredential)).ServeHTTP)
 
 	public.POST(DeviceAuthPath, h.oAuth2DeviceFlow)
 	public.GET(DeviceVerificationPath, h.performOAuth2DeviceVerificationFlow)

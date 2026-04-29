@@ -25,7 +25,7 @@ func TestHandlerConsent(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")))
 
 	h := oauth2.NewHandler(reg)
-	r := httprouterx.NewTestRouterAdminWithPrefix(t)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(r)
 	ts := httptest.NewServer(r)
@@ -33,7 +33,7 @@ func TestHandlerConsent(t *testing.T) {
 
 	res, err := http.Get(ts.URL + oauth2.DefaultConsentPath)
 	assert.Nil(t, err)
-	defer res.Body.Close() //nolint:errcheck
+	defer func() { _ = res.Body.Close() }()
 
 	body, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)

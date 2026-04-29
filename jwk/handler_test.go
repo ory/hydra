@@ -37,7 +37,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var testServer *httptest.Server
 		{
 			reg := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
-			router := httprouterx.NewTestRouterPublic(t)
+			router := httprouterx.NewRouterPublic()
 			h := jwk.NewHandler(reg)
 			h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 				return h
@@ -78,7 +78,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var testServer *httptest.Server
 		{
 			reg := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
-			router := httprouterx.NewTestRouterPublic(t)
+			router := httprouterx.NewRouterPublic()
 			h := jwk.NewHandler(reg)
 			h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 				return h

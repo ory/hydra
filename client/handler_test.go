@@ -132,7 +132,7 @@ func TestHandler(t *testing.T) {
 			n.UseFunc(httprouterx.NoCacheNegroni)
 			n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-			router := httprouterx.NewTestRouterAdminWithPrefix(t)
+			router := httprouterx.NewRouterAdminWithPrefix()
 			h.SetAdminRoutes(router)
 			n.UseHandler(router)
 
@@ -145,7 +145,7 @@ func TestHandler(t *testing.T) {
 			n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 			n.UseFunc(httprouterx.NoCacheNegroni)
 
-			router := httprouterx.NewTestRouterPublic(t)
+			router := httprouterx.NewRouterPublic()
 			h.SetPublicRoutes(router)
 			n.UseHandler(router)
 
@@ -159,7 +159,7 @@ func TestHandler(t *testing.T) {
 	fetch := func(t *testing.T, url string) (string, *http.Response) {
 		res, err := http.Get(url)
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 		body, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(body), res
@@ -172,7 +172,7 @@ func TestHandler(t *testing.T) {
 		r.Header.Set("Accept", "application/json")
 		res, err := http.DefaultClient.Do(r)
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 		out, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(out), res
@@ -186,7 +186,7 @@ func TestHandler(t *testing.T) {
 		r.Header.Set("Content-Type", "application/json")
 		res, err := ts.Client().Do(r)
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 		rb, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(rb), res
@@ -250,7 +250,7 @@ func TestHandler(t *testing.T) {
 
 						res, err := publicTs.Client().Do(req)
 						require.NoError(t, err)
-						defer res.Body.Close() //nolint:errcheck
+						defer func() { _ = res.Body.Close() }()
 
 						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)

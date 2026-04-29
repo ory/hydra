@@ -49,7 +49,7 @@ func (s *HandlerTestSuite) SetupTest() {
 		config.KeyDefaultClientScope:    []string{"foo", "bar"},
 	})))
 
-	router := httprouterx.NewTestRouterAdminWithPrefix(s.T())
+	router := httprouterx.NewRouterAdminWithPrefix()
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry)

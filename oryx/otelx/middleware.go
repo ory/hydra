@@ -5,65 +5,32 @@ package otelx
 
 import (
 	"cmp"
-	"context"
 	"net/http"
 	"strings"
 
+	"github.com/ory/x/httprouterx"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
-var WithDefaultFilters otelhttp.Option = otelhttp.WithFilter(func(r *http.Request) bool {
+var withDefaultFilters = otelhttp.WithFilter(func(r *http.Request) bool {
 	return !(strings.HasPrefix(r.URL.Path, "/health") ||
 		strings.HasPrefix(r.URL.Path, "/admin/health") ||
 		strings.HasPrefix(r.URL.Path, "/metrics") ||
 		strings.HasPrefix(r.URL.Path, "/admin/metrics"))
 })
 
-type contextKey int
-
-const callbackContextKey contextKey = iota
-
-func SpanNameRecorderMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			cb, _ := r.Context().Value(callbackContextKey).(func(string))
-			if cb == nil {
-				return
-			}
-			if r.Pattern != "" {
-				cb(r.Pattern)
-			}
-		}()
-		next.ServeHTTP(w, r)
-	})
-}
-
-func SpanNameRecorderNegroniFunc(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	defer func() {
-		cb, _ := r.Context().Value(callbackContextKey).(func(string))
-		if cb == nil {
-			return
-		}
-		if r.Pattern != "" {
-			cb(r.Pattern)
-		}
-	}()
-	next(w, r)
-}
-
 func NewMiddleware(next http.Handler, operation string, opts ...otelhttp.Option) http.Handler {
 	myOpts := []otelhttp.Option{
-		WithDefaultFilters,
+		withDefaultFilters,
 		otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
 			return cmp.Or(r.Pattern, operation, r.Method+" "+r.URL.Path)
 		}),
 	}
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		callback := func(s string) {
-			r.Pattern = cmp.Or(r.Pattern, s)
+		callback := func(r2 *http.Request) {
+			r.Pattern = cmp.Or(r.Pattern, r2.Pattern)
 		}
-		ctx := context.WithValue(r.Context(), callbackContextKey, callback)
-		r2 := r.WithContext(ctx)
+		r2 := httprouterx.WithAfterMatchHook(r, callback)
 		next.ServeHTTP(w, r2)
 		r.Pattern = cmp.Or(r2.Pattern, r.Pattern) // best-effort in case callback never is called
 	})

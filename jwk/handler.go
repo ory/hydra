@@ -49,8 +49,8 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
-	r.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	r.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)))
+	r.OPTIONS(WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)).ServeHTTP)
+	r.GET(WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)).ServeHTTP)
 }
 
 func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {

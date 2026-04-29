@@ -4,18 +4,22 @@
 package httprouterx
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"path"
 	"strings"
-	"testing"
-
-	"github.com/urfave/negroni"
 )
 
-const AdminPrefix = "/admin"
+const (
+	AdminPrefix = "/admin"
+
+	afterMatchHooks contextKey = 1
+)
 
 type (
+	contextKey         int
+	AfterMatchHookFunc func(*http.Request)
+
 	router struct {
 		mux    *http.ServeMux
 		prefix string
@@ -25,23 +29,21 @@ type (
 
 	Router interface {
 		http.Handler
+
+		Handle(pattern string, handler http.Handler)
+		HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
+
 		GET(route string, handle http.HandlerFunc)
+		OPTIONS(route string, handle http.HandlerFunc)
 		HEAD(route string, handle http.HandlerFunc)
 		POST(route string, handle http.HandlerFunc)
 		PUT(route string, handle http.HandlerFunc)
 		PATCH(route string, handle http.HandlerFunc)
 		DELETE(route string, handle http.HandlerFunc)
-		Handler(method, route string, handler http.Handler)
-		Handle(pattern string, handler http.Handler)
-		HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
 	}
 )
 
-func newRouter() *router {
-	return &router{
-		mux: http.NewServeMux(),
-	}
-}
+func newRouter() *router { return &router{mux: http.NewServeMux()} }
 
 // NewRouter creates a new general purpose router. It should only be used when neither the admin nor the public router is applicable.
 func NewRouter() Router { return newRouter() }
@@ -50,10 +52,6 @@ func NewRouter() Router { return newRouter() }
 func NewRouterAdmin() *RouterAdmin {
 	return &RouterAdmin{router: *newRouter()}
 }
-
-func NewTestRouterAdmin(_ testing.TB) *RouterAdmin           { return NewRouterAdmin() }
-func NewTestRouterAdminWithPrefix(_ testing.TB) *RouterAdmin { return NewRouterAdminWithPrefix() }
-func NewTestRouterPublic(_ testing.TB) *RouterPublic         { return NewRouterPublic() }
 
 func (r *RouterAdmin) ToPublic() *RouterPublic {
 	return &RouterPublic{router: router{
@@ -78,6 +76,10 @@ func (r *router) GET(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodGet, route, handle)
 }
 
+func (r *router) OPTIONS(route string, handle http.HandlerFunc) {
+	r.handle(http.MethodOptions, route, handle)
+}
+
 func (r *router) HEAD(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodHead, route, handle)
 }
@@ -98,23 +100,30 @@ func (r *router) DELETE(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodDelete, route, handle)
 }
 
-func (r *router) Handler(method, route string, handler http.Handler) {
-	r.handle(method, route, handler)
-}
-
 func (r *router) handle(method string, route string, handler http.Handler) {
 	route = path.Join(r.prefix, route)
-	r.mux.Handle(method+" "+route, handler)
+	r.mux.Handle(method+" "+route, afterMatchHookExecutor(handler))
+}
+
+func afterMatchHookExecutor(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if hooks, ok := r.Context().Value(afterMatchHooks).([]AfterMatchHookFunc); ok {
+			for _, hook := range hooks {
+				hook(r)
+			}
+		}
+		h.ServeHTTP(w, r)
+	})
 }
 
 // Handle registers the handler for the given pattern. It does not prepend the admin prefix, so the caller is responsible for ensuring that the pattern is correct.
 func (r *router) Handle(pattern string, handler http.Handler) {
-	r.mux.Handle(pattern, handler)
+	r.mux.Handle(pattern, afterMatchHookExecutor(handler))
 }
 
 // HandleFunc registers the handler for the given pattern. It does not prepend the admin prefix, so the caller is responsible for ensuring that the pattern is correct.
 func (r *router) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
-	r.mux.HandleFunc(pattern, handler)
+	r.Handle(pattern, http.HandlerFunc(handler))
 }
 
 func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.mux.ServeHTTP(w, req) }
@@ -136,28 +145,20 @@ func NoCacheNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFu
 func AddAdminPrefixIfNotPresentNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	if !strings.HasPrefix(r.URL.Path, AdminPrefix) {
 		r.URL.Path = path.Join(AdminPrefix, r.URL.Path)
+		if r.URL.RawPath != "" {
+			r.URL.RawPath = path.Join(AdminPrefix, r.URL.RawPath)
+		}
 	}
 
 	next(rw, r)
 }
 
-func PopulatePatternNegroni[R http.Handler](r R) negroni.Handler {
-	var mux *http.ServeMux
-	switch v := any(r).(type) {
-	case *RouterPublic:
-		mux = v.mux
-	case *RouterAdmin:
-		mux = v.mux
-	case *router:
-		mux = v.mux
-	case *http.ServeMux:
-		mux = v
-	default:
-		panic(fmt.Sprintf("unsupported router type %T", r))
-	}
-	return negroni.HandlerFunc(func(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-		_, pattern := mux.Handler(req)
-		req.Pattern = pattern
-		next(rw, req)
-	})
+// WithAfterMatchHook adds the passed AfterMatchHookFunc to the request's context. The hook is called after the
+// router matched the request, but before it is passed to the handler. This allows middlewares to access the matched
+// pattern and other information that is only available after the router has matched the request.
+// Note that this hook is called multiple times per request if routers are nested, the hook should anticipate that.
+func WithAfterMatchHook(req *http.Request, newHooks ...AfterMatchHookFunc) *http.Request {
+	hooks, _ := req.Context().Value(afterMatchHooks).([]AfterMatchHookFunc)
+	ctx := context.WithValue(req.Context(), afterMatchHooks, append(hooks, newHooks...))
+	return req.WithContext(ctx)
 }

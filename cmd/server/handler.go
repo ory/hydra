@@ -134,7 +134,6 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 	router := httprouterx.NewRouterAdminWithPrefix()
 	n := negroni.New(
 		recovery,
-		httprouterx.PopulatePatternNegroni(router),
 		negroni.HandlerFunc(httprouterx.TrimTrailingSlashNegroni),
 		negroni.HandlerFunc(httprouterx.NoCacheNegroni),
 		negroni.HandlerFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni),
@@ -164,12 +163,11 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 	})
 	n.Use(sqaMetrics)
 
-	router.Handler("", "/", serverx.DefaultNotFoundHandler)
+	router.Handle("/", serverx.DefaultNotFoundHandler)
 	d.RegisterAdminRoutes(router)
 
 	n.UseHandler(router)
 
-	n.UseFunc(otelx.SpanNameRecorderNegroniFunc)
 	return func() error {
 		return serve(ctx, d, cfg, n, "admin")
 	}, nil
@@ -192,7 +190,6 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 	router := httprouterx.NewRouterPublic()
 	n := negroni.New(
 		recovery,
-		httprouterx.PopulatePatternNegroni(router),
 		negroni.HandlerFunc(httprouterx.TrimTrailingSlashNegroni),
 		negroni.HandlerFunc(httprouterx.NoCacheNegroni),
 		negroni.HandlerFunc(semconv.Middleware),
@@ -221,11 +218,10 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 	})
 	n.Use(sqaMetrics)
 
-	router.Handler("", "/", serverx.DefaultNotFoundHandler)
+	router.Handle("/", serverx.DefaultNotFoundHandler)
 	d.RegisterPublicRoutes(ctx, router)
 
 	n.UseHandler(router)
-	n.UseFunc(otelx.SpanNameRecorderNegroniFunc)
 	return func() error {
 		return serve(ctx, d, cfg, n, "public")
 	}, nil

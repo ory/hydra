@@ -62,7 +62,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, cm.CreateClient(ctx, deleteRequest.Client.(*client.Client)))
 	require.NoError(t, store.CreateAccessTokenSession(ctx, deleteRequest.ID, deleteRequest))
 
-	r := httprouterx.NewTestRouterAdminWithPrefix(t)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(r)
 	ts := httptest.NewServer(r)
@@ -97,7 +97,7 @@ func TestUserinfo(t *testing.T) {
 
 	h := oauth2.NewHandler(reg)
 
-	router := httprouterx.NewTestRouterAdminWithPrefix(t)
+	router := httprouterx.NewRouterAdminWithPrefix()
 	h.SetPublicRoutes(router.ToPublic(), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(router)
 	ts := httptest.NewServer(router)
@@ -348,7 +348,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		h := oauth2.NewHandler(reg)
 
-		r := httprouterx.NewTestRouterAdminWithPrefix(t)
+		r := httprouterx.NewRouterAdminWithPrefix()
 		h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
 		ts := httptest.NewServer(r)
@@ -356,7 +356,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 
 		var wellKnownResp hydra.OidcConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
@@ -393,7 +393,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 
 		h := oauth2.NewHandler(reg)
 
-		r := httprouterx.NewTestRouterAdminWithPrefix(t)
+		r := httprouterx.NewRouterAdminWithPrefix()
 		h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
 		ts := httptest.NewServer(r)
@@ -401,7 +401,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 
 		res, err := http.Get(ts.URL + "/.well-known/oauth-authorization-server")
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 
 		var wellKnownResp hydra.OidcConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)

@@ -67,7 +67,7 @@ func TestRevoke(t *testing.T) {
 	now := time.Now().UTC().Round(time.Second)
 
 	handler := oauth2.NewHandler(reg)
-	router := httprouterx.NewTestRouterAdminWithPrefix(t)
+	router := httprouterx.NewRouterAdminWithPrefix()
 	handler.SetPublicRoutes(router.ToPublic(), func(h http.Handler) http.Handler { return h })
 	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

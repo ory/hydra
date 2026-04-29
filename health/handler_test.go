@@ -72,7 +72,7 @@ func TestPublicHealthHandler(t *testing.T) {
 			require.NoError(t, reg.Migrator().MigrateUp(t.Context()))
 			require.NoError(t, reg.InitNetwork(t.Context()))
 
-			public := httprouterx.NewTestRouterPublic(t)
+			public := httprouterx.NewRouterPublic()
 			reg.RegisterPublicRoutes(t.Context(), public)
 
 			ts := httptest.NewServer(public)

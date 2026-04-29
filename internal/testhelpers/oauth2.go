@@ -75,7 +75,7 @@ func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.
 		n.UseFunc(httprouterx.NoCacheNegroni)
 		n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-		router := httprouterx.NewTestRouterAdminWithPrefix(t)
+		router := httprouterx.NewRouterAdminWithPrefix()
 		reg.RegisterAdminRoutes(router)
 		n.UseHandler(router)
 
@@ -89,7 +89,7 @@ func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.
 		n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 		n.UseFunc(httprouterx.NoCacheNegroni)
 
-		router := httprouterx.NewTestRouterPublic(t)
+		router := httprouterx.NewRouterPublic()
 		reg.RegisterPublicRoutes(ctx, router)
 		n.UseHandler(router)
 

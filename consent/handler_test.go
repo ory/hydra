@@ -34,7 +34,7 @@ func TestGetLogoutRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := httprouterx.NewTestRouterAdminWithPrefix(t)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -100,7 +100,7 @@ func TestGetLoginRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := httprouterx.NewTestRouterAdminWithPrefix(t)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -167,7 +167,7 @@ func TestGetConsentRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := httprouterx.NewTestRouterAdminWithPrefix(t)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -244,7 +244,7 @@ func TestAcceptLoginRequestDouble(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg)
-	r := httprouterx.NewTestRouterAdminWithPrefix(t)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -285,7 +285,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg)
-	r := httprouterx.NewTestRouterAdminWithPrefix(t)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	t.Cleanup(ts.Close)

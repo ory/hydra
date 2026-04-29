@@ -67,8 +67,8 @@ func TestClientSDK(t *testing.T) {
 		config.KeyPublicAllowDynamicRegistration: true,
 	})))
 
-	routerAdmin := httprouterx.NewTestRouterAdminWithPrefix(t)
-	routerPublic := httprouterx.NewTestRouterPublic(t)
+	routerAdmin := httprouterx.NewRouterAdminWithPrefix()
+	routerPublic := httprouterx.NewRouterPublic()
 	clHandler := client.NewHandler(r)
 	clHandler.SetPublicRoutes(routerPublic)
 	clHandler.SetAdminRoutes(routerAdmin)

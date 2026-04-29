@@ -44,7 +44,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	c.Scope = "fosite,openid,photos,offline,foo.*"
 	require.NoError(t, reg.ClientManager().UpdateClient(context.TODO(), c))
 
-	router := httprouterx.NewTestRouterAdminWithPrefix(t)
+	router := httprouterx.NewRouterAdminWithPrefix()
 	handler := oauth2.NewHandler(reg)
 	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

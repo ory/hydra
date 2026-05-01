@@ -2438,6 +2438,7 @@ type ApiOauth2TokenExchangeRequest struct {
 	grantType    *string
 	clientId     *string
 	code         *string
+	codeVerifier *string
 	redirectUri  *string
 	refreshToken *string
 }
@@ -2454,6 +2455,11 @@ func (r ApiOauth2TokenExchangeRequest) ClientId(clientId string) ApiOauth2TokenE
 
 func (r ApiOauth2TokenExchangeRequest) Code(code string) ApiOauth2TokenExchangeRequest {
 	r.code = &code
+	return r
+}
+
+func (r ApiOauth2TokenExchangeRequest) CodeVerifier(codeVerifier string) ApiOauth2TokenExchangeRequest {
+	r.codeVerifier = &codeVerifier
 	return r
 }
 
@@ -2537,6 +2543,9 @@ func (a *OAuth2APIService) Oauth2TokenExchangeExecute(r ApiOauth2TokenExchangeRe
 	}
 	if r.code != nil {
 		parameterAddToHeaderOrQuery(localVarFormParams, "code", r.code, "", "")
+	}
+	if r.codeVerifier != nil {
+		parameterAddToHeaderOrQuery(localVarFormParams, "code_verifier", r.codeVerifier, "", "")
 	}
 	parameterAddToHeaderOrQuery(localVarFormParams, "grant_type", r.grantType, "", "")
 	if r.redirectUri != nil {

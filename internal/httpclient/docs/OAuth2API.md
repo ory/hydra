@@ -1318,7 +1318,7 @@ No authorization required
 
 ## Oauth2TokenExchange
 
-> OAuth2TokenExchange Oauth2TokenExchange(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+> OAuth2TokenExchange Oauth2TokenExchange(ctx).GrantType(grantType).ClientId(clientId).Code(code).CodeVerifier(codeVerifier).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
 
 The OAuth 2.0 Token Endpoint
 
@@ -1340,12 +1340,13 @@ func main() {
 	grantType := "grantType_example" // string | 
 	clientId := "clientId_example" // string |  (optional)
 	code := "code_example" // string |  (optional)
+	codeVerifier := "codeVerifier_example" // string |  (optional)
 	redirectUri := "redirectUri_example" // string |  (optional)
 	refreshToken := "refreshToken_example" // string |  (optional)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2API.Oauth2TokenExchange(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+	resp, r, err := apiClient.OAuth2API.Oauth2TokenExchange(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).CodeVerifier(codeVerifier).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.Oauth2TokenExchange``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1369,6 +1370,7 @@ Name | Type | Description  | Notes
  **grantType** | **string** |  | 
  **clientId** | **string** |  | 
  **code** | **string** |  | 
+ **codeVerifier** | **string** |  | 
  **redirectUri** | **string** |  | 
  **refreshToken** | **string** |  | 
 

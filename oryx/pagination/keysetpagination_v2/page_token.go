@@ -12,9 +12,10 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/nacl/secretbox"
+
+	"github.com/ory/herodot"
 )
 
 var fallbackEncryptionKey = &[32]byte{}

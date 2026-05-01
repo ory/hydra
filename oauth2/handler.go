@@ -1109,6 +1109,9 @@ type _ struct {
 
 	// in: formData
 	ClientID string `json:"client_id"`
+
+	// in: formData
+	CodeVerifier string `json:"code_verifier"`
 }
 
 // OAuth2 Token Exchange Result

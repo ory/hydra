@@ -130,7 +130,7 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 	// using SQLite's online backup API. The restore streams pages directly into
 	// the open connection, so mb.c stays valid throughout and any holders of
 	// it (including WithContext copies) keep working.
-	if testing.Testing() && isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase {
+	if testing.Testing() && isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase && !mb.hasTestData {
 		goldenDbPath := mb.goldenDatabasePath()
 		if _, statErr := os.Stat(goldenDbPath); statErr == nil {
 			// Only restore onto a fresh (uninitialized) database. If the

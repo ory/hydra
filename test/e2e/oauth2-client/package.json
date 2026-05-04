@@ -28,7 +28,7 @@
     "nodemon": "^2.0.22"
   },
   "overrides": {
-    "node-forge": "^1.4.0",
-    "path-to-regexp": "^0.1.13"
+    "node-forge": "1.4.0",
+    "path-to-regexp": "0.1.13"
   }
 }

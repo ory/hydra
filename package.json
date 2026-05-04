@@ -29,8 +29,10 @@
     "wait-on": "9.0.1"
   },
   "overrides": {
-    "axios": ">=1.15.0",
-    "glob": ">=11.1.0",
-    "path-to-regexp": "^8.4.0"
+    "@nestjs/core": "11.1.19",
+    "axios": "1.15.2",
+    "file-type": "22.0.1",
+    "glob": "13.0.6",
+    "path-to-regexp": "8.4.2"
   }
 }

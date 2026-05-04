@@ -312,7 +312,7 @@ func (p *DefaultProvider) DSN() string {
 				p.l.Fatal("could not create temp dir for SQLite database")
 			}
 
-			p.sqliteInMemoryDSN = fmt.Sprintf("sqlite://file:%s?_fk=true&mode=memory&cache=shared&_busy_timeout=100000&_time_format=sqlite", string(fn))
+			p.sqliteInMemoryDSN = fmt.Sprintf("sqlite://file:%s.sqlite?_fk=true&mode=memory&cache=shared&_busy_timeout=100000&_time_format=sqlite", string(fn))
 		})
 		return p.sqliteInMemoryDSN
 	}

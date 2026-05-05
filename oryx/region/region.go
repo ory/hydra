@@ -78,22 +78,6 @@ func (r Region) Contains(other Region) bool {
 	return false
 }
 
-// CRDBRegion returns the CockroachDB region literal for a specific region,
-// or "" for super-regions and invalid values.
-func (r Region) CRDBRegion() string {
-	switch r {
-	case EUCentral:
-		return "gcp-europe-west3"
-	case AsiaNorthEast:
-		return "gcp-asia-northeast1"
-	case USEast:
-		return "gcp-us-east4"
-	case USWest:
-		return "gcp-us-west2"
-	}
-	return ""
-}
-
 // Scan implements sql.Scanner. NULL and empty scan to the zero value;
 // validate via Region.Valid if "unset" must be rejected.
 func (r *Region) Scan(src any) error {
@@ -124,21 +108,6 @@ func IsEqual(a, b *Region) bool {
 		return false
 	}
 	return *a == *b
-}
-
-// FromCRDB maps a CRDB region literal to its Region, or "" if unknown.
-func FromCRDB(s string) Region {
-	switch s {
-	case "gcp-europe-west3":
-		return EUCentral
-	case "gcp-asia-northeast1":
-		return AsiaNorthEast
-	case "gcp-us-east4":
-		return USEast
-	case "gcp-us-west2":
-		return USWest
-	}
-	return ""
 }
 
 // ErrInvalid is wrapped when a submitted region is not a known value.

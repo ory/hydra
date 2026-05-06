@@ -22,11 +22,11 @@ import (
 var (
 	// ErrInvalidatedAuthorizeCode is an error indicating that an authorization code has been
 	// used previously.
-	ErrInvalidatedAuthorizeCode = stderr.New("Authorization code has ben invalidated")
-	// ErrInvalidatedDeviceCode is an error indicating that a device code has benn used previously.
-	ErrInvalidatedDeviceCode = stderr.New("Device code has been invalidated")
+	ErrInvalidatedAuthorizeCode = stderr.New("Authorization code has been invalidated") //lint:ignore ST1005 Uppercase message OK here
+	// ErrInvalidatedDeviceCode is an error indicating that a device code has been used previously.
+	ErrInvalidatedDeviceCode = stderr.New("Device code has been invalidated") //lint:ignore ST1005 Uppercase message OK here
 	// ErrExistingUserCodeSignature is an error indicating that a row already exists with the provided user_code signature.
-	ErrExistingUserCodeSignature = stderr.New("User code signature already exists in the database")
+	ErrExistingUserCodeSignature = stderr.New("User code signature already exists in the database") //lint:ignore ST1005 Uppercase message OK here
 	// ErrSerializationFailure is an error indicating that the transactional capable storage could not guarantee
 	// consistency of Update & Delete operations on the same rows between multiple sessions.
 	ErrSerializationFailure = &RFC6749Error{

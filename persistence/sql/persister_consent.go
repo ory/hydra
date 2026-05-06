@@ -44,11 +44,11 @@ func (p *ConsentPersister) RevokeSubjectConsentSession(ctx context.Context, user
 	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ?", user))
 }
 
-func (p *ConsentPersister) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectClientConsentSession", trace.WithAttributes(attribute.String("client", client)))
+func (p *ConsentPersister) RevokeSubjectClientConsentSession(ctx context.Context, user, clientID string) (err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectClientConsentSession", trace.WithAttributes(attribute.String("client.id", clientID)))
 	defer otelx.End(span, &err)
 
-	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
+	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, clientID))
 }
 
 func (p *ConsentPersister) RevokeConsentSessionByID(ctx context.Context, consentRequestID string) (err error) {
@@ -156,15 +156,15 @@ func (p *Persister) CreateForcedObfuscatedLoginSession(ctx context.Context, sess
 	})
 }
 
-func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (_ *consent.ForcedObfuscatedLoginSession, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetForcedObfuscatedLoginSession", trace.WithAttributes(attribute.String("client", client)))
+func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, clientID, obfuscated string) (_ *consent.ForcedObfuscatedLoginSession, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetForcedObfuscatedLoginSession", trace.WithAttributes(attribute.String("client.id", clientID)))
 	defer otelx.End(span, &err)
 
 	var s consent.ForcedObfuscatedLoginSession
 
 	if err := p.Connection(ctx).Where(
 		"client_id = ? AND subject_obfuscated = ? AND nid = ?",
-		client,
+		clientID,
 		obfuscated,
 		p.NetworkID(ctx),
 	).First(&s); errors.Is(err, sql.ErrNoRows) {

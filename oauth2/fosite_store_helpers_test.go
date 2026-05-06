@@ -661,7 +661,7 @@ func testHelperRotateRefreshToken(x *driver.RegistrySQL) func(t *testing.T) {
 
 			time.Sleep(time.Second * 2)
 
-			req, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
+			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
 			assert.Error(t, err)
 		})
 	}

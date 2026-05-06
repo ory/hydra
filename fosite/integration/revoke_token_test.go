@@ -10,7 +10,6 @@ import (
 	"github.com/parnurzeal/gorequest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	goauth "golang.org/x/oauth2"
 
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/compose"
@@ -31,7 +30,7 @@ func runRevokeTokenTest(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	defer ts.Close()
 
 	oauthClient := newOAuth2AppClient(ts)
-	token, err := oauthClient.Token(goauth.NoContext)
+	token, err := oauthClient.Token(t.Context())
 	require.NoError(t, err)
 
 	resp, _, errs := gorequest.New().Post(ts.URL+"/revoke").

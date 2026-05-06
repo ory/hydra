@@ -30,7 +30,7 @@ type Handler struct {
 
 var _ fosite.TokenEndpointHandler = (*Handler)(nil)
 
-var verifierWrongFormat = regexp.MustCompile("[^\\w\\.\\-~]")
+var verifierWrongFormat = regexp.MustCompile(`[^\w\.\-~]`)
 
 func (c *Handler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
 	// This let's us define multiple response types, for example open id connect's id_token

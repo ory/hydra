@@ -95,11 +95,11 @@ func runAuthorizeCodeGrantWithPublicClientTest(t *testing.T, strategy oauth2.Cor
 			require.Equal(t, c.authStatusCode, resp.StatusCode)
 
 			if resp.StatusCode == http.StatusOK {
-				token, err := oauthClient.Exchange(goauth.NoContext, resp.Request.URL.Query().Get("code"))
+				token, err := oauthClient.Exchange(t.Context(), resp.Request.URL.Query().Get("code"))
 				require.NoError(t, err)
 				require.NotEmpty(t, token.AccessToken)
 
-				httpClient := oauthClient.Client(goauth.NoContext, token)
+				httpClient := oauthClient.Client(t.Context(), token)
 				resp, err := httpClient.Get(ts.URL + "/info")
 				require.NoError(t, err)
 				assert.Equal(t, http.StatusOK, resp.StatusCode)

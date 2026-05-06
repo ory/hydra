@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/httpx"
+	"github.com/ory/x/otelx"
 
 	"github.com/hashicorp/go-retryablehttp"
 
@@ -163,9 +164,13 @@ func executeHookAndUpdateSession(ctx context.Context, reg httpx.ClientProvider, 
 func TokenHook(reg interface {
 	config.Provider
 	httpx.ClientProvider
+	otelx.Provider
 },
 ) AccessRequestHook {
-	return func(ctx context.Context, requester fosite.AccessRequester) error {
+	return func(ctx context.Context, requester fosite.AccessRequester) (err error) {
+		ctx, span := reg.Tracer(ctx).Tracer().Start(ctx, "oauth2.AccessRequestHook")
+		defer otelx.End(span, &err)
+
 		hookConfig := reg.Config().TokenHookConfig(ctx)
 		if hookConfig == nil {
 			return nil

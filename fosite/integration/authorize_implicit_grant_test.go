@@ -116,7 +116,7 @@ func runTestAuthorizeImplicitGrant(t *testing.T, strategy oauth2.CoreStrategyPro
 					Expiry:       time.Now().UTC().Add(time.Duration(expires) * time.Second),
 				}
 
-				httpClient := oauthClient.Client(goauth.NoContext, token)
+				httpClient := oauthClient.Client(t.Context(), token)
 				resp, err := httpClient.Get(ts.URL + "/info")
 				require.NoError(t, err)
 				assert.Equal(t, http.StatusOK, resp.StatusCode)

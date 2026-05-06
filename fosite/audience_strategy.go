@@ -5,7 +5,6 @@ package fosite
 
 import (
 	"context"
-	"net/http"
 	"net/url"
 	"strings"
 
@@ -92,7 +91,7 @@ func GetAudiences(form url.Values) []string {
 	}
 }
 
-func (f *Fosite) validateAudience(ctx context.Context, r *http.Request, request Requester) error {
+func (f *Fosite) validateAudience(ctx context.Context, request Requester) error {
 	audience := GetAudiences(request.GetRequestForm())
 
 	if err := f.Config.GetAudienceStrategy(ctx)(request.GetClient().GetAudience(), audience); err != nil {

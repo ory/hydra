@@ -44,7 +44,7 @@ func TestOIDCImplicitFlow(t *testing.T) {
 	oauthClient := newOAuth2Client(ts)
 	fositeStore.Clients["my-client"].(*fosite.DefaultClient).RedirectURIs[0] = ts.URL + "/callback"
 
-	var state = "12345678901234567890"
+	state := "12345678901234567890"
 	for k, c := range []struct {
 		responseType string
 		description  string
@@ -63,7 +63,6 @@ func TestOIDCImplicitFlow(t *testing.T) {
 			hasToken: true,
 		},
 		{
-
 			responseType: "id_token%20token",
 			nonce:        "1111111111111111",
 			description:  "should pass id token (id_token token)",
@@ -74,7 +73,6 @@ func TestOIDCImplicitFlow(t *testing.T) {
 			hasIdToken: true,
 		},
 		{
-
 			responseType: "token%20id_token%20code",
 			nonce:        "1111111111111111",
 			description:  "should pass id token (code id_token token)",
@@ -84,7 +82,6 @@ func TestOIDCImplicitFlow(t *testing.T) {
 			hasIdToken:   true,
 		},
 		{
-
 			responseType: "token%20code",
 			nonce:        "1111111111111111",
 			description:  "should pass id token (code token)",
@@ -93,7 +90,6 @@ func TestOIDCImplicitFlow(t *testing.T) {
 			hasCode:      true,
 		},
 		{
-
 			responseType: "id_token%20code",
 			nonce:        "1111111111111111",
 			description:  "should pass id token (id_token code)",
@@ -113,7 +109,7 @@ func TestOIDCImplicitFlow(t *testing.T) {
 					return errors.New("Dont follow redirects")
 				},
 			}
-			resp, err := client.Get(authURL)
+			_, err := client.Get(authURL)
 			require.Error(t, err)
 
 			t.Logf("Response (%d): %s", k, callbackURL.String())
@@ -153,8 +149,9 @@ func TestOIDCImplicitFlow(t *testing.T) {
 			}
 
 			httpClient := oauthClient.Client(context.Background(), token)
-			resp, err = httpClient.Get(ts.URL + "/info")
+			resp, err := httpClient.Get(ts.URL + "/info")
 			require.NoError(t, err)
+			t.Cleanup(func() { _ = resp.Body.Close() })
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			t.Logf("Passed test case (%d) %s", k, c.description)
 		})

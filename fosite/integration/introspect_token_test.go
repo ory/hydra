@@ -11,7 +11,6 @@ import (
 	"github.com/parnurzeal/gorequest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	goauth "golang.org/x/oauth2"
 
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/compose"
@@ -53,9 +52,9 @@ func runIntrospectTokenTest(t *testing.T, strategy oauth2.CoreStrategyProvider, 
 	defer ts.Close()
 
 	oauthClient := newOAuth2AppClient(ts)
-	a, err := oauthClient.Token(goauth.NoContext)
+	a, err := oauthClient.Token(t.Context())
 	require.NoError(t, err)
-	b, err := oauthClient.Token(goauth.NoContext)
+	b, err := oauthClient.Token(t.Context())
 	require.NoError(t, err)
 
 	for k, c := range []struct {

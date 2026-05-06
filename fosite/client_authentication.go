@@ -14,7 +14,11 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/otelx"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/pkg/errors"
@@ -28,7 +32,14 @@ type ClientAuthenticationStrategy func(context.Context, *http.Request, url.Value
 // #nosec:gosec G101 - False Positive
 const clientAssertionJWTBearerType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
 
-func (f *Fosite) findClientPublicJWK(ctx context.Context, oidcClient OpenIDConnectClient, t *jwt.Token, expectsRSAKey bool) (interface{}, error) {
+func (f *Fosite) findClientPublicJWK(ctx context.Context, oidcClient OpenIDConnectClient, t *jwt.Token, expectsRSAKey bool) (jwk interface{}, err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/hydra/v2/fosite").Start(ctx, "Fosite.findClientPublicJWK",
+		trace.WithAttributes(
+			attribute.String("jwks_uri", oidcClient.GetJSONWebKeysURI()),
+			attribute.Bool("expects_rsa_key", expectsRSAKey),
+		))
+	defer otelx.End(span, &err)
+
 	if set := oidcClient.GetJSONWebKeys(); set != nil {
 		return findPublicKey(t, set, expectsRSAKey)
 	}
@@ -65,8 +76,13 @@ func (f *Fosite) AuthenticateClient(ctx context.Context, r *http.Request, form u
 
 // DefaultClientAuthenticationStrategy provides the fosite's default client authentication strategy,
 // HTTP Basic Authentication and JWT Bearer
-func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *http.Request, form url.Values) (Client, error) {
+func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *http.Request, form url.Values) (_ Client, err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/hydra/v2/fosite").Start(ctx, "Fosite.DefaultClientAuthenticationStrategy")
+	defer otelx.End(span, &err)
+
 	if assertionType := form.Get("client_assertion_type"); assertionType == clientAssertionJWTBearerType {
+		span.SetAttributes(attribute.String("client.assertion_type", clientAssertionJWTBearerType))
+
 		assertion := form.Get("client_assertion")
 		if len(assertion) == 0 {
 			return nil, errorsx.WithStack(ErrInvalidRequest.WithHintf("The client_assertion request parameter must be set when using client_assertion_type of '%s'.", clientAssertionJWTBearerType))
@@ -90,6 +106,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 					clientID = sub
 				}
 			}
+			span.SetAttributes(attribute.String("client.id", clientID))
 
 			client, err = f.Store.FositeClientManager().GetClient(ctx, clientID)
 			if err != nil {
@@ -100,6 +117,11 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 			if !ok {
 				return nil, errorsx.WithStack(ErrInvalidRequest.WithHint("The server configuration does not support OpenID Connect specific authentication methods."))
 			}
+
+			span.SetAttributes(
+				attribute.String("client.authentication_method", oidcClient.GetTokenEndpointAuthMethod()),
+				attribute.String("client.authentication_signing_algorithm", oidcClient.GetTokenEndpointAuthSigningAlgorithm()),
+			)
 
 			switch oidcClient.GetTokenEndpointAuthMethod() {
 			case "private_key_jwt":
@@ -119,6 +141,9 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 			if oidcClient.GetTokenEndpointAuthSigningAlgorithm() != fmt.Sprintf("%s", t.Header["alg"]) {
 				return nil, errorsx.WithStack(ErrInvalidClient.WithHintf("The 'client_assertion' uses signing algorithm '%s' but the requested OAuth 2.0 Client enforces signing algorithm '%s'.", t.Header["alg"], oidcClient.GetTokenEndpointAuthSigningAlgorithm()))
 			}
+
+			span.SetAttributes(attribute.String("token.method", string(t.Method)))
+
 			switch t.Method {
 			case jose.RS256, jose.RS384, jose.RS512:
 				return f.findClientPublicJWK(ctx, oidcClient, t, true)
@@ -196,6 +221,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 	if err != nil {
 		return nil, err
 	}
+	span.SetAttributes(attribute.String("client.id", clientID))
 
 	client, err := f.Store.FositeClientManager().GetClient(ctx, clientID)
 	if err != nil {
@@ -203,16 +229,21 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 	}
 
 	if oidcClient, ok := client.(OpenIDConnectClient); !ok {
+		span.SetAttributes(attribute.Bool("client.isOIDCClient", false))
 		// If this isn't an OpenID Connect client then we actually don't care about any of this, just continue!
 	} else if ok && form.Get("client_id") != "" && form.Get("client_secret") != "" && oidcClient.GetTokenEndpointAuthMethod() != "client_secret_post" {
+		span.SetAttributes(attribute.String("client.token_auth_method", oidcClient.GetTokenEndpointAuthMethod()))
 		return nil, errorsx.WithStack(ErrInvalidClient.WithHintf("The OAuth 2.0 Client supports client authentication method '%s', but method 'client_secret_post' was requested. You must configure the OAuth 2.0 client's 'token_endpoint_auth_method' value to accept 'client_secret_post'.", oidcClient.GetTokenEndpointAuthMethod()))
 	} else if _, secret, basicOk := r.BasicAuth(); basicOk && ok && secret != "" && oidcClient.GetTokenEndpointAuthMethod() != "client_secret_basic" {
+		span.SetAttributes(attribute.String("client.token_auth_method", oidcClient.GetTokenEndpointAuthMethod()))
 		return nil, errorsx.WithStack(ErrInvalidClient.WithHintf("The OAuth 2.0 Client supports client authentication method '%s', but method 'client_secret_basic' was requested. You must configure the OAuth 2.0 client's 'token_endpoint_auth_method' value to accept 'client_secret_basic'.", oidcClient.GetTokenEndpointAuthMethod()))
 	} else if ok && oidcClient.GetTokenEndpointAuthMethod() != "none" && client.IsPublic() {
+		span.SetAttributes(attribute.String("client.token_auth_method", oidcClient.GetTokenEndpointAuthMethod()))
 		return nil, errorsx.WithStack(ErrInvalidClient.WithHintf("The OAuth 2.0 Client supports client authentication method '%s', but method 'none' was requested. You must configure the OAuth 2.0 client's 'token_endpoint_auth_method' value to accept 'none'.", oidcClient.GetTokenEndpointAuthMethod()))
 	}
 
 	if client.IsPublic() {
+		span.SetAttributes(attribute.Bool("client.public", true))
 		return client, nil
 	}
 

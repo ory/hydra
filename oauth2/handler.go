@@ -64,7 +64,8 @@ const (
 )
 
 // Taken from https://github.com/ory/hydra/v2/fosite/blob/049ed1924cd0b41f12357b0fe617530c264421ac/handler/openid/flow_explicit_auth.go#L29
-var oidcParameters = []string{"grant_type",
+var oidcParameters = []string{
+	"grant_type",
 	"max_age",
 	"prompt",
 	"acr_values",
@@ -155,7 +156,7 @@ func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *
 	ctx := r.Context()
 
 	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
-	if errors.Is(err, consent.ErrAbortOAuth2Request) {
+	if errors.Is(err, consent.ErrUserRedirected) {
 		return
 	} else if err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -761,12 +762,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	// persisted to the database, while only one of them was actually used to validate the user_code
 	// (see https://github.com/ory/hydra/pull/3851#discussion_r1843678761)
 	f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
-	if errors.Is(err, consent.ErrAbortOAuth2Request) {
-		x.LogError(r, err, h.r.Logger())
-		return
-	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
-		x.LogError(r, err, h.r.Logger())
-		h.r.Writer().WriteError(w, r, err)
+	if errors.Is(err, consent.ErrUserRedirected) {
 		return
 	} else if err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -883,7 +879,7 @@ type _ struct {
 //	Extensions:
 //	  x-ory-ratelimit-bucket: hydra-public-high
 func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
-	var ctx = r.Context()
+	ctx := r.Context()
 
 	request, err := h.r.OAuth2Provider().NewDeviceRequest(ctx, r)
 	if err != nil {
@@ -891,7 +887,7 @@ func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var session = &Session{
+	session := &Session{
 		DefaultSession: &openid.DefaultSession{
 			Headers: &jwt.Headers{},
 		},
@@ -1296,13 +1292,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fl, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
-	if errors.Is(err, consent.ErrAbortOAuth2Request) {
-		x.LogError(r, err, h.r.Logger())
-		// do nothing
-		return
-	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
-		x.LogError(r, err, h.r.Logger())
-		h.writeAuthorizeError(w, r, authorizeRequest, err)
+	if errors.Is(err, consent.ErrUserRedirected) {
 		return
 	} else if err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -1501,7 +1491,6 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
 	accessToken := fosite.AccessTokenFromRequest(r)
 	tokenType, _, err := h.r.OAuth2Provider().IntrospectToken(ctx, accessToken, fosite.AccessToken, session)
-
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

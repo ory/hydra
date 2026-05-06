@@ -47,10 +47,12 @@ func NewStrategy(r InternalRegistry) Strategy {
 	return &defaultStrategy{r: r}
 }
 
-var ErrAbortOAuth2Request = stderrs.New("the OAuth 2.0 Authorization request must be aborted")
-var ErrNoPreviousConsentFound = stderrs.New("no previous OAuth 2.0 Consent could be found for this access request")
-var ErrNoAuthenticationSessionFound = stderrs.New("no previous login session was found")
-var ErrHintDoesNotMatchAuthentication = stderrs.New("subject from hint does not match subject from session")
+var (
+	ErrUserRedirected                 = stderrs.New("the user was redirected, no further response should be written by the caller")
+	ErrNoPreviousConsentFound         = stderrs.New("no previous OAuth 2.0 Consent could be found for this access request")
+	ErrNoAuthenticationSessionFound   = stderrs.New("no previous login session was found")
+	ErrHintDoesNotMatchAuthentication = stderrs.New("subject from hint does not match subject from session")
+)
 
 func (s *defaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.Client, hintSubject, sessionSubject string) error {
 	obfuscatedUserID, err := s.ObfuscateSubjectIdentifier(ctx, c, sessionSubject, "")
@@ -310,7 +312,7 @@ func (s *defaultStrategy) forwardAuthenticationRequest(
 	http.Redirect(w, r, authURL.String(), http.StatusFound)
 
 	// generate the verifier
-	return errors.WithStack(ErrAbortOAuth2Request)
+	return errors.WithStack(ErrUserRedirected)
 }
 
 func (s *defaultStrategy) revokeAuthenticationSession(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -613,7 +615,7 @@ func (s *defaultStrategy) forwardConsentRequest(
 	)
 
 	// generate the verifier
-	return errors.WithStack(ErrAbortOAuth2Request)
+	return errors.WithStack(ErrUserRedirected)
 }
 
 func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWriter, r *http.Request, verifier string) (_ *flow.Flow, err error) {
@@ -807,7 +809,7 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 				WithRequest(r).
 				Info("User logout skipped because no authentication session exists.")
 			http.Redirect(w, r, redir, http.StatusFound)
-			return nil, errors.WithStack(ErrAbortOAuth2Request)
+			return nil, errors.WithStack(ErrUserRedirected)
 		} else if err != nil {
 			return nil, err
 		}
@@ -833,7 +835,7 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 			WithRequest(r).
 			Info("User logout requires user confirmation, redirecting to Logout UI.")
 		http.Redirect(w, r, urlx.SetQuery(s.r.Config().LogoutURL(ctx), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
-		return nil, errors.WithStack(ErrAbortOAuth2Request)
+		return nil, errors.WithStack(ErrUserRedirected)
 	}
 
 	claims, err := s.getIDTokenHintClaims(ctx, hint)
@@ -930,7 +932,7 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.
 		http.Redirect(w, r, redir, http.StatusFound)
-		return nil, errors.WithStack(ErrAbortOAuth2Request)
+		return nil, errors.WithStack(ErrUserRedirected)
 	} else if err != nil {
 		return nil, err
 	}
@@ -952,7 +954,7 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 	}
 
 	http.Redirect(w, r, urlx.SetQuery(s.r.Config().LogoutURL(ctx), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
-	return nil, errors.WithStack(ErrAbortOAuth2Request)
+	return nil, errors.WithStack(ErrUserRedirected)
 }
 
 func (s *defaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.Context, r *http.Request, subject, sid string) error {
@@ -1002,7 +1004,7 @@ func (s *defaultStrategy) completeLogout(ctx context.Context, w http.ResponseWri
 
 			// OP initiated log out but no session was found. So let's just redirect back...
 			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
-			return nil, errors.WithStack(ErrAbortOAuth2Request)
+			return nil, errors.WithStack(ErrUserRedirected)
 		} else if err != nil {
 			return nil, err
 		}
@@ -1013,7 +1015,7 @@ func (s *defaultStrategy) completeLogout(ctx context.Context, w http.ResponseWri
 			// case there isn't really a lot to do because we don't want to sign out a different ID, so let's just
 			// go to the post redirect uri without actually doing anything!
 			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
-			return nil, errors.WithStack(ErrAbortOAuth2Request)
+			return nil, errors.WithStack(ErrUserRedirected)
 		}
 	}
 
@@ -1252,7 +1254,7 @@ func (s *defaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 	)
 
 	// generate the verifier
-	return errors.WithStack(ErrAbortOAuth2Request)
+	return errors.WithStack(ErrUserRedirected)
 }
 
 func (s *defaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWriter, r *http.Request, verifier string) (_ *flow.Flow, err error) {

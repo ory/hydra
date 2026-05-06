@@ -13,6 +13,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
+	"modernc.org/sqlite"
 
 	"github.com/ory/herodot"
 )
@@ -91,7 +92,7 @@ func HandleError(err error) error {
 		SQLState() string
 	}
 
-	if errors.Is(err, sql.ErrNoRows) {
+	if stderrs.Is(err, sql.ErrNoRows) {
 		return errors.WithStack(ErrNoRows())
 	}
 	if e, ok := stderrs.AsType[stater](err); ok {
@@ -111,11 +112,12 @@ func HandleError(err error) error {
 			return errors.WithStack(ErrNoSuchTable().WithWrap(e))
 		case 1054: // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html#error_er_bad_field_error
 			return errors.WithStack(ErrNoSuchColumn().WithWrap(e))
+		case 1213: // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html#error_er_lock_deadlock
+			return errors.WithStack(ErrConcurrentUpdate().WithWrap(e))
 		}
 	}
-
-	if err := handleSqlite(err); err != nil {
-		return errors.WithStack(err)
+	if e, ok := stderrs.AsType[*sqlite.Error](err); ok {
+		return handleSqlite(e, err)
 	}
 
 	return errors.WithStack(err)

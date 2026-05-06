@@ -38,7 +38,7 @@ require (
 	github.com/ory/hydra-client-go/v2 v2.2.1
 	github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e
 	github.com/ory/kratos-client-go v1.3.8
-	github.com/ory/pop/v6 v6.4.2-0.20260330100515-0277b33f8355
+	github.com/ory/pop/v6 v6.4.2-0.20260506111808-5dbeab0cb08b
 	github.com/ory/x v0.0.0-00010101000000-000000000000
 	github.com/parnurzeal/gorequest v0.3.0
 	github.com/pborman/uuid v1.2.1

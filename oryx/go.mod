@@ -48,7 +48,7 @@ require (
 	github.com/ory/dockertest/v4 v4.0.0-beta.4
 	github.com/ory/herodot v0.10.9-0.20260330111132-da75ef0fbc22
 	github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e
-	github.com/ory/pop/v6 v6.4.2-0.20260330100515-0277b33f8355
+	github.com/ory/pop/v6 v6.4.2-0.20260506111808-5dbeab0cb08b
 	github.com/pelletier/go-toml v1.9.5
 	github.com/peterhellberg/link v1.2.0
 	github.com/pkg/errors v0.9.1

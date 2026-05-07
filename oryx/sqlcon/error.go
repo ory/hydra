@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"modernc.org/sqlite"
@@ -97,9 +96,6 @@ func HandleError(err error) error {
 	}
 	if e, ok := stderrs.AsType[stater](err); ok {
 		return errors.WithStack(handlePostgres(err, e.SQLState()))
-	}
-	if e, ok := stderrs.AsType[*pq.Error](err); ok {
-		return errors.WithStack(handlePostgres(err, string(e.Code)))
 	}
 	if e, ok := stderrs.AsType[*pgconn.PgError](err); ok {
 		return errors.WithStack(handlePostgres(err, e.Code))

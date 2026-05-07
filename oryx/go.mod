@@ -41,14 +41,13 @@ require (
 	github.com/knadh/koanf/v2 v2.2.2
 	github.com/laher/mergefs v0.1.1
 	github.com/lestrrat-go/jwx v1.2.31
-	github.com/lib/pq v1.12.0
 	github.com/mailhog/data v1.0.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/ory/analytics-go/v5 v5.0.1
 	github.com/ory/dockertest/v4 v4.0.0-beta.4
 	github.com/ory/herodot v0.10.9-0.20260330111132-da75ef0fbc22
 	github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e
-	github.com/ory/pop/v6 v6.4.2-0.20260506111808-5dbeab0cb08b
+	github.com/ory/pop/v6 v6.4.2-0.20260507161217-89126558d369
 	github.com/pelletier/go-toml v1.9.5
 	github.com/peterhellberg/link v1.2.0
 	github.com/pkg/errors v0.9.1
@@ -156,6 +155,7 @@ require (
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
+	github.com/lib/pq v1.12.0 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

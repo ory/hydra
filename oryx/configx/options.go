@@ -74,6 +74,13 @@ func DisableEnvLoading() OptionModifier {
 	}
 }
 
+// DisableFileWatching loads configured files once without watching them for changes.
+func DisableFileWatching() OptionModifier {
+	return func(p *Provider) {
+		p.disableFileWatching = true
+	}
+}
+
 func WithValue(key string, value interface{}) OptionModifier {
 	return func(p *Provider) {
 		p.forcedValues = append(p.forcedValues, tuple{Key: key, Value: value})

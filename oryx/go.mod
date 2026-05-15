@@ -40,6 +40,7 @@ require (
 	github.com/knadh/koanf/providers/rawbytes v0.1.0
 	github.com/knadh/koanf/v2 v2.2.2
 	github.com/laher/mergefs v0.1.1
+	github.com/landlock-lsm/go-landlock v0.8.1
 	github.com/lestrrat-go/jwx v1.2.31
 	github.com/mailhog/data v1.0.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -204,6 +205,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	kernel.org/pub/linux/libs/security/libcap/psx v1.2.77 // indirect
 	modernc.org/libc v1.70.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect

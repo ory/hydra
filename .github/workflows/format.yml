@@ -5,6 +5,9 @@ on:
   push:
   merge_group:
 
+env:
+  CGO_ENABLED: "0"
+
 jobs:
   format:
     runs-on: ubuntu-latest

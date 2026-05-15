@@ -10,6 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/ory/x/landlockx"
 )
 
 const (
@@ -30,6 +32,15 @@ func NewJsonnetCmd() *cobra.Command {
 		Short:  "Run Jsonnet as a CLI command",
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Lock the worker down to its already-open stdio: the
+			// only I/O it does is read snippets/parameters from stdin
+			// and write JSON to stdout/stderr. Denying all path-based
+			// filesystem access prevents a malicious snippet from
+			// touching the operator's file system even if the
+			// jsonnet VM ever exposed a path-import primitive.
+			if err := landlockx.ApplyEmpty(nil); err != nil {
+				return errors.Wrap(err, "failed to apply empty landlock sandbox")
+			}
 
 			// This could fail because current limits are lower than what we tried to set,
 			// so we still continue in this case.

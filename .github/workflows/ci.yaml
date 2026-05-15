@@ -13,6 +13,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CGO_ENABLED: "0"
+
 jobs:
   oidc-conformity:
     name: Run OIDC conformity tests
@@ -95,6 +98,7 @@ jobs:
     name: Run HSM tests
     runs-on: ubuntu-latest
     env:
+      CGO_ENABLED: "1"
       HSM_ENABLED: true
       HSM_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
       HSM_TOKEN_LABEL: hydra
@@ -116,7 +120,7 @@ jobs:
       - name: HSM tests
         run: |
           pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra
-          go test -p 1 -failfast -short -timeout=20m -tags=sqlite,hsm ./...
+          go test -p 1 -failfast -short -timeout=20m -tags=hsm ./...
 
   test-e2e:
     name: Run end-to-end tests

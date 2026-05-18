@@ -29,6 +29,7 @@ const (
 	deviceVerifier
 	consentChallenge
 	consentVerifier
+	authorizeCode
 )
 
 func (p purpose) RequestType() string {
@@ -39,6 +40,8 @@ func (p purpose) RequestType() string {
 		return "device"
 	case consentChallenge, consentVerifier:
 		return "consent"
+	case authorizeCode:
+		return "authorization code"
 	default:
 		return "unknown"
 	}
@@ -53,6 +56,7 @@ var (
 	AsDeviceVerifier   = withPurpose(deviceVerifier)
 	AsConsentChallenge = withPurpose(consentChallenge)
 	AsConsentVerifier  = withPurpose(consentVerifier)
+	AsAuthorizeCode    = withPurpose(authorizeCode)
 )
 
 func additionalDataFromOpts(opts ...CodecOption) []byte {

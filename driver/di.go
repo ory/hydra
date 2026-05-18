@@ -7,6 +7,8 @@ import (
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/handler/pkce"
 	"github.com/ory/hydra/v2/jwk"
 )
 
@@ -28,6 +30,13 @@ func RegistryWithHMACSHAStrategy(s func(r *RegistrySQL) oauth2.CoreStrategy) Reg
 func RegistryWithJWTStrategy(s func(r *RegistrySQL) oauth2.AccessTokenStrategy) RegistryModifier {
 	return func(r *RegistrySQL) error {
 		r.jwtStrategy = s(r)
+		return nil
+	}
+}
+
+func RegistryWithAuthorizeCodeStrategy(s func(r *RegistrySQL) oauth2.AuthorizeCodeStrategy) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.authorizeCodeStrategy = s(r)
 		return nil
 	}
 }
@@ -56,6 +65,20 @@ func RegistryWithAccessTokenStorage(s func(r *RegistrySQL) oauth2.AccessTokenSto
 func RegistryWithAuthorizeCodeStorage(s func(r *RegistrySQL) oauth2.AuthorizeCodeStorage) RegistryModifier {
 	return func(r *RegistrySQL) error {
 		r.authorizeCodeStorage = s(r)
+		return nil
+	}
+}
+
+func RegistryWithPKCERequestStorage(s func(r *RegistrySQL) pkce.PKCERequestStorage) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.pkceRequestStorage = s(r)
+		return nil
+	}
+}
+
+func RegistryWithOpenIDConnectRequestStorage(s func(r *RegistrySQL) openid.OpenIDConnectRequestStorage) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.openIDConnectRequestStorage = s(r)
 		return nil
 	}
 }

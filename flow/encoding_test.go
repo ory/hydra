@@ -134,6 +134,8 @@ func TestEncoding(t *testing.T) {
 			{"consent verifier decoded as consent challenge", flow.AsConsentVerifier, flow.AsConsentChallenge},
 			{"login challenge decoded as consent challenge", flow.AsLoginChallenge, flow.AsConsentChallenge},
 			{"consent challenge decoded as login challenge", flow.AsConsentChallenge, flow.AsLoginChallenge},
+			{"authorization code decoded as login challenge", flow.AsAuthorizeCode, flow.AsLoginChallenge},
+			{"login challenge decoded as authorization code", flow.AsLoginChallenge, flow.AsAuthorizeCode},
 		}
 
 		for _, tc := range testCases {

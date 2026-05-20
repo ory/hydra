@@ -295,19 +295,21 @@ func (s *MemoryStore) SetClientAssertionJWT(_ context.Context, jti string, exp t
 	return nil
 }
 
-func (s *MemoryStore) CreateAuthorizeCodeSession(_ context.Context, code string, req fosite.Requester) error {
+func (s *MemoryStore) CreateAuthorizeCodeSession(_ context.Context, signature string, req fosite.Requester) error {
 	s.authorizeCodesMutex.Lock()
 	defer s.authorizeCodesMutex.Unlock()
 
-	s.AuthorizeCodes[code] = StoreAuthorizeCode{active: true, Requester: req}
+	s.AuthorizeCodes[signature] = StoreAuthorizeCode{active: true, Requester: req}
 	return nil
 }
 
-func (s *MemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
+// GetAuthorizeCodeSession keys by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (s *MemoryStore) GetAuthorizeCodeSession(_ context.Context, _, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.authorizeCodesMutex.RLock()
 	defer s.authorizeCodesMutex.RUnlock()
 
-	rel, ok := s.AuthorizeCodes[code]
+	rel, ok := s.AuthorizeCodes[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
 	}
@@ -318,43 +320,49 @@ func (s *MemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ 
 	return rel.Requester, nil
 }
 
-func (s *MemoryStore) InvalidateAuthorizeCodeSession(ctx context.Context, code string) error {
+// InvalidateAuthorizeCodeSession keys by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (s *MemoryStore) InvalidateAuthorizeCodeSession(_ context.Context, _, signature string) error {
 	s.authorizeCodesMutex.Lock()
 	defer s.authorizeCodesMutex.Unlock()
 
-	rel, ok := s.AuthorizeCodes[code]
+	rel, ok := s.AuthorizeCodes[signature]
 	if !ok {
 		return fosite.ErrNotFound
 	}
 	rel.active = false
-	s.AuthorizeCodes[code] = rel
+	s.AuthorizeCodes[signature] = rel
 	return nil
 }
 
-func (s *MemoryStore) CreatePKCERequestSession(_ context.Context, code string, req fosite.Requester) error {
+func (s *MemoryStore) CreatePKCERequestSession(_ context.Context, signature string, req fosite.Requester) error {
 	s.pkcesMutex.Lock()
 	defer s.pkcesMutex.Unlock()
 
-	s.PKCES[code] = req
+	s.PKCES[signature] = req
 	return nil
 }
 
-func (s *MemoryStore) GetPKCERequestSession(_ context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
+// GetPKCERequestSession keys by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (s *MemoryStore) GetPKCERequestSession(_ context.Context, _, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.pkcesMutex.RLock()
 	defer s.pkcesMutex.RUnlock()
 
-	rel, ok := s.PKCES[code]
+	rel, ok := s.PKCES[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
 	}
 	return rel, nil
 }
 
-func (s *MemoryStore) DeletePKCERequestSession(_ context.Context, code string) error {
+// DeletePKCERequestSession keys by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (s *MemoryStore) DeletePKCERequestSession(_ context.Context, _, signature string) error {
 	s.pkcesMutex.Lock()
 	defer s.pkcesMutex.Unlock()
 
-	delete(s.PKCES, code)
+	delete(s.PKCES, signature)
 	return nil
 }
 

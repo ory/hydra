@@ -410,7 +410,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 						areq.Form.Add("code", code)
 
 						require.NoError(t, store.CreateAuthorizeCodeSession(context.Background(), sig, areq))
-						require.NoError(t, store.InvalidateAuthorizeCodeSession(context.Background(), sig))
+						require.NoError(t, store.InvalidateAuthorizeCodeSession(context.Background(), code, sig))
 					},
 					description: "should fail because code has been used already",
 					expectErr:   fosite.ErrInvalidGrant,
@@ -512,12 +512,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
 
@@ -603,12 +603,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
 
@@ -661,12 +661,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
 
@@ -733,7 +733,7 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 
@@ -786,12 +786,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
 
@@ -844,12 +844,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
 

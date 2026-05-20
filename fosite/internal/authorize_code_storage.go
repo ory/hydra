@@ -46,44 +46,44 @@ func (m *MockAuthorizeCodeStorage) EXPECT() *MockAuthorizeCodeStorageMockRecorde
 }
 
 // CreateAuthorizeCodeSession mocks base method.
-func (m *MockAuthorizeCodeStorage) CreateAuthorizeCodeSession(ctx context.Context, code string, request fosite.Requester) error {
+func (m *MockAuthorizeCodeStorage) CreateAuthorizeCodeSession(ctx context.Context, signature string, request fosite.Requester) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAuthorizeCodeSession", ctx, code, request)
+	ret := m.ctrl.Call(m, "CreateAuthorizeCodeSession", ctx, signature, request)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateAuthorizeCodeSession indicates an expected call of CreateAuthorizeCodeSession.
-func (mr *MockAuthorizeCodeStorageMockRecorder) CreateAuthorizeCodeSession(ctx, code, request any) *gomock.Call {
+func (mr *MockAuthorizeCodeStorageMockRecorder) CreateAuthorizeCodeSession(ctx, signature, request any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAuthorizeCodeSession", reflect.TypeOf((*MockAuthorizeCodeStorage)(nil).CreateAuthorizeCodeSession), ctx, code, request)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAuthorizeCodeSession", reflect.TypeOf((*MockAuthorizeCodeStorage)(nil).CreateAuthorizeCodeSession), ctx, signature, request)
 }
 
 // GetAuthorizeCodeSession mocks base method.
-func (m *MockAuthorizeCodeStorage) GetAuthorizeCodeSession(ctx context.Context, code string, session fosite.Session) (fosite.Requester, error) {
+func (m *MockAuthorizeCodeStorage) GetAuthorizeCodeSession(ctx context.Context, code, signature string, session fosite.Session) (fosite.Requester, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAuthorizeCodeSession", ctx, code, session)
+	ret := m.ctrl.Call(m, "GetAuthorizeCodeSession", ctx, code, signature, session)
 	ret0, _ := ret[0].(fosite.Requester)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAuthorizeCodeSession indicates an expected call of GetAuthorizeCodeSession.
-func (mr *MockAuthorizeCodeStorageMockRecorder) GetAuthorizeCodeSession(ctx, code, session any) *gomock.Call {
+func (mr *MockAuthorizeCodeStorageMockRecorder) GetAuthorizeCodeSession(ctx, code, signature, session any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthorizeCodeSession", reflect.TypeOf((*MockAuthorizeCodeStorage)(nil).GetAuthorizeCodeSession), ctx, code, session)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthorizeCodeSession", reflect.TypeOf((*MockAuthorizeCodeStorage)(nil).GetAuthorizeCodeSession), ctx, code, signature, session)
 }
 
 // InvalidateAuthorizeCodeSession mocks base method.
-func (m *MockAuthorizeCodeStorage) InvalidateAuthorizeCodeSession(ctx context.Context, code string) error {
+func (m *MockAuthorizeCodeStorage) InvalidateAuthorizeCodeSession(ctx context.Context, code, signature string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InvalidateAuthorizeCodeSession", ctx, code)
+	ret := m.ctrl.Call(m, "InvalidateAuthorizeCodeSession", ctx, code, signature)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InvalidateAuthorizeCodeSession indicates an expected call of InvalidateAuthorizeCodeSession.
-func (mr *MockAuthorizeCodeStorageMockRecorder) InvalidateAuthorizeCodeSession(ctx, code any) *gomock.Call {
+func (mr *MockAuthorizeCodeStorageMockRecorder) InvalidateAuthorizeCodeSession(ctx, code, signature any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateAuthorizeCodeSession", reflect.TypeOf((*MockAuthorizeCodeStorage)(nil).InvalidateAuthorizeCodeSession), ctx, code)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateAuthorizeCodeSession", reflect.TypeOf((*MockAuthorizeCodeStorage)(nil).InvalidateAuthorizeCodeSession), ctx, code, signature)
 }

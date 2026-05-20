@@ -501,16 +501,22 @@ func (p *Persister) CreateAuthorizeCodeSession(ctx context.Context, signature st
 	})
 }
 
-// GetAuthorizeCodeSession implements AuthorizeCodeStorage
-func (p *Persister) GetAuthorizeCodeSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
+// GetAuthorizeCodeSession implements AuthorizeCodeStorage.
+//
+// The SQL persister keys rows by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (p *Persister) GetAuthorizeCodeSession(ctx context.Context, _, signature string, session fosite.Session) (request fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetAuthorizeCodeSession")
 	defer otelx.End(span, &err)
 
 	return p.findSessionBySignature(ctx, signature, session, sqlTableCode)
 }
 
-// InvalidateAuthorizeCodeSession implements AuthorizeCodeStorage
-func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) (err error) {
+// InvalidateAuthorizeCodeSession implements AuthorizeCodeStorage.
+//
+// The SQL persister keys rows by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, _, signature string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateAuthorizeCodeSession")
 	defer otelx.End(span, &err)
 
@@ -721,8 +727,11 @@ func (p *Persister) DeleteOpenIDConnectSession(ctx context.Context, signature st
 	return p.deleteSessionBySignature(ctx, signature, sqlTableOpenID)
 }
 
-// GetPKCERequestSession implements PKCERequestStorage
-func (p *Persister) GetPKCERequestSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
+// GetPKCERequestSession implements PKCERequestStorage.
+//
+// The SQL persister keys rows by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (p *Persister) GetPKCERequestSession(ctx context.Context, _, signature string, session fosite.Session) (_ fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPKCERequestSession")
 	defer otelx.End(span, &err)
 	return p.findSessionBySignature(ctx, signature, session, sqlTablePKCE)
@@ -736,8 +745,11 @@ func (p *Persister) CreatePKCERequestSession(ctx context.Context, signature stri
 	return p.createSession(ctx, signature, requester, sqlTablePKCE, requester.GetSession().GetExpiresAt(fosite.AuthorizeCode).UTC())
 }
 
-// DeletePKCERequestSession implements PKCERequestStorage
-func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature string) (err error) {
+// DeletePKCERequestSession implements PKCERequestStorage.
+//
+// The SQL persister keys rows by signature; code is accepted for interface
+// compatibility with AEAD storage adapters and intentionally unused here.
+func (p *Persister) DeletePKCERequestSession(ctx context.Context, _, signature string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeletePKCERequestSession")
 	defer otelx.End(span, &err)
 	return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)

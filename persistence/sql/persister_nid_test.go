@@ -525,15 +525,15 @@ func (s *PersisterTestSuite) TestDeletePKCERequestSession() {
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
 			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
-			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreatePKCERequestSession(s.t1, authorizeCode, request))
+			signature := uuid.Must(uuid.NewV4()).String()
+			require.NoError(t, r.Persister().CreatePKCERequestSession(s.t1, signature, request))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "pkce"}
 
-			require.NoError(t, r.Persister().DeletePKCERequestSession(s.t2, authorizeCode))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
-			require.NoError(t, r.Persister().DeletePKCERequestSession(s.t1, authorizeCode))
-			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
+			require.NoError(t, r.Persister().DeletePKCERequestSession(s.t2, "", signature))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
+			require.NoError(t, r.Persister().DeletePKCERequestSession(s.t1, "", signature))
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
 		})
 	}
 }
@@ -771,10 +771,10 @@ func (s *PersisterTestSuite) TestGetAuthorizeCodeSession() {
 			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 
-			actual, err := r.Persister().GetAuthorizeCodeSession(s.t2, sig, &fosite.DefaultSession{})
+			actual, err := r.Persister().GetAuthorizeCodeSession(s.t2, "", sig, &fosite.DefaultSession{})
 			require.Error(t, err)
 			require.Nil(t, actual)
-			actual, err = r.Persister().GetAuthorizeCodeSession(s.t1, sig, &fosite.DefaultSession{})
+			actual, err = r.Persister().GetAuthorizeCodeSession(s.t1, "", sig, &fosite.DefaultSession{})
 			require.NoError(t, err)
 			require.NotNil(t, actual)
 		})
@@ -971,11 +971,11 @@ func (s *PersisterTestSuite) TestGetPKCERequestSession() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
 			require.NoError(t, r.Persister().CreatePKCERequestSession(s.t1, sig, request))
 
-			actual, err := r.Persister().GetPKCERequestSession(s.t2, sig, &fosite.DefaultSession{})
+			actual, err := r.Persister().GetPKCERequestSession(s.t2, "", sig, &fosite.DefaultSession{})
 			require.Error(t, err)
 			require.Nil(t, actual)
 
-			actual, err = r.Persister().GetPKCERequestSession(s.t1, sig, &fosite.DefaultSession{})
+			actual, err = r.Persister().GetPKCERequestSession(s.t1, "", sig, &fosite.DefaultSession{})
 			require.NoError(t, err)
 			require.Equal(t, request.GetID(), actual.GetID())
 		})
@@ -1138,12 +1138,12 @@ func (s *PersisterTestSuite) TestInvalidateAuthorizeCodeSession() {
 			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 
-			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t2, sig))
+			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t2, "", sig))
 			actual := persistencesql.OAuth2RequestSQL{Table: "code"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
 			require.Equal(t, true, actual.Active)
 
-			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t1, sig))
+			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t1, "", sig))
 			actual = persistencesql.OAuth2RequestSQL{Table: "code"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
 			require.Equal(t, false, actual.Active)

@@ -131,7 +131,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 
 	code := request.GetRequestForm().Get("code")
 	signature := c.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, code)
-	pkceRequest, err := c.Storage.PKCERequestStorage().GetPKCERequestSession(ctx, signature, request.GetSession())
+	pkceRequest, err := c.Storage.PKCERequestStorage().GetPKCERequestSession(ctx, code, signature, request.GetSession())
 
 	nv := len(verifier)
 
@@ -145,7 +145,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
-	if err := c.Storage.PKCERequestStorage().DeletePKCERequestSession(ctx, signature); err != nil {
+	if err := c.Storage.PKCERequestStorage().DeletePKCERequestSession(ctx, code, signature); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 

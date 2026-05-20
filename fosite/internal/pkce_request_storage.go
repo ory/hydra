@@ -60,30 +60,30 @@ func (mr *MockPKCERequestStorageMockRecorder) CreatePKCERequestSession(ctx, sign
 }
 
 // DeletePKCERequestSession mocks base method.
-func (m *MockPKCERequestStorage) DeletePKCERequestSession(ctx context.Context, signature string) error {
+func (m *MockPKCERequestStorage) DeletePKCERequestSession(ctx context.Context, code, signature string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletePKCERequestSession", ctx, signature)
+	ret := m.ctrl.Call(m, "DeletePKCERequestSession", ctx, code, signature)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeletePKCERequestSession indicates an expected call of DeletePKCERequestSession.
-func (mr *MockPKCERequestStorageMockRecorder) DeletePKCERequestSession(ctx, signature any) *gomock.Call {
+func (mr *MockPKCERequestStorageMockRecorder) DeletePKCERequestSession(ctx, code, signature any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePKCERequestSession", reflect.TypeOf((*MockPKCERequestStorage)(nil).DeletePKCERequestSession), ctx, signature)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePKCERequestSession", reflect.TypeOf((*MockPKCERequestStorage)(nil).DeletePKCERequestSession), ctx, code, signature)
 }
 
 // GetPKCERequestSession mocks base method.
-func (m *MockPKCERequestStorage) GetPKCERequestSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+func (m *MockPKCERequestStorage) GetPKCERequestSession(ctx context.Context, code, signature string, session fosite.Session) (fosite.Requester, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPKCERequestSession", ctx, signature, session)
+	ret := m.ctrl.Call(m, "GetPKCERequestSession", ctx, code, signature, session)
 	ret0, _ := ret[0].(fosite.Requester)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPKCERequestSession indicates an expected call of GetPKCERequestSession.
-func (mr *MockPKCERequestStorageMockRecorder) GetPKCERequestSession(ctx, signature, session any) *gomock.Call {
+func (mr *MockPKCERequestStorageMockRecorder) GetPKCERequestSession(ctx, code, signature, session any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPKCERequestSession", reflect.TypeOf((*MockPKCERequestStorage)(nil).GetPKCERequestSession), ctx, signature, session)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPKCERequestSession", reflect.TypeOf((*MockPKCERequestStorage)(nil).GetPKCERequestSession), ctx, code, signature, session)
 }

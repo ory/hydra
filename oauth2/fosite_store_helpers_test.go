@@ -243,24 +243,24 @@ func testHelperCreateGetDeleteAuthorizeCodes(x *driver.RegistrySQL) func(t *test
 
 		mockRequestForeignKey(t, "blank", x)
 
-		code := uuid.Must(uuid.NewV4()).String()
+		signature := uuid.Must(uuid.NewV4()).String()
 
 		ctx := t.Context()
-		res, err := m.GetAuthorizeCodeSession(ctx, code, oauth2.NewTestSession(t, "bar"))
+		res, err := m.GetAuthorizeCodeSession(ctx, "", signature, oauth2.NewTestSession(t, "bar"))
 		assert.Error(t, err)
 		assert.Nil(t, res)
 
-		err = m.CreateAuthorizeCodeSession(ctx, code, newDefaultRequest(t, "blank"))
+		err = m.CreateAuthorizeCodeSession(ctx, signature, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, code, oauth2.NewTestSession(t, "bar"))
+		res, err = m.GetAuthorizeCodeSession(ctx, "", signature, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, newDefaultRequest(t, "blank"), res, "RequestedScope", "GrantedScope", "Form", "Session")
 
-		err = m.InvalidateAuthorizeCodeSession(ctx, code)
+		err = m.InvalidateAuthorizeCodeSession(ctx, "", signature)
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, code, oauth2.NewTestSession(t, "bar"))
+		res, err = m.GetAuthorizeCodeSession(ctx, "", signature, oauth2.NewTestSession(t, "bar"))
 		require.Error(t, err)
 		assert.EqualError(t, err, fosite.ErrInvalidatedAuthorizeCode.Error())
 		assert.NotNil(t, res)
@@ -671,22 +671,22 @@ func testHelperCreateGetDeletePKCERequestSession(x *driver.RegistrySQL) func(t *
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
-		code := uuid.Must(uuid.NewV4()).String()
+		signature := uuid.Must(uuid.NewV4()).String()
 		ctx := t.Context()
-		_, err := m.GetPKCERequestSession(ctx, code, oauth2.NewTestSession(t, "bar"))
+		_, err := m.GetPKCERequestSession(ctx, "", signature, oauth2.NewTestSession(t, "bar"))
 		assert.NotNil(t, err)
 
-		err = m.CreatePKCERequestSession(ctx, code, newDefaultRequest(t, "blank"))
+		err = m.CreatePKCERequestSession(ctx, signature, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		res, err := m.GetPKCERequestSession(ctx, code, oauth2.NewTestSession(t, "bar"))
+		res, err := m.GetPKCERequestSession(ctx, "", signature, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, newDefaultRequest(t, "blank"), res, "RequestedScope", "GrantedScope", "Form", "Session")
 
-		err = m.DeletePKCERequestSession(ctx, code)
+		err = m.DeletePKCERequestSession(ctx, "", signature)
 		require.NoError(t, err)
 
-		_, err = m.GetPKCERequestSession(ctx, code, oauth2.NewTestSession(t, "bar"))
+		_, err = m.GetPKCERequestSession(ctx, "", signature, oauth2.NewTestSession(t, "bar"))
 		assert.NotNil(t, err)
 	}
 }
@@ -801,25 +801,53 @@ func testFositeSqlStoreTransactionRollbackRefreshToken(m *driver.RegistrySQL) fu
 
 func testFositeSqlStoreTransactionCommitAuthorizeCode(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		doTestCommit(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
+		doTestCommit(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, getAuthorizeCodeSessionBySignature(m), invalidateAuthorizeCodeSessionBySignature(m))
 	}
 }
 
 func testFositeSqlStoreTransactionRollbackAuthorizeCode(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		doTestRollback(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
+		doTestRollback(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, getAuthorizeCodeSessionBySignature(m), invalidateAuthorizeCodeSessionBySignature(m))
 	}
 }
 
 func testFositeSqlStoreTransactionCommitPKCERequest(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		doTestCommit(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
+		doTestCommit(m, t, m.OAuth2Storage().CreatePKCERequestSession, getPKCERequestSessionBySignature(m), deletePKCERequestSessionBySignature(m))
 	}
 }
 
 func testFositeSqlStoreTransactionRollbackPKCERequest(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		doTestRollback(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
+		doTestRollback(m, t, m.OAuth2Storage().CreatePKCERequestSession, getPKCERequestSessionBySignature(m), deletePKCERequestSessionBySignature(m))
+	}
+}
+
+// getAuthorizeCodeSessionBySignature adapts the (code, signature) Get method to the
+// signature-only function shape that doTestCommit/doTestRollback share with the access
+// and refresh token tests. invalidateAuthorizeCodeSessionBySignature, getPKCERequestSessionBySignature,
+// and deletePKCERequestSessionBySignature do the same for their respective methods.
+func getAuthorizeCodeSessionBySignature(m *driver.RegistrySQL) func(context.Context, string, fosite.Session) (fosite.Requester, error) {
+	return func(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+		return m.OAuth2Storage().GetAuthorizeCodeSession(ctx, "", signature, session)
+	}
+}
+
+func invalidateAuthorizeCodeSessionBySignature(m *driver.RegistrySQL) func(context.Context, string) error {
+	return func(ctx context.Context, signature string) error {
+		return m.OAuth2Storage().InvalidateAuthorizeCodeSession(ctx, "", signature)
+	}
+}
+
+func getPKCERequestSessionBySignature(m *driver.RegistrySQL) func(context.Context, string, fosite.Session) (fosite.Requester, error) {
+	return func(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+		return m.OAuth2Storage().GetPKCERequestSession(ctx, "", signature, session)
+	}
+}
+
+func deletePKCERequestSessionBySignature(m *driver.RegistrySQL) func(context.Context, string) error {
+	return func(ctx context.Context, signature string) error {
+		return m.OAuth2Storage().DeletePKCERequestSession(ctx, "", signature)
 	}
 }
 
@@ -1520,7 +1548,7 @@ func testHelperAuthorizeCodeInvalidation(x *driver.RegistrySQL) func(t *testing.
 		require.NoError(t, x.OAuth2Storage().CreateAuthorizeCodeSession(ctx, authCodeSignature, &initialRequest))
 
 		// Verify initial state
-		originalCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewTestSession(t, "sub"))
+		originalCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, "", authCodeSignature, oauth2.NewTestSession(t, "sub"))
 		require.NoError(t, err)
 		require.Equal(t, initialExpiry.Unix(), originalCode.GetSession().GetExpiresAt(fosite.AuthorizeCode).Unix())
 
@@ -1536,11 +1564,11 @@ func testHelperAuthorizeCodeInvalidation(x *driver.RegistrySQL) func(t *testing.
 		require.True(t, codeData.Active)
 
 		// Invalidate the code
-		err = x.OAuth2Storage().InvalidateAuthorizeCodeSession(ctx, authCodeSignature)
+		err = x.OAuth2Storage().InvalidateAuthorizeCodeSession(ctx, "", authCodeSignature)
 		require.NoError(t, err)
 
 		// Check that the code was invalidated but is still retrievable
-		invalidatedCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewTestSession(t, "sub"))
+		invalidatedCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, "", authCodeSignature, oauth2.NewTestSession(t, "sub"))
 		require.Error(t, err)
 		require.ErrorIs(t, err, fosite.ErrInvalidatedAuthorizeCode)
 		require.NotNil(t, invalidatedCode) // Should still be retrievable

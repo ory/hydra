@@ -21,13 +21,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/pkg/errors"
-
-	"github.com/ory/x/logrusx"
 )
 
 var (
-	// ErrNilDependency is returned if a dependency is missing.
-	ErrNilDependency = fmt.Errorf("a dependency was expected to be defined but is nil. Please open an issue with the stack trace")
 	// ErrNoPrintButFail is returned to detect a failure state that was already reported to the user in some way
 	ErrNoPrintButFail = fmt.Errorf("this error should never be printed")
 
@@ -105,19 +101,6 @@ func Fatalf(message string, args ...interface{}) {
 		_, _ = fmt.Fprintln(os.Stderr, message)
 	}
 	os.Exit(1)
-}
-
-// ExpectDependency expects every dependency to be not nil or it fatals.
-// Deprecated: do not use this function in commands, as it makes it impossible to test them. Instead, return the error.
-func ExpectDependency(logger *logrusx.Logger, dependencies ...interface{}) {
-	if logger == nil {
-		panic("missing logger for dependency check")
-	}
-	for _, d := range dependencies {
-		if d == nil {
-			logger.WithError(errors.WithStack(ErrNilDependency)).Fatalf("A fatal issue occurred.")
-		}
-	}
 }
 
 // CallbackWriter will execute each callback once the message is received.

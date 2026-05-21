@@ -13,9 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -163,21 +161,21 @@ func DumpSchema(t testing.TB, c *pop.Connection) string {
 
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	require.NoError(t, err)
-	containers, err := cli.ContainerList(t.Context(), container.ListOptions{
-		Filters: filters.NewArgs(filters.Arg("publish", port)),
+	list, err := cli.ContainerList(t.Context(), client.ContainerListOptions{
+		Filters: client.Filters{}.Add("publish", port),
 	})
 	require.NoError(t, err)
-	require.Lenf(t, containers, 1, "expected exactly one %s container with port %s", name, port)
+	require.Lenf(t, list.Items, 1, "expected exactly one %s container with port %s", name, port)
 
-	process, err := cli.ContainerExecCreate(t.Context(), containers[0].ID, container.ExecOptions{
-		Tty:          true,
+	process, err := cli.ExecCreate(t.Context(), list.Items[0].ID, client.ExecCreateOptions{
+		TTY:          true,
 		AttachStdout: true,
 		Cmd:          cmd,
 	})
 	require.NoError(t, err)
 
-	resp, err := cli.ContainerExecAttach(t.Context(), process.ID, container.ExecAttachOptions{
-		Tty: true,
+	resp, err := cli.ExecAttach(t.Context(), process.ID, client.ExecAttachOptions{
+		TTY: true,
 	})
 	require.NoError(t, err)
 	dump, err := io.ReadAll(resp.Reader)

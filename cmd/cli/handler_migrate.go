@@ -52,6 +52,10 @@ func (h *MigrateHandler) makeMigrationManager(cmd *cobra.Command, args []string)
 		return nil, cmdx.FailSilently(cmd)
 	}
 
+	if err := popx.VerifyDialect(cmd.Context(), d.Persister().Connection(cmd.Context())); err != nil {
+		return nil, err
+	}
+
 	return d.Migrator(), nil
 }
 

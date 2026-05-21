@@ -27,6 +27,7 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/otelx/semconv"
+	"github.com/ory/x/popx"
 	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/reqlog"
 	"github.com/ory/x/serverx"
@@ -95,6 +96,10 @@ func RunServeAll(dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args [
 
 		d, err := driver.New(ctx, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags())))...)
 		if err != nil {
+			return err
+		}
+
+		if err := popx.VerifyDialect(ctx, d.Persister().Connection(ctx)); err != nil {
 			return err
 		}
 

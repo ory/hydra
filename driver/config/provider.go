@@ -52,6 +52,7 @@ const (
 	KeyOAuth2DeviceAuthorisationURL              = "webfinger.oidc_discovery.device_authorization_url"
 	KeySubjectTypesSupported                     = "oidc.subject_identifiers.supported_types"
 	KeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
+	KeyDCRAccessTokenStrategy                    = "oidc.dynamic_client_registration.strategies.access_token" // #nosec G101
 	KeyDSN                                       = "dsn"
 	KeyClientHTTPNoPrivateIPRanges               = "clients.http.disallow_private_ip_ranges"
 	KeyClientHTTPPrivateIPExceptionURLs          = "clients.http.private_ip_exception_urls"
@@ -595,6 +596,24 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 		return AccessTokenDefaultStrategy
 	}
 
+	return s
+}
+
+// OIDCDynamicClientRegistrationAccessTokenStrategy returns the access token
+// strategy that should be applied to clients created via OpenID Connect
+// Dynamic Client Registration (RFC 7591). An empty string means the option
+// is not configured and DCR clients should fall back to the global
+// `strategies.access_token` setting.
+func (p *DefaultProvider) OIDCDynamicClientRegistrationAccessTokenStrategy(ctx context.Context) AccessTokenStrategyType {
+	raw := p.getProvider(ctx).String(KeyDCRAccessTokenStrategy)
+	if raw == "" {
+		return ""
+	}
+	s, err := ToAccessTokenStrategyType(raw)
+	if err != nil {
+		p.l.WithError(err).Warnf("Key `%s` contains an invalid value, falling back to the global access token strategy.", KeyDCRAccessTokenStrategy)
+		return ""
+	}
 	return s
 }
 

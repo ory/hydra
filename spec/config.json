@@ -752,7 +752,7 @@
         },
         "exclude_not_before_claim": {
           "type": "boolean",
-          "description": "Set to true if you want to exclude claim `nbf (not before)` part of access token.",
+          "description": "Set to true if you want to omit the `nbf` (not valid before) claim in the access token.",
           "default": false,
           "examples": [true]
         },

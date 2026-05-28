@@ -36,7 +36,7 @@ import (
 
 const (
 	KiB                = 1024
-	jsonnetOutputLimit = 512 * KiB
+	jsonnetOutputLimit = 256 * KiB
 	jsonnetErrLimit    = 1 * KiB
 )
 
@@ -155,10 +155,10 @@ func newWorker(ctx context.Context) (_ worker, err error) {
 
 	span.SetAttributes(semconv.ProcessPID(cmd.Process.Pid))
 
-	scan := func(c chan<- string, r io.Reader) {
+	scan := func(c chan<- string, r io.Reader, maxTokenSize int) {
 		defer close(c)
-		// NOTE: `bufio.Scanner` has its own internal limit of 64 KiB.
 		scanner := bufio.NewScanner(r)
+		scanner.Buffer(make([]byte, 0, 64*KiB), maxTokenSize)
 
 		scanner.Split(splitNull)
 		for scanner.Scan() {
@@ -169,9 +169,9 @@ func newWorker(ctx context.Context) (_ worker, err error) {
 		}
 	}
 	out := make(chan string, 1)
-	go scan(out, stdout)
+	go scan(out, stdout, jsonnetOutputLimit)
 	errs := make(chan string, 1)
-	go scan(errs, stderr)
+	go scan(errs, stderr, jsonnetErrLimit)
 
 	w := worker{
 		cmd:    cmd,

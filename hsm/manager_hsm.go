@@ -142,7 +142,7 @@ func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (_ *jose.JSONW
 
 func (m *KeyManager) GetKeySet(ctx context.Context, set string) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet", trace.WithAttributes(attribute.String("set", set)))
-	otelx.End(span, &err)
+	defer otelx.End(span, &err)
 
 	m.RLock()
 	defer m.RUnlock()

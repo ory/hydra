@@ -45,7 +45,7 @@ func New(d dependencies) Client {
 
 func (k *Default) Authenticate(ctx context.Context, name, secret string) (session *client.Session, err error) {
 	ctx, span := k.Tracer(ctx).Tracer().Start(ctx, "kratos.Authenticate")
-	otelx.End(span, &err)
+	defer otelx.End(span, &err)
 
 	publicURL, ok := k.Config().KratosPublicURL(ctx)
 	span.SetAttributes(attribute.String("public_url", fmt.Sprintf("%+v", publicURL)))
@@ -79,7 +79,7 @@ func (k *Default) Authenticate(ctx context.Context, name, secret string) (sessio
 
 func (k *Default) DisableSession(ctx context.Context, identityProviderSessionID string) (err error) {
 	ctx, span := k.Tracer(ctx).Tracer().Start(ctx, "kratos.DisableSession")
-	otelx.End(span, &err)
+	defer otelx.End(span, &err)
 
 	adminURL, ok := k.Config().KratosAdminURL(ctx)
 	span.SetAttributes(attribute.String("admin_url", fmt.Sprintf("%+v", adminURL)))

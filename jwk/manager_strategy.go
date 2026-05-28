@@ -51,7 +51,7 @@ func (m ManagerStrategy) AddKey(ctx context.Context, set string, key *jose.JSONW
 
 func (m ManagerStrategy) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) (err error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.AddKeySet", trace.WithAttributes(attribute.String("set", set)))
-	otelx.End(span, &err)
+	defer otelx.End(span, &err)
 
 	return m.softwareKeyManager.AddKeySet(ctx, set, keys)
 }

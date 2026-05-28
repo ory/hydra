@@ -208,6 +208,27 @@ func TestClientSDK(t *testing.T) {
 		assertx.EqualAsJSONExcept(t, expected, result, nil)
 	})
 
+	t.Run("case=patch preserves registration access token", func(t *testing.T) {
+		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(createTestClient("")).Execute()
+		require.NoError(t, err)
+		require.NotNil(t, created.RegistrationAccessToken)
+		originalRAT := *created.RegistrationAccessToken
+
+		_, _, err = c.OAuth2API.PatchOAuth2Client(context.Background(), *created.ClientId).
+			JsonPatch([]hydra.JsonPatch{{Op: "replace", Path: "/client_uri", Value: "http://foo.bar"}}).Execute()
+		require.NoError(t, err)
+
+		dynURL := publicServer.URL + client.DynClientsHandlerPath + "/" + *created.ClientId
+
+		req, err := http.NewRequest(http.MethodGet, dynURL, nil)
+		require.NoError(t, err)
+		req.Header.Set("Authorization", "Bearer "+originalRAT)
+		res, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		_ = res.Body.Close()
+		assert.Equal(t, http.StatusOK, res.StatusCode, "registration access token must still be valid after admin PATCH")
+	})
+
 	t.Run("case=patch client illegally", func(t *testing.T) {
 		op := "replace"
 		path := "/id"

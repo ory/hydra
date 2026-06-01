@@ -4,8 +4,6 @@
 package configx
 
 import (
-	"context"
-
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/v2"
 
@@ -16,16 +14,13 @@ import (
 
 // KoanfMemory implements a KoanfMemory provider.
 type KoanfMemory struct {
-	doc stdjson.RawMessage
-
-	ctx    context.Context
+	doc    stdjson.RawMessage
 	parser koanf.Parser
 }
 
 // NewKoanfMemory returns a file provider.
-func NewKoanfMemory(ctx context.Context, doc stdjson.RawMessage) *KoanfMemory {
+func NewKoanfMemory(doc stdjson.RawMessage) *KoanfMemory {
 	return &KoanfMemory{
-		ctx:    ctx,
 		doc:    doc,
 		parser: json.Parser(),
 	}

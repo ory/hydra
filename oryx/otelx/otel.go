@@ -42,6 +42,12 @@ func NewNoop() *Tracer {
 	return t
 }
 
+type simpleProvider struct{ t *Tracer }
+
+func (p simpleProvider) Tracer(_ context.Context) *Tracer { return p.t }
+
+func NewNoopProvider() Provider { return &simpleProvider{t: NewNoop()} }
+
 // setup constructs the tracer based on the given configuration.
 func (t *Tracer) setup(name string, l *logrusx.Logger, c *Config) error {
 	switch f := stringsx.SwitchExact(c.Provider); {

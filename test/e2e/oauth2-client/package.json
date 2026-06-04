@@ -29,6 +29,7 @@
   },
   "overrides": {
     "node-forge": "1.4.0",
-    "path-to-regexp": "0.1.13"
+    "path-to-regexp": "0.1.13",
+    "qs": "6.15.2"
   }
 }

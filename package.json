@@ -30,7 +30,7 @@
   },
   "overrides": {
     "@nestjs/core": "11.1.19",
-    "axios": "1.15.2",
+    "axios": "1.16.0",
     "file-type": "22.0.1",
     "glob": "13.0.6",
     "path-to-regexp": "8.4.2"

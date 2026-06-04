@@ -57,6 +57,21 @@ func newTestConfig(t *testing.T, opts ...configx.OptionModifier) *config.Default
 	return config.NewCustom(logrusx.New("", ""), p, contextx.NewTestConfigProvider(spec.ConfigValidationSchema, all...))
 }
 
+func TestGetAllowedPrompts(t *testing.T) {
+	t.Parallel()
+
+	c := NewConfig(&stubConfigDeps{conf: newTestConfig(t)})
+	allowed := c.GetAllowedPrompts(t.Context())
+
+	// Every prompt value defined by the OpenID Connect Core specification must be
+	// accepted, otherwise authorization requests from compliant clients fail with
+	// an "invalid_request" error.
+	// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
+	for _, prompt := range []string{"none", "login", "consent", "select_account"} {
+		assert.Contains(t, allowed, prompt, "OpenID Connect prompt value %q must be supported", prompt)
+	}
+}
+
 func TestGetTokenURLs(t *testing.T) {
 	ctx := context.Background()
 

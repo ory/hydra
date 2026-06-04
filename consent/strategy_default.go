@@ -122,7 +122,10 @@ func (s *defaultStrategy) requestAuthentication(
 	defer otelx.End(span, &err)
 
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
-	if slices.Contains(prompt, "login") {
+	// We do not support multiple accounts within a single login session, so we
+	// treat "select_account" like "login": the user is always sent to the login
+	// screen, where they can authenticate with the account of their choice.
+	if slices.Contains(prompt, "login") || slices.Contains(prompt, "select_account") {
 		return s.forwardAuthenticationRequest(ctx, w, r, ar, nil, f)
 	}
 

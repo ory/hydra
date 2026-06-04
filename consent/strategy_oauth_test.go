@@ -789,6 +789,9 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			{"prompt": {"login"}},
 			{"max_age": {"1"}},
 			{"max_age": {"0"}},
+			// select_account is treated like login: the user must re-authenticate
+			// so they can choose which account to sign in with.
+			{"prompt": {"select_account"}},
 		} {
 			t.Run("values="+values.Encode(), func(t *testing.T) {
 				if k == 1 {

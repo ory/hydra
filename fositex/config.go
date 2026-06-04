@@ -208,7 +208,7 @@ func (c *Config) GetIDTokenIssuer(ctx context.Context) string {
 }
 
 func (c *Config) GetAllowedPrompts(context.Context) []string {
-	return []string{"login", "none", "consent", "registration"}
+	return []string{"login", "none", "consent", "registration", "select_account"}
 }
 
 func (c *Config) GetRedirectSecureChecker(context.Context) func(context.Context, *url.URL) bool {

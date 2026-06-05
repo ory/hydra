@@ -19,7 +19,14 @@ type hasherConfig struct {
 }
 
 func (c hasherConfig) HasherPBKDF2Config(_ context.Context) *hasherx.PBKDF2Config {
-	return &hasherx.PBKDF2Config{}
+	// Mirror the production defaults from driver/config.DefaultProvider. Since
+	// golang.org/x/crypto v0.52.0, pbkdf2.Key panics on a zero key length.
+	return &hasherx.PBKDF2Config{
+		Algorithm:  "sha256",
+		Iterations: 1,
+		SaltLength: 16,
+		KeyLength:  32,
+	}
 }
 
 func (c hasherConfig) HasherBcryptConfig(_ context.Context) *hasherx.BCryptConfig {

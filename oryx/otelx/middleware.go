@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ory/x/httprouterx"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
+	"github.com/ory/x/httprouterx"
 )
 
 var withDefaultFilters = otelhttp.WithFilter(func(r *http.Request) bool {

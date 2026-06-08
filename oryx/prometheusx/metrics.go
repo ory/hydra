@@ -11,10 +11,11 @@ import (
 	"time"
 
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/ory/x/httprouterx"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/negroni"
+
+	"github.com/ory/x/httprouterx"
 )
 
 type HTTPMetrics struct {

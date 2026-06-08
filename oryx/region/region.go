@@ -1,3 +1,6 @@
+// Copyright © 2026 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 // Package region defines the Ory Network region enumeration. Lives in x/ so
 // kratos-oss and other OSS layers can use it without importing cloudlib.
 package region
@@ -5,8 +8,9 @@ package region
 import (
 	"database/sql/driver"
 
-	"github.com/ory/herodot"
 	"github.com/pkg/errors"
+
+	"github.com/ory/herodot"
 )
 
 // Region is an Ory Network region. Specific regions map to a single CRDB

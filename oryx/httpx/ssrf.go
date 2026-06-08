@@ -11,9 +11,10 @@ import (
 	"time"
 
 	"github.com/gobwas/glob"
-	"github.com/ory/x/ipx"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
+	"github.com/ory/x/ipx"
 )
 
 var _ http.RoundTripper = (*noInternalIPRoundTripper)(nil)

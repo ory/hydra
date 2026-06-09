@@ -24,7 +24,7 @@ if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
 
-(cd ../../; go build  -o test/e2e/hydra . )
+go -C ../../ build  -o test/e2e/hydra .
 
 # Install oauth2-client
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then

@@ -83,6 +83,17 @@ func newOpts() *opts {
 
 type Modifier func(*opts)
 
+// redactedSource returns a safe representation of the source for use in error
+// messages. base64:// sources embed the full payload (which may contain
+// secrets such as private keys) and are therefore redacted; all other sources
+// are returned unchanged.
+func redactedSource(source string) string {
+	if strings.HasPrefix(source, "base64://") {
+		return "base64://[redacted]"
+	}
+	return source
+}
+
 // NewFetcher creates a new fetcher instance.
 func NewFetcher(opts ...Modifier) *Fetcher {
 	o := newOpts()
@@ -108,7 +119,7 @@ func (f *Fetcher) FetchBytes(ctx context.Context, source string) ([]byte, error)
 	if !slices.ContainsFunc(f.schemes, func(scheme string) bool {
 		return strings.HasPrefix(source, scheme+"://")
 	}) {
-		return nil, errors.WithStack(fmt.Errorf("%w: in source %q: allowed schemes: %s", ErrUnknownScheme, source, strings.Join(f.schemes, ", ")))
+		return nil, errors.WithStack(fmt.Errorf("%w: in source %q: allowed schemes: %s", ErrUnknownScheme, redactedSource(source), strings.Join(f.schemes, ", ")))
 	}
 	switch {
 	case strings.HasPrefix(source, "http://"), strings.HasPrefix(source, "https://"):
@@ -116,17 +127,17 @@ func (f *Fetcher) FetchBytes(ctx context.Context, source string) ([]byte, error)
 	case strings.HasPrefix(source, "file://"):
 		b, err := os.ReadFile(strings.TrimPrefix(source, "file://"))
 		if err != nil {
-			return nil, errors.Wrapf(err, "read file: %s", source)
+			return nil, errors.Wrapf(err, "read file: %s", redactedSource(source))
 		}
 		return b, nil
 	case strings.HasPrefix(source, "base64://"):
 		src, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(source, "base64://"))
 		if err != nil {
-			return nil, errors.Wrapf(err, "base64decode: %s", source)
+			return nil, errors.Wrapf(err, "base64decode: %s", redactedSource(source))
 		}
 		return src, nil
 	default:
-		return nil, errors.Wrap(ErrUnknownScheme, "unknown scheme in source: "+source)
+		return nil, errors.Wrap(ErrUnknownScheme, "unknown scheme in source: "+redactedSource(source))
 	}
 }
 
@@ -149,16 +160,16 @@ func (f *Fetcher) fetchRemote(ctx context.Context, source string) (b []byte, err
 
 	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodGet, source, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "new request: %s", source)
+		return nil, errors.Wrapf(err, "new request: %s", redactedSource(source))
 	}
 	res, err := f.hc.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, source)
+		return nil, errors.Wrap(err, redactedSource(source))
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("expected http response status code 200 but got %d when fetching: %s", res.StatusCode, source)
+		return nil, errors.Errorf("expected http response status code 200 but got %d when fetching: %s", res.StatusCode, redactedSource(source))
 	}
 
 	if f.limit > 0 {

@@ -1,19 +1,8 @@
 //go:build go1.18
 // +build go1.18
 
-// Copyright 2026 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright © 2026 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
 
 package hydra_test
 
@@ -34,7 +23,7 @@ type testConfig struct {
 	secret []byte
 }
 
-func (c *testConfig) GetTokenEntropy(_ context.Context) int          { return 32 }
+func (c *testConfig) GetTokenEntropy(_ context.Context) int             { return 32 }
 func (c *testConfig) GetGlobalSecret(_ context.Context) ([]byte, error) { return c.secret, nil }
 func (c *testConfig) GetRotatedGlobalSecrets(_ context.Context) ([][]byte, error) {
 	return nil, nil
@@ -67,11 +56,11 @@ func FuzzHMACTokenValidate(f *testing.F) {
 		f.Add(validToken)
 	}
 
-	f.Add("")                    // empty
-	f.Add(".")                   // just separator
-	f.Add("abc.def")             // invalid base64
-	f.Add("AAAA.AAAA")           // valid base64, wrong signature
-	f.Add("not-a-token")         // no separator
+	f.Add("")                          // empty
+	f.Add(".")                         // just separator
+	f.Add("abc.def")                   // invalid base64
+	f.Add("AAAA.AAAA")                 // valid base64, wrong signature
+	f.Add("not-a-token")               // no separator
 	f.Add(string(make([]byte, 10000))) // large input
 
 	f.Fuzz(func(t *testing.T, token string) {
@@ -145,10 +134,10 @@ func FuzzJWTValidate(f *testing.F) {
 		f.Add(validToken)
 	}
 
-	f.Add("")                // empty
-	f.Add("eyJ...")          // garbage
-	f.Add("a.b.c")           // 3-part but invalid
-	f.Add("header.payload")  // 2-part
+	f.Add("")               // empty
+	f.Add("eyJ...")         // garbage
+	f.Add("a.b.c")          // 3-part but invalid
+	f.Add("header.payload") // 2-part
 
 	f.Fuzz(func(t *testing.T, token string) {
 		if len(token) > 1<<16 {

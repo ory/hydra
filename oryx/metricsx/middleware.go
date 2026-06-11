@@ -17,6 +17,7 @@ import (
 	"sync"
 	"time"
 
+	"connectrpc.com/connect"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -343,6 +344,48 @@ func (sw *Service) UnaryInterceptor(ctx context.Context, req interface{}, info *
 	}
 
 	return resp, err
+}
+
+func (sw *Service) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
+	return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+		if sw.optOut {
+			return next(ctx, req)
+		}
+
+		start := time.Now()
+		resp, err := next(ctx, req)
+		latency := time.Since(start).Milliseconds()
+
+		hosts := []string{sw.o.Hostname}
+		for _, h := range append([]string{"Host"}, knownHeaders...) {
+			if v := req.Header().Get(h); len(v) > 0 {
+				hosts = append(hosts, v)
+			}
+		}
+		host := urlx.ExtractPublicAddress(hosts...)
+
+		if err := sw.c.Enqueue(analytics.Page{
+			InstanceId:     sw.instanceId,
+			DeploymentId:   sw.o.DeploymentId,
+			Project:        sw.o.Service,
+			UrlHost:        host,
+			UrlPath:        req.Spec().Procedure,
+			RequestCode:    int(status.Code(err)),
+			RequestLatency: int(latency),
+		}); err != nil {
+			sw.l.WithError(err).Debug("Could not commit anonymized telemetry data")
+			// do nothing...
+		}
+
+		return resp, err
+	}
+}
+
+func (sw *Service) WrapStreamingClient(next connect.StreamingClientFunc) connect.StreamingClientFunc {
+	return next
+}
+func (sw *Service) WrapStreamingHandler(next connect.StreamingHandlerFunc) connect.StreamingHandlerFunc {
+	return next
 }
 
 func (sw *Service) StreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {

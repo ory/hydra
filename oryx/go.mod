@@ -4,6 +4,7 @@ go 1.26
 
 require (
 	code.dny.dev/ssrf v0.2.0
+	connectrpc.com/connect v1.20.0
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/auth0/go-jwt-middleware/v2 v2.3.0
 	github.com/avast/retry-go/v4 v4.6.1

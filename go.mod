@@ -73,6 +73,7 @@ require (
 
 require (
 	code.dny.dev/ssrf v0.2.0 // indirect
+	connectrpc.com/connect v1.20.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect

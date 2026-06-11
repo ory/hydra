@@ -1,5 +1,7 @@
 code.dny.dev/ssrf v0.2.0 h1:wCBP990rQQ1CYfRpW+YK1+8xhwUjv189AQ3WMo1jQaI=
 code.dny.dev/ssrf v0.2.0/go.mod h1:B+91l25OnyaLIeCx0WRJN5qfJ/4/ZTZxRXgm0lj/2w8=
+connectrpc.com/connect v1.20.0 h1:6TNDAB+WeNd2uolWNlYczB5E0KNNaVMNUEx8JEUsPmQ=
+connectrpc.com/connect v1.20.0/go.mod h1:A2ygJrukXwWy32vkCAAHNVguZrqZ+jeZ9rGRnGR4dN4=
 dario.cat/mergo v1.0.2 h1:85+piFYR1tMbRrLcDwR18y4UKJ3aH1Tbzi24VRW1TK8=
 dario.cat/mergo v1.0.2/go.mod h1:E/hbnu0NxMFBjpMIE34DRGLWqDy0g5FuKDhCb31ngxA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=

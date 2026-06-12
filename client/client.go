@@ -407,6 +407,26 @@ func (c *Client) BeforeSave(_ *pop.Connection) error {
 		c.AllowedCORSOrigins = sqlxx.StringSliceJSONFormat{}
 	}
 
+	if c.Contacts == nil {
+		c.Contacts = sqlxx.StringSliceJSONFormat{}
+	}
+
+	if c.PostLogoutRedirectURIs == nil {
+		c.PostLogoutRedirectURIs = sqlxx.StringSliceJSONFormat{}
+	}
+
+	if c.RequestURIs == nil {
+		c.RequestURIs = sqlxx.StringSliceJSONFormat{}
+	}
+
+	if c.GrantTypes == nil {
+		c.GrantTypes = sqlxx.StringSliceJSONFormat{}
+	}
+
+	if c.ResponseTypes == nil {
+		c.ResponseTypes = sqlxx.StringSliceJSONFormat{}
+	}
+
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now()
 	}

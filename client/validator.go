@@ -235,6 +235,13 @@ func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) 
 		return errors.WithStack(ErrInvalidRequest.WithDescription(`"skip_logout_consent" cannot be set for dynamic client registration`))
 	}
 
+	// Apply the configured access-token strategy override for dynamically
+	// registered clients (if any). When unset, the client inherits the
+	// global `strategies.access_token` setting at token-issuance time.
+	if s := v.r.Config().OIDCDynamicClientRegistrationAccessTokenStrategy(ctx); s != "" {
+		c.AccessTokenStrategy = string(s)
+	}
+
 	return v.Validate(ctx, c)
 }
 

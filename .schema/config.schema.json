@@ -462,6 +462,18 @@
                 "type": "string"
               },
               "examples": [["openid", "offline", "offline_access"]]
+            },
+            "strategies": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Optional strategy overrides for clients created via OpenID Connect Dynamic Client Registration. When unset, dynamically registered clients inherit the global strategies (e.g. `strategies.access_token`).",
+              "properties": {
+                "access_token": {
+                  "type": "string",
+                  "enum": ["opaque", "jwt"],
+                  "description": "Access token strategy used for clients created via Dynamic Client Registration. When unset, the global `strategies.access_token` is used. Clients cannot override this value via the registration payload."
+                }
+              }
             }
           }
         }

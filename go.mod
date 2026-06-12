@@ -1,4 +1,4 @@
-﻿module github.com/ory/hydra/v2
+module github.com/ory/hydra/v2
 
 go 1.26
 

@@ -118,6 +118,7 @@ const (
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
+	KeyOAuth2GrantJWTOmitAssertionAudience       = "oauth2.grant.jwt.omit_assertion_audience"
 	KeyRefreshTokenHook                          = "oauth2.refresh_token_hook" // #nosec G101
 	KeyTokenHook                                 = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
@@ -738,6 +739,10 @@ func (p *DefaultProvider) HSMKeySetPrefix() string {
 
 func (p *DefaultProvider) GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Context) bool {
 	return p.getProvider(ctx).Bool(KeyOAuth2GrantJWTIssuedDateOptional)
+}
+
+func (p *DefaultProvider) GetGrantTypeJWTBearerOmitAssertionAudience(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyOAuth2GrantJWTOmitAssertionAudience)
 }
 
 func (p *DefaultProvider) GetJWTMaxDuration(ctx context.Context) time.Duration {

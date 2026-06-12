@@ -19,6 +19,12 @@ import (
 // #nosec:gosec G101 - False Positive
 const grantTypeJWTBearer = "urn:ietf:params:oauth:grant-type:jwt-bearer"
 
+// omitAssertionAudienceProvider is an optional interface that can be implemented
+// by the Config to control whether the audience from the assertion JWT is omitted.
+type omitAssertionAudienceProvider interface {
+	GetGrantTypeJWTBearerOmitAssertionAudience(ctx context.Context) bool
+}
+
 var _ fosite.TokenEndpointHandler = (*Handler)(nil)
 
 type Handler struct {
@@ -103,8 +109,14 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		request.GrantScope(scope)
 	}
 
-	for _, audience := range claims.Audience {
-		request.GrantAudience(audience)
+	omitAudience := false
+	if p, ok := c.Config.(omitAssertionAudienceProvider); ok {
+		omitAudience = p.GetGrantTypeJWTBearerOmitAssertionAudience(ctx)
+	}
+	if !omitAudience {
+		for _, audience := range claims.Audience {
+			request.GrantAudience(audience)
+		}
 	}
 
 	session, err := c.getSessionFromRequest(request)

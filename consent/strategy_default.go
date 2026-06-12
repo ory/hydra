@@ -636,7 +636,13 @@ func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 
 	if f.ConsentError.IsError() {
 		f.ConsentError.SetDefaults(flow.ConsentRequestDeniedErrorName)
-		return nil, errors.WithStack(f.ConsentError.ToRFCError())
+		// Return the flow alongside the error so device-flow callers can read
+		// DeviceCodeRequestID and mark the device-code session as rejected. This
+		// lets the polling client receive access_denied (RFC 8628 section 3.5)
+		// instead of waiting for the device code to expire. The authorization
+		// code flow caller (HandleOAuth2AuthorizationRequest) discards the flow
+		// on error, so returning it here is safe for that path.
+		return f, errors.WithStack(f.ConsentError.ToRFCError())
 	}
 
 	if err := s.r.ConsentManager().CreateConsentSession(ctx, f); errors.Is(err, sqlcon.ErrUniqueViolation()) {

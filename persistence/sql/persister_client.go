@@ -76,13 +76,24 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		}
 
 		if cl.Secret == "" {
+			// Secret not being changed, preserve it and rotated secrets
 			cl.Secret = string(o.GetHashedSecret())
+			if cl.RotatedSecrets == "" {
+				cl.RotatedSecrets = o.RotatedSecrets
+			}
 		} else {
+			// New secret provided - hash it and clear rotated secrets
 			h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
 			if err != nil {
 				return err
 			}
+
 			cl.Secret = string(h)
+			// Clear rotated secrets when secret is replaced (not rotated)
+			// Only preserve if explicitly set by the rotate endpoint
+			if cl.RotatedSecrets == "" {
+				cl.RotatedSecrets = ""
+			}
 		}
 
 		// Ensure ID is the same

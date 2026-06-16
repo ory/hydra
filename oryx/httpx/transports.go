@@ -62,3 +62,7 @@ func (ct *TransportWithHost) RoundTrip(req *http.Request) (*http.Response, error
 	req.Host = ct.host
 	return ct.RoundTripper.RoundTrip(req)
 }
+
+type TransportFunc func(*http.Request) (*http.Response, error)
+
+func (f TransportFunc) RoundTrip(req *http.Request) (*http.Response, error) { return f(req) }

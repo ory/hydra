@@ -5,7 +5,11 @@ const express = require("express")
 const session = require("express-session")
 const uuid = require("node-uuid")
 const oauth2 = require("simple-oauth2")
-const fetch = require("node-fetch")
+// Use Node's built-in fetch (undici) rather than node-fetch@2. node-fetch@2 is
+// unmaintained and throws ERR_STREAM_PREMATURE_CLOSE while reading larger
+// "Connection: close" response bodies on recent Node versions, which made the
+// device-flow e2e tests (the largest responses: JWT access token + ID token)
+// fail whenever CI's floating Node 24.x landed on an affected patch release.
 const ew = require("express-winston")
 const winston = require("winston")
 const { Issuer } = require("openid-client")
@@ -20,12 +24,42 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 const blacklistedSid = []
 
-const isStatusOk = (res) =>
-  res.ok
-    ? Promise.resolve(res)
-    : Promise.reject(
-        new Error(`Received unexpected status code ${res.statusCode}`),
-      )
+const isStatusOk = async (res) => {
+  if (res.ok) {
+    return res
+  }
+  // Surface the server's actual status and body so failures are diagnosable.
+  // (The original code read res.statusCode, which is undefined on a fetch
+  // Response — it exposes res.status — producing the opaque "status code
+  // undefined".) Tag it so requestJson does not retry a definitive HTTP error.
+  const body = await res.text().catch(() => "")
+  const err = new Error(
+    `Received unexpected status code ${res.status}: ${body}`,
+  )
+  err.isHttpStatus = true
+  throw err
+}
+
+// requestJson fetches a URL, verifies the status, and reads the JSON body,
+// retrying transient failures. The body read is inside the retry on purpose: a
+// connection can be closed before the full body is delivered, which surfaces as
+// a "Premature close" while reading the body rather than as a failure of the
+// fetch() call itself. Definitive HTTP error responses are not retried.
+const requestJson = async (url, opts, attempts = 4) => {
+  let lastErr
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await isStatusOk(await fetch(url, opts))
+      return await res.json()
+    } catch (err) {
+      lastErr = err
+      if (err.isHttpStatus) {
+        break
+      }
+    }
+  }
+  throw lastErr
+}
 
 const config = {
   url: process.env.AUTHORIZATION_SERVER_URL || "http://127.0.0.1:5004/",
@@ -177,19 +211,18 @@ app.get("/oauth2/device", async (req, res) => {
       ),
   )
 
-  fetch(new URL("/oauth2/device/auth", config.public).toString(), {
+  requestJson(new URL("/oauth2/device/auth", config.public).toString(), {
     method: "POST",
     body: params,
     headers: headers,
   })
-    .then(isStatusOk)
-    .then((res) => res.json())
     .then((body) => {
       // Store the device_code to use after authentication to get the tokens
       req.session.device_code = body?.device_code
       res.redirect(body?.verification_uri_complete)
     })
     .catch((err) => {
+      console.error("device authorization request failed:", err)
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -218,17 +251,19 @@ app.get("/oauth2/device/success", async (req, res) => {
     "Basic " + Buffer.from(clientId + ":" + clientSecret).toString("base64"),
   )
 
-  fetch(new URL("/oauth2/token", config.public).toString(), {
+  requestJson(new URL("/oauth2/token", config.public).toString(), {
     method: "POST",
     body: params,
     headers: headers,
   })
-    .then(isStatusOk)
-    .then((resp) => resp.json())
     .then((data) => {
       res.send({ result: "success", token: data })
     })
     .catch((err) => {
+      // Log server-side so the real failure lands in oauth2-client.e2e.log,
+      // which CI dumps on failure. Otherwise the only signal is the test reading
+      // an undefined token, which hides what actually went wrong.
+      console.error("device token exchange failed:", err)
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -289,12 +324,10 @@ app.get("/oauth2/introspect/at", (req, res) => {
   const params = new URLSearchParams()
   params.append("token", req.session.oauth2_flow.token.access_token)
 
-  fetch(new URL("/oauth2/introspect", config.admin).toString(), {
+  requestJson(new URL("/oauth2/introspect", config.admin).toString(), {
     method: "POST",
     body: params,
   })
-    .then(isStatusOk)
-    .then((res) => res.json())
     .then((body) => res.json({ result: "success", body }))
     .catch((err) => {
       console.error(err)
@@ -306,12 +339,10 @@ app.get("/oauth2/introspect/rt", async (req, res) => {
   const params = new URLSearchParams()
   params.append("token", req.session.oauth2_flow.token.refresh_token)
 
-  fetch(new URL("/oauth2/introspect", config.admin).toString(), {
+  requestJson(new URL("/oauth2/introspect", config.admin).toString(), {
     method: "POST",
     body: params,
   })
-    .then(isStatusOk)
-    .then((res) => res.json())
     .then((body) => res.json({ result: "success", body }))
     .catch((err) => {
       res.send(JSON.stringify({ error: err.toString() }))

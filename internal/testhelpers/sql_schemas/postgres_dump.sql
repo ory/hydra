@@ -1,4 +1,4 @@
--- migrations hash: 9ca90c1aaa8c09268d225b414e946af686058788bfe285c358b8daea9ce52149152e41ef2aeb3c1e836dd6f898a3e749fbbd495f31e51d1c40bce6dadd1d9b5d
+-- migrations hash: 1817b52e8c4e0f020e6951d16d6ce1d471061f23f9e61bfd4d97edac653791705a192ed6ed2fdd68c1c8df2fbce8f25efc4f248393b6ccbbffd86d88f07e604c
 
 
 
@@ -470,6 +470,8 @@ CREATE UNIQUE INDEX hydra_oauth2_flow_consent_challenge_idx ON public.hydra_oaut
 CREATE UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx ON public.hydra_oauth2_flow USING btree (device_challenge_id);
 
 CREATE INDEX hydra_oauth2_flow_login_session_id_idx ON public.hydra_oauth2_flow USING btree (login_session_id, nid);
+
+CREATE INDEX hydra_oauth2_flow_login_session_subject_idx ON public.hydra_oauth2_flow USING btree (nid, login_session_id, subject) INCLUDE (client_id) WHERE (login_session_id IS NOT NULL);
 
 CREATE INDEX hydra_oauth2_flow_previous_consents_idx ON public.hydra_oauth2_flow USING btree (subject, client_id, nid, consent_skip, consent_error, consent_remember);
 

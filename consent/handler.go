@@ -905,14 +905,14 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 		r.URL.Query().Get("challenge"),
 	)
 
-	c, err := h.r.LogoutManager().AcceptLogoutRequest(r.Context(), challenge)
+	verifier, err := h.r.LogoutManager().AcceptLogoutRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {verifier}}).String(),
 	})
 }
 
@@ -981,7 +981,6 @@ type _ struct {
 //
 //	Responses:
 //	  200: oAuth2LogoutRequest
-//	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
 //
 //	Extensions:
@@ -1001,13 +1000,6 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request)
 	// We do not want to share the secret so remove it.
 	if request.Client != nil {
 		request.Client.Secret = ""
-	}
-
-	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
-			RedirectTo: request.RequestURL,
-		})
-		return
 	}
 
 	h.r.Writer().Write(w, r, request)

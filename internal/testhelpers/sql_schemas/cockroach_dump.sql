@@ -1,4 +1,4 @@
--- migrations hash: 9ca90c1aaa8c09268d225b414e946af686058788bfe285c358b8daea9ce52149152e41ef2aeb3c1e836dd6f898a3e749fbbd495f31e51d1c40bce6dadd1d9b5d
+-- migrations hash: 1817b52e8c4e0f020e6951d16d6ce1d471061f23f9e61bfd4d97edac653791705a192ed6ed2fdd68c1c8df2fbce8f25efc4f248393b6ccbbffd86d88f07e604c
 
 CREATE TABLE public.schema_migration (
 	version VARCHAR(48) NOT NULL,
@@ -181,7 +181,8 @@ CREATE TABLE public.hydra_oauth2_flow (
 	INDEX hydra_oauth2_flow_login_session_id_idx (login_session_id ASC, nid ASC),
 	INDEX hydra_oauth2_flow_sub_idx (subject ASC, nid ASC),
 	INDEX hydra_oauth2_flow_previous_consents_idx (subject ASC, client_id ASC, nid ASC, consent_skip ASC, consent_error ASC, consent_remember ASC),
-	UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx (device_challenge_id ASC)
+	UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx (device_challenge_id ASC),
+	INDEX hydra_oauth2_flow_login_session_subject_idx (nid ASC, login_session_id ASC, subject ASC) STORING (client_id) WHERE login_session_id IS NOT NULL
 );
 CREATE TABLE public.hydra_oauth2_access (
 	signature VARCHAR(255) NOT NULL,

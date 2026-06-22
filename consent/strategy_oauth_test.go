@@ -51,7 +51,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
-	oauth2Config := func(t *testing.T, c *client.Client) *oauth2.Config {
+	oauth2Config := func(_ *testing.T, c *client.Client) *oauth2.Config {
 		return &oauth2.Config{
 			ClientID:     c.GetID(),
 			ClientSecret: c.Secret,
@@ -188,7 +188,8 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 					RejectOAuth2Request(hydra.RejectOAuth2Request{
 						Error:            new(fosite.ErrInteractionRequired.ErrorField),
 						ErrorDescription: new("expect-reject-consent"),
-						StatusCode:       new(int64(fosite.ErrInteractionRequired.CodeField))}).Execute()
+						StatusCode:       new(int64(fosite.ErrInteractionRequired.CodeField)),
+					}).Execute()
 				require.NoError(t, err)
 				require.NotEmpty(t, vr.RedirectTo)
 				http.Redirect(w, r, vr.RedirectTo, http.StatusFound)
@@ -266,7 +267,6 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 				"The resource owner or authorization server denied the request. The consent verifier has already been used.",
 				q.Get("error_description"), q)
 		})
-
 	})
 
 	t.Run("case=should pass and set acr values properly", func(t *testing.T) {
@@ -312,9 +312,11 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		conf := oauth2Config(t, c)
 
 		var sid string
-		var run = func(t *testing.T) {
-			code := makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]},
-				"scope": {"openid"}})
+		run := func(t *testing.T) {
+			code := makeRequestAndExpectCode(t, hc, c, url.Values{
+				"redirect_uri": {c.RedirectURIs[0]},
+				"scope":        {"openid"},
+			})
 
 			token, err := conf.Exchange(context.Background(), code)
 			require.NoError(t, err)
@@ -453,7 +455,6 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	})
 
 	t.Run("case=should pass if both login and consent are granted and check remember flows with refresh session cookie", func(t *testing.T) {
-
 		subject := "subject-1"
 		c := createDefaultClient(t)
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
@@ -536,8 +537,10 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		}
 
 		t.Run("perform first flow", func(t *testing.T) {
-			makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]},
-				"scope": {"openid"}})
+			makeRequestAndExpectCode(t, hc, c, url.Values{
+				"redirect_uri": {c.RedirectURIs[0]},
+				"scope":        {"openid"},
+			})
 		})
 
 		t.Run("perform follow up flow with extend_session_lifespan=false", func(t *testing.T) {
@@ -654,12 +657,14 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		// - This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme
 		// - This should pass because prompt=none, client is public, redirection scheme is HTTP and host is localhost
 
-		c := &client.Client{ID: uuidx.NewV4().String(), TokenEndpointAuthMethod: "none",
+		c := &client.Client{
+			ID: uuidx.NewV4().String(), TokenEndpointAuthMethod: "none",
 			RedirectURIs: []string{
 				testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler),
 				"custom://redirection-scheme/path",
 				"custom://localhost/path",
-			}}
+			},
+		}
 		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 
 		subject := "aeneas-rekkas"
@@ -918,7 +923,8 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		t.Run("case=should pass even though id_token_hint is expired", func(t *testing.T) {
 			// Formerly: should pass as regularly even though id_token_hint is expired
 			makeRequestAndExpectCode(t, nil, c, url.Values{
-				"id_token_hint": {testhelpers.NewIDTokenWithExpiry(t, reg, subject, -time.Hour)}})
+				"id_token_hint": {testhelpers.NewIDTokenWithExpiry(t, reg, subject, -time.Hour)},
+			})
 		})
 	})
 
@@ -1066,7 +1072,6 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		hc := testhelpers.NewEmptyJarClient(t)
 		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
-
 	})
 
 	t.Run("case=should be able to retry accept login request", func(t *testing.T) {
@@ -1142,7 +1147,7 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
-	oauth2Config := func(t *testing.T, c *client.Client) *oauth2.Config {
+	oauth2Config := func(_ *testing.T, c *client.Client) *oauth2.Config {
 		return &oauth2.Config{
 			ClientID:     c.GetID(),
 			ClientSecret: c.Secret,
@@ -1207,7 +1212,7 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 		hc := testhelpers.NewEmptyJarClient(t)
 
 		var sid string
-		var run = func(t *testing.T) {
+		run := func(t *testing.T) {
 			res, resp := makeOAuth2DeviceAuthRequest(t, reg, hc, c, "openid")
 			assert.EqualValues(t, http.StatusOK, resp.StatusCode)
 
@@ -1316,7 +1321,6 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 		assert.Equal(t, "baz", idClaims.Get("bar").String(), "%s", idClaims.Raw)
 		sid := idClaims.Get("sid").String()
 		assert.NotNil(t, sid)
-
 	})
 	t.Run("case=should fail because a device verifier was given that doesn't exist in the store", func(t *testing.T) {
 		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))

@@ -20,6 +20,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/hydra/v2/client"
@@ -668,13 +669,10 @@ func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	return f, nil
 }
 
-func (s *defaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
-	if err != nil {
-		return nil, err
-	}
-
-	var urls []string
+// generateFrontChannelLogoutURLs generates front-channel logout URLs for the
+// given clients for session ID sid. Returns a non-nil error only on
+// misconfiguration.
+func (s *defaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, clients []client.Client, sid string) (urls []string, _ error) {
 	for _, c := range clients {
 		u, err := url.Parse(c.FrontChannelLogoutURI)
 		if err != nil {
@@ -690,11 +688,18 @@ func (s *defaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 	return urls, nil
 }
 
-func (s *defaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.Request, subject, sid string) error {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
-	if err != nil {
-		return err
+// executeBackChannelLogout calls the given backchannel logout endpoints with a
+// JWT containing `sid` in parallel background goroutines. Returns a non-nil
+// error only on misconfiguration.
+func (s *defaultStrategy) executeBackChannelLogout(ctx context.Context, clients []client.Client, sid string) (err error) {
+	if len(clients) == 0 {
+		return nil
 	}
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "defaultStrategy.executeBackChannelLogout",
+		trace.WithAttributes(
+			attribute.Int("clients", len(clients)),
+			attribute.String("sid", sid)))
+	defer otelx.End(span, &err)
 
 	openIDKeyID, err := s.r.OpenIDJWTSigner().GetPublicKeyID(ctx)
 	if err != nil {
@@ -733,15 +738,18 @@ func (s *defaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.GetID(), token: t})
 	}
 
-	span := trace.SpanFromContext(ctx)
 	cl := s.r.HTTPClient(ctx)
-	execute := func(t task) {
-		log := s.r.Logger().WithRequest(r).
+	execute := func(ctx context.Context, t task) {
+		log := s.r.Logger().
 			WithField("client_id", t.clientID).
 			WithField("backchannel_logout_url", t.url)
 
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+
 		body := url.Values{"logout_token": {t.token}}.Encode()
-		req, err := retryablehttp.NewRequestWithContext(trace.ContextWithSpan(context.Background(), span), "POST", t.url, []byte(body))
+
+		req, err := retryablehttp.NewRequestWithContext(ctx, "POST", t.url, []byte(body))
 		if err != nil {
 			log.WithError(err).Error("Unable to construct OpenID Connect Back-Channel Logout Request")
 			return
@@ -765,7 +773,7 @@ func (s *defaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 	}
 
 	for _, t := range tasks {
-		go execute(t)
+		go execute(context.WithoutCancel(ctx), t)
 	}
 
 	return nil
@@ -817,20 +825,19 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 			return nil, err
 		}
 
-		challenge := uuid.New()
-		if err := s.r.LogoutManager().CreateLogoutRequest(ctx, &flow.LogoutRequest{
-			RequestURL:  r.URL.String(),
-			ID:          challenge,
-			Subject:     session.Subject,
-			SessionID:   session.ID,
-			Verifier:    uuid.New(),
-			RequestedAt: sqlxx.NullTime(time.Now().UTC().Round(time.Second)),
-			ExpiresAt:   sqlxx.NullTime(time.Now().UTC().Round(time.Second).Add(s.r.Config().ConsentRequestMaxAge(ctx))),
-			RPInitiated: false,
-
-			// PostLogoutRedirectURI is set to the value from config.Provider().LogoutRedirectURL()
+		now := time.Now().UTC().Round(time.Second)
+		exp := now.Add(s.r.Config().ConsentRequestMaxAge(ctx))
+		challenge, err := s.r.LogoutManager().CreateLogoutChallenge(ctx, &flow.LogoutRequest{
+			RequestURL:            r.URL.String(),
+			Subject:               session.Subject,
+			SessionID:             session.ID,
+			RequestedAt:           &now,
+			ExpiresAt:             &exp,
+			RPInitiated:           false,
 			PostLogoutRedirectURI: redir,
-		}); err != nil {
+			Client:                nil, // Client is nil because we don't have a client in OP-initiated logout flows
+		})
+		if err != nil {
 			return nil, err
 		}
 
@@ -856,13 +863,13 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		)
 	}
 
-	now := time.Now().UTC().Unix()
-	if !claims.VerifyIssuedAt(now, true) {
+	now := time.Now().UTC().Round(time.Second)
+	if !claims.VerifyIssuedAt(now.Unix(), true) {
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.
 			WithHintf(
 				`Logout failed because iat claim value '%.0f' from query parameter id_token_hint is before now ('%d').`,
 				mapx.GetFloat64Default(claims, "iat", float64(0)),
-				now,
+				now.Unix(),
 			),
 		)
 	}
@@ -900,6 +907,8 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.
 			WithHint("Logout failed because none of the listed audiences is a registered OAuth 2.0 Client."))
 	}
+
+	cl.Secret = "" // We don't want to expose the client secret (redundant but better safe than sorry)
 
 	if len(requestedRedir) > 0 {
 		var f *url.URL
@@ -940,49 +949,41 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		return nil, err
 	}
 
-	challenge := uuid.New()
-	if err := s.r.LogoutManager().CreateLogoutRequest(ctx, &flow.LogoutRequest{
-		RequestURL:  r.URL.String(),
-		ID:          challenge,
-		SessionID:   hintSid,
-		Subject:     session.Subject,
-		Verifier:    uuid.New(),
-		Client:      cl,
-		RPInitiated: true,
-
-		// PostLogoutRedirectURI is set to the value from config.Provider().LogoutRedirectURL()
+	now = time.Now().UTC().Round(time.Second)
+	exp := now.Add(s.r.Config().ConsentRequestMaxAge(ctx))
+	challenge, err := s.r.LogoutManager().CreateLogoutChallenge(ctx, &flow.LogoutRequest{
+		RequestURL:            r.URL.String(),
+		Subject:               session.Subject,
+		SessionID:             hintSid,
+		RequestedAt:           &now,
+		ExpiresAt:             &exp,
+		RPInitiated:           true,
 		PostLogoutRedirectURI: redir,
-	}); err != nil {
-		return nil, err
+		Client:                cl,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 
 	http.Redirect(w, r, urlx.SetQuery(s.r.Config().LogoutURL(ctx), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
 	return nil, errors.WithStack(ErrUserRedirected)
 }
 
-func (s *defaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.Context, r *http.Request, subject, sid string) error {
-	if err := s.executeBackChannelLogout(ctx, r, subject, sid); err != nil {
+func (s *defaultStrategy) deleteSession(ctx context.Context, sid string) (err error) {
+	session, err := s.r.LoginManager().DeleteLoginSession(ctx, sid)
+	if err != nil {
 		return err
 	}
 
-	// We delete the session after back channel log out has worked as the session is otherwise removed
-	// from the store which will break the query for finding all the channels.
-	//
-	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
-	// even if an upstream URL fails!
-	if session, err := s.r.LoginManager().DeleteLoginSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows()) {
-		// This is ok (session probably already revoked), do nothing!
-	} else if err != nil {
-		return err
-	} else {
-		// revoke Kratos session asynchronously
-		go func(ctx context.Context, kratosSessionID string) {
-			innerErr := s.r.Kratos().DisableSession(ctx, kratosSessionID)
-			if innerErr != nil {
-				s.r.Logger().WithError(innerErr).WithField("sid", sid).WithField("kratos-sid", kratosSessionID).Error("Unable to revoke session in Ory Kratos.")
-			}
-		}(context.WithoutCancel(ctx), session.IdentityProviderSessionID.String())
-	}
+	// revoke Kratos session asynchronously
+	go func(ctx context.Context, kratosSessionID string) {
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+		innerErr := s.r.Kratos().DisableSession(ctx, kratosSessionID)
+		if innerErr != nil {
+			s.r.Logger().WithError(innerErr).WithField("sid", sid).WithField("kratos-sid", kratosSessionID).Error("Unable to revoke session in Ory Kratos.")
+		}
+	}(context.WithoutCancel(ctx), session.IdentityProviderSessionID.String())
 
 	return nil
 }
@@ -1020,28 +1021,65 @@ func (s *defaultStrategy) completeLogout(ctx context.Context, w http.ResponseWri
 			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
 			return nil, errors.WithStack(ErrUserRedirected)
 		}
+
+		if session.ID != lr.SessionID {
+			// If we end up here, this likely means a logout_verifier was
+			// reused. Rather than logging the user out of their new session
+			// (issued after their previous session was revoked), we simply
+			// redirect them to the post_logout_redirect_uri.
+			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
+			return nil, errors.WithStack(ErrUserRedirected)
+		}
 	}
 
-	store, err := s.r.CookieStore(ctx)
+	// It is safe to call these functions for a (subject,sid) combination that was
+	// previously logged out (e.g., through re-use of the logout verifier). Both
+	// lists will be empty in that case.
+	frontChannelClients, backChannelClients, err := s.r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(ctx, lr.Subject, lr.SessionID)
 	if err != nil {
 		return nil, err
 	}
 
-	_, _ = s.revokeAuthenticationCookie(ctx, w, r, store) // Cookie removal is optional
-
-	urls, err := s.generateFrontChannelLogoutURLs(ctx, lr.Subject, lr.SessionID)
-	if err != nil {
-		return nil, err
+	// Deleting the session also serves as a re-use detection mechanism for the logout verifier.
+	if err := s.deleteSession(ctx, lr.SessionID); errors.Is(err, sqlcon.ErrNoRows()) {
+		// This can happen in two scenarios:
+		//
+		// 1. The session was deleted through some other means (API or TTL
+		// expiration) while we were going through the logout flow.
+		//
+		// 2. The logout verifier has been reused. If this happens, we don't
+		// want to log the user out of the current session! Instead, we simply
+		// redirect them to the logout redirect URI.
+		//
+		// So in both scenarios, we don't want to inadvertantly log the user out
+		// of their current session, and in both scenarios, there are no front-
+		// or back-channel logout URLs to call (because the association in the
+		// database has been severed). Hence, we can short-circuit the logout
+		// flow and simply redirect to the post_logout_redirect_uri without
+		// doing anything else.
+		return &flow.LogoutResult{RedirectTo: lr.PostLogoutRedirectURI}, nil
+	} else if err != nil {
+		return nil, err // database error
 	}
 
-	if err := s.performBackChannelLogoutAndDeleteSession(ctx, r, lr.Subject, lr.SessionID); err != nil {
-		return nil, err
+	// Whether the current session cookie matches the one hinted during the
+	// initial logout request or not, we always want to remove it and logout the
+	// user at this point
+	_ = s.revokeAuthenticationSession(ctx, w, r) // this is best effort: we don't want to fail the logout flow if this fails
+
+	if err := s.executeBackChannelLogout(ctx, backChannelClients, lr.SessionID); err != nil {
+		return nil, err // can error only on misconfiguration
+	}
+	urls, err := s.generateFrontChannelLogoutURLs(ctx, frontChannelClients, lr.SessionID)
+	if err != nil {
+		return nil, err // can error only on misconfiguration
 	}
 
 	s.r.Logger().
 		WithRequest(r).
 		WithField("subject", lr.Subject).
-		Info("User logout completed!")
+		WithField("sid", lr.SessionID).
+		Info("User logout completed")
 
 	return &flow.LogoutResult{
 		RedirectTo:             lr.PostLogoutRedirectURI,
@@ -1069,7 +1107,27 @@ func (s *defaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.Respo
 		return lsErr
 	}
 
-	if err := s.performBackChannelLogoutAndDeleteSession(ctx, r, loginSession.Subject, sid); err != nil {
+	// The client list must be read before deleting the session: the deletion
+	// severs the flow-to-session association (ON DELETE SET NULL) that this
+	// query relies on.
+	_, clients, err := s.r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(ctx, loginSession.Subject, sid)
+	if err != nil {
+		return err
+	}
+
+	// Deleting the session gates back-channel logout execution: of multiple
+	// concurrent revocations for the same sid, only the caller that deletes
+	// the session row executes the back-channel requests. This mirrors
+	// completeLogout and keeps back-channel logout at-most-once.
+	if err := s.deleteSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows()) {
+		// The session was revoked concurrently; that caller executes the
+		// back-channel logout requests, so there is nothing left to do.
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	if err := s.executeBackChannelLogout(ctx, clients, sid); err != nil {
 		return err
 	}
 
@@ -1077,7 +1135,7 @@ func (s *defaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.Respo
 		WithRequest(r).
 		WithField("subject", loginSession.Subject).
 		WithField("sid", sid).
-		Info("User logout completed via headless flow!")
+		Info("User logout completed via headless flow")
 
 	return nil
 }

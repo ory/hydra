@@ -1,0 +1,2 @@
+-- Error 1553 (HY000): Cannot drop index 'hydra_oauth2_flow_login_session_subject_idx': needed in a foreign key constraint
+-- DROP INDEX hydra_oauth2_flow_login_session_subject_idx ON hydra_oauth2_flow;

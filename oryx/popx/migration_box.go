@@ -96,6 +96,9 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 			if err != nil {
 				return errors.WithStack(err)
 			}
+			if info.Name() == "." {
+				return nil
+			}
 			if !info.Type().IsRegular() {
 				t.Logf("skipping testdata entry that is not a file: %s", path)
 				return nil

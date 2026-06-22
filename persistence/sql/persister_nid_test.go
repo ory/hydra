@@ -74,23 +74,19 @@ func (s *PersisterTestSuite) TearDownTest() {
 }
 
 func (s *PersisterTestSuite) TestAcceptLogoutRequest() {
-	lr := newLogoutRequest()
-
 	for k, r := range s.registries {
 		s.T().Run("dialect="+k, func(t *testing.T) {
-			require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
-
-			expected, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
+			challenge, err := r.LogoutManager().CreateLogoutChallenge(s.t1, newLogoutRequest())
 			require.NoError(t, err)
-			require.Equal(t, false, expected.Accepted)
 
-			lrAccepted, err := r.LogoutManager().AcceptLogoutRequest(s.t2, lr.ID)
-			require.Error(t, err)
-			require.Equal(t, &flow.LogoutRequest{}, lrAccepted)
+			// Accepting from a different network must fail.
+			_, err = r.LogoutManager().AcceptLogoutRequest(s.t2, challenge)
+			require.ErrorIs(t, err, x.ErrNotFound)
 
-			actual, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
+			// Accepting in the same network succeeds and yields a verifier.
+			verifier, err := r.LogoutManager().AcceptLogoutRequest(s.t1, challenge)
 			require.NoError(t, err)
-			require.Equal(t, expected, actual)
+			require.NotEmpty(t, verifier)
 		})
 	}
 }
@@ -297,18 +293,21 @@ func (s *PersisterTestSuite) TestCreateGrant() {
 func (s *PersisterTestSuite) TestCreateLogoutRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			cl := &client.Client{ID: "client-id"}
-			lr := flow.LogoutRequest{
-				// TODO there is not FK for SessionID so we don't need it here; TODO make sure the missing FK is intentional
-				ID:       uuid.Must(uuid.NewV4()).String(),
-				ClientID: sql.NullString{Valid: true, String: cl.ID},
-			}
-
+			cl := &client.Client{ID: "client-id-create-logout-" + uuidx.NewV4().String()}
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().CreateLogoutRequest(s.t1, &lr))
-			actual, err := r.Persister().GetLogoutRequest(s.t1, lr.ID)
+
+			lr := newLogoutRequest()
+			lr.Client = cl
+
+			challenge, err := r.LogoutManager().CreateLogoutChallenge(s.t1, lr)
 			require.NoError(t, err)
-			require.Equal(t, s.t1NID, actual.NID)
+			require.NotEmpty(t, challenge)
+
+			// Round-trip preserves the client identity within the same NID.
+			actual, err := r.LogoutManager().GetLogoutRequest(s.t1, challenge)
+			require.NoError(t, err)
+			require.NotNil(t, actual.Client)
+			assert.Equal(t, cl.ID, actual.Client.GetID())
 		})
 	}
 }
@@ -587,8 +586,6 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 
 			req := &flow.OAuth2ConsentRequest{
 				ConsentRequestID: "consent-request-id",
-				LoginChallenge:   sqlxx.NullString(f.ID),
-				Skip:             false,
 			}
 
 			f.ConsentRequestID = sqlxx.NullString(req.ConsentRequestID)
@@ -916,22 +913,29 @@ func (s *PersisterTestSuite) TestGetGrants() {
 func (s *PersisterTestSuite) TestGetLogoutRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			cl := &client.Client{ID: "client-id"}
-			lr := flow.LogoutRequest{
-				ID:       uuid.Must(uuid.NewV4()).String(),
-				ClientID: sql.NullString{Valid: true, String: cl.ID},
-			}
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().CreateLogoutRequest(s.t1, &lr))
-
-			actual, err := r.Persister().GetLogoutRequest(s.t2, lr.ID)
-			require.Error(t, err)
-			require.Equal(t, &flow.LogoutRequest{}, actual)
-
-			actual, err = r.Persister().GetLogoutRequest(s.t1, lr.ID)
+			lr := newLogoutRequest()
+			challenge, err := r.LogoutManager().CreateLogoutChallenge(s.t1, lr)
 			require.NoError(t, err)
-			require.NotEqual(t, &flow.LogoutRequest{}, actual)
+
+			// Cross-network get must fail.
+			_, err = r.LogoutManager().GetLogoutRequest(s.t2, challenge)
+			require.ErrorIs(t, err, x.ErrNotFound)
+
+			// Same-network get returns the original payload.
+			actual, err := r.LogoutManager().GetLogoutRequest(s.t1, challenge)
+			require.NoError(t, err)
+			require.NotNil(t, actual)
+			assert.Equal(t, challenge, actual.Challenge)
+			assert.Equal(t, lr.Subject, actual.Subject)
+			assert.Equal(t, lr.SessionID, actual.SessionID)
+			assert.Equal(t, lr.RequestURL, actual.RequestURL)
+			assert.Equal(t, lr.RPInitiated, actual.RPInitiated)
+			require.NotNil(t, actual.ExpiresAt)
+			require.NotNil(t, actual.RequestedAt)
+			assert.True(t, lr.ExpiresAt.Equal(*actual.ExpiresAt))
+			assert.True(t, lr.RequestedAt.Equal(*actual.RequestedAt))
+			assert.Equal(t, lr.PostLogoutRedirectURI, actual.PostLogoutRedirectURI)
+			assert.Nil(t, actual.Client)
 		})
 	}
 }
@@ -1168,7 +1172,7 @@ func (s *PersisterTestSuite) TestIsJWTUsed() {
 	}
 }
 
-func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogout() {
+func (s *PersisterTestSuite) TestListClientsWithBackChannelLogout() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			c1 := &client.Client{ID: "client-1", BackChannelLogoutURI: "not-null"}
@@ -1196,18 +1200,20 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 			t2f1.ConsentRequestID = sqlxx.NullString(t2f1.ID)
 			t2f2.ConsentRequestID = sqlxx.NullString(t2f2.ID)
 
-			cs, err := r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(s.t1, "sub", t1f1.SessionID.String())
+			front, back, err := r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(s.t1, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
-			require.Equal(t, 1, len(cs))
+			require.Len(t, back, 1)
+			require.Len(t, front, 0)
 
-			cs, err = r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(s.t2, "sub", t1f1.SessionID.String())
+			front, back, err = r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(s.t2, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
-			require.Equal(t, 2, len(cs))
+			require.Len(t, back, 2)
+			require.Len(t, front, 0)
 		})
 	}
 }
 
-func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLogout() {
+func (s *PersisterTestSuite) TestListClientsWithFrontChannelLogout() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			c1 := &client.Client{ID: "client-1", FrontChannelLogoutURI: "not-null"}
@@ -1235,13 +1241,15 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 			t2f1.ConsentRequestID = sqlxx.NullString(t2f1.ID)
 			t2f2.ConsentRequestID = sqlxx.NullString(t2f2.ID)
 
-			cs, err := r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t1, "sub", t1f1.SessionID.String())
+			front, back, err := r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(s.t1, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
-			require.Equal(t, 1, len(cs))
+			require.Len(t, front, 1)
+			require.Len(t, back, 0)
 
-			cs, err = r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t2, "sub", t1f1.SessionID.String())
+			front, back, err = r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(s.t2, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
-			require.Equal(t, 2, len(cs))
+			require.Len(t, front, 2)
+			require.Len(t, back, 0)
 		})
 	}
 }
@@ -1288,18 +1296,14 @@ func (s *PersisterTestSuite) TestQueryWithNetwork() {
 func (s *PersisterTestSuite) TestRejectLogoutRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			lr := newLogoutRequest()
-			require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
-
-			require.Error(t, r.LogoutManager().RejectLogoutRequest(s.t2, lr.ID))
-			actual, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
+			challenge, err := r.LogoutManager().CreateLogoutChallenge(s.t1, newLogoutRequest())
 			require.NoError(t, err)
-			require.Equal(t, lr, actual)
 
-			require.NoError(t, r.LogoutManager().RejectLogoutRequest(s.t1, lr.ID))
-			actual, err = r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
-			require.Error(t, err)
-			require.Equal(t, &flow.LogoutRequest{}, actual)
+			// Cross-network reject must fail.
+			require.ErrorIs(t, r.LogoutManager().RejectLogoutRequest(s.t2, challenge), x.ErrNotFound)
+
+			// Same-network reject succeeds.
+			require.NoError(t, r.LogoutManager().RejectLogoutRequest(s.t1, challenge))
 		})
 	}
 }
@@ -1657,52 +1661,34 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			run := func(t *testing.T, lr *flow.LogoutRequest) {
-				lr.Verifier = uuid.Must(uuid.NewV4()).String()
-				lr.Accepted = true
-				lr.Rejected = false
-				require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
-
-				expected, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
+			t.Run("case=cross-network verify fails", func(t *testing.T) {
+				challenge, err := r.LogoutManager().CreateLogoutChallenge(s.t1, newLogoutRequest())
+				require.NoError(t, err)
+				verifier, err := r.LogoutManager().AcceptLogoutRequest(s.t1, challenge)
 				require.NoError(t, err)
 
-				lrInvalidated, err := r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
-				require.Error(t, err)
-				require.Nil(t, lrInvalidated)
-				actual := &flow.LogoutRequest{}
-				require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
-				require.Equal(t, expected, actual)
-
-				lrInvalidated, err = r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
-				require.NoError(t, err)
-				require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
-				require.Equal(t, lrInvalidated, actual)
-				require.Equal(t, true, actual.WasHandled)
-			}
-
-			t.Run("case=legacy logout request without expiry", func(t *testing.T) {
-				lr := newLogoutRequest()
-				run(t, lr)
-			})
-
-			t.Run("case=logout request with expiry", func(t *testing.T) {
-				lr := newLogoutRequest()
-				lr.ExpiresAt = sqlxx.NullTime(time.Now().Add(time.Hour))
-				run(t, lr)
-			})
-
-			t.Run("case=logout request that expired returns error", func(t *testing.T) {
-				lr := newLogoutRequest()
-				lr.ExpiresAt = sqlxx.NullTime(time.Now().UTC().Add(-time.Hour))
-				lr.Verifier = uuid.Must(uuid.NewV4()).String()
-				lr.Accepted = true
-				lr.Rejected = false
-				require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
-
-				_, err := r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
+				_, err = r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t2, verifier)
 				require.ErrorIs(t, err, x.ErrNotFound)
 
-				_, err = r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
+				// Same-network verify succeeds.
+				got, err := r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t1, verifier)
+				require.NoError(t, err)
+				require.NotNil(t, got)
+			})
+
+			t.Run("case=expired logout request returns error", func(t *testing.T) {
+				lr := newLogoutRequest()
+				expired := time.Now().UTC().Add(-time.Hour)
+				lr.ExpiresAt = &expired
+				challenge, err := r.LogoutManager().CreateLogoutChallenge(s.t1, lr)
+				require.NoError(t, err)
+
+				// Expiry is enforced on every decode path, so an expired
+				// challenge already fails at the accept step.
+				_, err = r.LogoutManager().AcceptLogoutRequest(s.t1, challenge)
+				require.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
+
+				_, err = r.LogoutManager().GetLogoutRequest(s.t1, challenge)
 				require.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
 			})
 		})
@@ -1745,8 +1731,16 @@ func newFlow(nid uuid.UUID, clientID string, subject string, sessionID sqlxx.Nul
 }
 
 func newLogoutRequest() *flow.LogoutRequest {
+	now := time.Now().UTC().Round(time.Second)
+	exp := now.Add(time.Hour)
 	return &flow.LogoutRequest{
-		ID: uuid.Must(uuid.NewV4()).String(),
+		Subject:               uuidx.NewV4().String(),
+		SessionID:             uuidx.NewV4().String(),
+		RequestURL:            "http://request.example.com/",
+		RPInitiated:           true,
+		RequestedAt:           &now,
+		ExpiresAt:             &exp,
+		PostLogoutRedirectURI: "http://redirect.example.com/",
 	}
 }
 

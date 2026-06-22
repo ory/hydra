@@ -54,17 +54,17 @@ func MockConsentFlow(remember bool, rememberFor int, skip bool) *flow.Flow {
 	}
 }
 
-func mockLogoutRequest(withClient bool) (c *flow.LogoutRequest) {
+func mockLogoutRequest(withClient bool) *flow.LogoutRequest {
+	now := time.Now().UTC().Round(time.Second)
+	exp := now.Add(time.Hour)
 	req := &flow.LogoutRequest{
 		Subject:               uuidx.NewV4().String(),
-		ID:                    uuidx.NewV4().String(),
-		Verifier:              uuidx.NewV4().String(),
 		SessionID:             uuidx.NewV4().String(),
 		RPInitiated:           true,
 		RequestURL:            "http://request-me/",
 		PostLogoutRedirectURI: "http://redirect-me/",
-		WasHandled:            false,
-		Accepted:              false,
+		RequestedAt:           &now,
+		ExpiresAt:             &exp,
 	}
 	if withClient {
 		req.Client = &client.Client{ID: uuidx.NewV4().String()}
@@ -370,12 +370,12 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 				assert.Equal(t, f.ConsentRequestID, consents[0].ConsentRequestID)
 				assert.Equal(t, f.Client.ID, consents[0].Client.GetID())
 			})
-
-			t.Run("random subject", func(t *testing.T) {
-				_, _, err := m.FindSubjectsGrantedConsentRequests(t.Context(), uuidx.NewV4().String())
-				assert.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
-			})
 		}
+
+		t.Run("random subject", func(t *testing.T) {
+			_, _, err := m.FindSubjectsGrantedConsentRequests(t.Context(), uuidx.NewV4().String())
+			assert.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
+		})
 
 		t.Run("case=ListUserAuthenticatedClientsWithFrontAndBackChannelLogout", func(t *testing.T) {
 			// The idea of this test is to create two identities (subjects) with 4 sessions each, where
@@ -469,16 +469,11 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 					}
 				}
 
-				t.Run(fmt.Sprintf("method=ListUserAuthenticatedClientsWithFrontChannelLogout/session=%s/subject=%s", ls.ID, ls.Subject), func(t *testing.T) {
-					actual, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(t.Context(), ls.Subject, ls.ID)
+				t.Run(fmt.Sprintf("method=ListClientsWithLogoutURLsForSubjectAndSID/session=%s/subject=%s", ls.ID, ls.Subject), func(t *testing.T) {
+					front, back, err := m.ListClientsWithLogoutURLsForSubjectAndSID(t.Context(), ls.Subject, ls.ID)
 					require.NoError(t, err)
-					check(t, frontChannels, actual)
-				})
-
-				t.Run(fmt.Sprintf("method=ListUserAuthenticatedClientsWithBackChannelLogout/session=%s", ls.ID), func(t *testing.T) {
-					actual, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(t.Context(), ls.Subject, ls.ID)
-					require.NoError(t, err)
-					check(t, backChannels, actual)
+					check(t, frontChannels, front)
+					check(t, backChannels, back)
 				})
 			}
 		})
@@ -519,70 +514,125 @@ func ObfuscatedSubjectManagerTest(t *testing.T, deps Deps, m consent.ObfuscatedS
 }
 
 func LogoutManagerTest(t *testing.T, m consent.LogoutManager, clientManager client.Manager) {
-	for _, withClient := range []bool{true, false} {
-		t.Run("get with random challenge", func(t *testing.T) {
-			_, err := m.GetLogoutRequest(t.Context(), uuidx.NewV4().String())
-			assert.ErrorIs(t, err, sqlcon.ErrNoRows())
-		})
+	t.Run("get with random challenge", func(t *testing.T) {
+		_, err := m.GetLogoutRequest(t.Context(), uuidx.NewV4().String())
+		assert.Error(t, err)
+	})
 
+	t.Run("legacy UUID inputs are treated as expired", func(t *testing.T) {
+		// During the rollout of the stateless logout flow, any logout
+		// challenge or verifier issued by the previous (DB-backed) code path
+		// is a UUID. The persister recognizes those by shape and returns
+		// ErrorLogoutFlowExpired so the caller's normal retry-on-expired
+		// behavior kicks in, rather than surfacing a 4xx/5xx from a failed
+		// AEAD decryption.
+		legacy := uuidx.NewV4().String()
+
+		_, err := m.GetLogoutRequest(t.Context(), legacy)
+		assert.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
+
+		_, err = m.AcceptLogoutRequest(t.Context(), legacy)
+		assert.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
+
+		assert.ErrorIs(t, m.RejectLogoutRequest(t.Context(), legacy), flow.ErrorLogoutFlowExpired)
+
+		_, err = m.VerifyAndInvalidateLogoutRequest(t.Context(), legacy)
+		assert.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
+	})
+
+	t.Run("expired challenge is rejected everywhere", func(t *testing.T) {
+		// Stateless challenges cannot be revoked, so the embedded expiry is
+		// the only time bound. Every consumer must enforce it, not just the
+		// final verifier step: otherwise the logout UI renders and accepts a
+		// stale challenge only for the flow to fail at the very end.
+		req := mockLogoutRequest(false)
+		exp := time.Now().UTC().Add(-time.Minute).Round(time.Second)
+		req.ExpiresAt = &exp
+
+		challenge, err := m.CreateLogoutChallenge(t.Context(), req)
+		require.NoError(t, err)
+
+		_, err = m.GetLogoutRequest(t.Context(), challenge)
+		assert.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
+
+		_, err = m.AcceptLogoutRequest(t.Context(), challenge)
+		assert.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
+
+		assert.ErrorIs(t, m.RejectLogoutRequest(t.Context(), challenge), flow.ErrorLogoutFlowExpired)
+	})
+
+	for _, withClient := range []bool{true, false} {
 		t.Run(fmt.Sprintf("with client=%v", withClient), func(t *testing.T) {
-			setup := func(t *testing.T) *flow.LogoutRequest {
+			setup := func(t *testing.T) (*flow.LogoutRequest, string) {
 				req := mockLogoutRequest(withClient)
 				if withClient {
 					require.NoError(t, clientManager.CreateClient(t.Context(), req.Client))
 				}
-				require.NoError(t, m.CreateLogoutRequest(t.Context(), req))
-				return req
+				challenge, err := m.CreateLogoutChallenge(t.Context(), req)
+				require.NoError(t, err)
+				require.NotEmpty(t, challenge)
+				return req, challenge
 			}
 
 			t.Run("get unhandled", func(t *testing.T) {
-				expected := setup(t)
+				expected, challenge := setup(t)
 
-				actual, err := m.GetLogoutRequest(t.Context(), expected.ID)
+				actual, err := m.GetLogoutRequest(t.Context(), challenge)
 				require.NoError(t, err)
-				assert.False(t, actual.WasHandled)
-				assert.False(t, actual.Accepted)
 				compareLogoutRequest(t, expected, actual)
 			})
 
 			t.Run("accept and verify", func(t *testing.T) {
-				expected := setup(t)
+				expected, challenge := setup(t)
 
-				actual, err := m.AcceptLogoutRequest(t.Context(), expected.ID)
+				verifier, err := m.AcceptLogoutRequest(t.Context(), challenge)
 				require.NoError(t, err)
-				assert.True(t, actual.Accepted)
-				assert.False(t, actual.WasHandled)
-				compareLogoutRequest(t, expected, actual)
+				require.NotEmpty(t, verifier)
 
-				actual, err = m.VerifyAndInvalidateLogoutRequest(t.Context(), expected.Verifier)
+				actual, err := m.VerifyAndInvalidateLogoutRequest(t.Context(), verifier)
 				require.NoError(t, err)
-				assert.True(t, actual.Accepted)
-				assert.True(t, actual.WasHandled)
-				compareLogoutRequest(t, expected, actual)
+				compareVerifiedLogoutRequest(t, expected, actual)
 
 				t.Run("double verify fails", func(t *testing.T) {
-					_, err = m.VerifyAndInvalidateLogoutRequest(t.Context(), expected.Verifier)
+					_, err := m.VerifyAndInvalidateLogoutRequest(t.Context(), verifier)
 					require.NotErrorIs(t, err, x.ErrNotFound)
 				})
 
 				t.Run("get verified", func(t *testing.T) {
-					actual, err = m.GetLogoutRequest(t.Context(), expected.ID)
+					actual, err := m.GetLogoutRequest(t.Context(), challenge)
 					require.NoError(t, err)
-					assert.True(t, actual.WasHandled)
-					assert.True(t, actual.Accepted)
 					compareLogoutRequest(t, expected, actual)
 				})
 			})
 
 			t.Run("reject", func(t *testing.T) {
-				expected := setup(t)
+				expected, challenge := setup(t)
 
-				require.NoError(t, m.RejectLogoutRequest(t.Context(), expected.ID))
-				_, err := m.GetLogoutRequest(t.Context(), expected.ID)
-				assert.ErrorIs(t, err, sqlcon.ErrNoRows())
+				require.NoError(t, m.RejectLogoutRequest(t.Context(), challenge))
+
+				// Reject is a pure decode in the stateless flow; the challenge
+				// remains decodable. (The legacy DB-row implementation deleted
+				// the row here.)
+				actual, err := m.GetLogoutRequest(t.Context(), challenge)
+				require.NoError(t, err)
+				compareLogoutRequest(t, expected, actual)
 			})
 		})
 	}
+}
+
+// compareVerifiedLogoutRequest compares only the fields that survive the
+// challenge-to-verifier exchange. The verifier is consumed machine-to-machine
+// and intentionally drops the client metadata and the original request URL to
+// keep the verifier short.
+func compareVerifiedLogoutRequest(t *testing.T, a, b *flow.LogoutRequest) {
+	assert.Nil(t, b.Client)
+	assert.Empty(t, b.RequestURL)
+
+	assert.EqualValues(t, a.Subject, b.Subject)
+	assert.EqualValues(t, a.PostLogoutRedirectURI, b.PostLogoutRedirectURI)
+	assert.EqualValues(t, a.RPInitiated, b.RPInitiated)
+	assert.EqualValues(t, a.SessionID, b.SessionID)
 }
 
 func compareLogoutRequest(t *testing.T, a, b *flow.LogoutRequest) {
@@ -591,9 +641,7 @@ func compareLogoutRequest(t *testing.T, a, b *flow.LogoutRequest) {
 		assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
 	}
 
-	assert.EqualValues(t, a.ID, b.ID)
 	assert.EqualValues(t, a.Subject, b.Subject)
-	assert.EqualValues(t, a.Verifier, b.Verifier)
 	assert.EqualValues(t, a.RequestURL, b.RequestURL)
 	assert.EqualValues(t, a.PostLogoutRedirectURI, b.PostLogoutRedirectURI)
 	assert.EqualValues(t, a.RPInitiated, b.RPInitiated)

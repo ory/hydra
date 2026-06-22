@@ -22,14 +22,23 @@ type (
 	CodecOption func(ad *data)
 )
 
+// DO NOT CHANGE THESE VALUES!
+//
+// They are used in the additional data of the AEAD encryption. Changing a
+// value breaks all outstanding challenges and verifiers of that purpose during
+// a rolling upgrade. The values are explicit instead of iota so that an
+// insertion or reordering shows up as a diff on every affected line; new
+// purposes must use a fresh, never-recycled value.
 const (
-	loginChallenge purpose = iota
-	loginVerifier
-	deviceChallenge
-	deviceVerifier
-	consentChallenge
-	consentVerifier
-	authorizeCode
+	loginChallenge   purpose = 0
+	loginVerifier    purpose = 1
+	deviceChallenge  purpose = 2
+	deviceVerifier   purpose = 3
+	consentChallenge purpose = 4
+	consentVerifier  purpose = 5
+	authorizeCode    purpose = 6
+	logoutChallenge  purpose = 7
+	logoutVerifier   purpose = 8
 )
 
 func (p purpose) RequestType() string {
@@ -40,6 +49,8 @@ func (p purpose) RequestType() string {
 		return "device"
 	case consentChallenge, consentVerifier:
 		return "consent"
+	case logoutChallenge, logoutVerifier:
+		return "logout"
 	case authorizeCode:
 		return "authorization code"
 	default:
@@ -56,6 +67,8 @@ var (
 	AsDeviceVerifier   = withPurpose(deviceVerifier)
 	AsConsentChallenge = withPurpose(consentChallenge)
 	AsConsentVerifier  = withPurpose(consentVerifier)
+	AsLogoutChallenge  = withPurpose(logoutChallenge)
+	AsLogoutVerifier   = withPurpose(logoutVerifier)
 	AsAuthorizeCode    = withPurpose(authorizeCode)
 )
 

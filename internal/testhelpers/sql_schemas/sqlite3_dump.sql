@@ -1,4 +1,4 @@
--- migrations hash: 9ca90c1aaa8c09268d225b414e946af686058788bfe285c358b8daea9ce52149152e41ef2aeb3c1e836dd6f898a3e749fbbd495f31e51d1c40bce6dadd1d9b5d
+-- migrations hash: 1817b52e8c4e0f020e6951d16d6ce1d471061f23f9e61bfd4d97edac653791705a192ed6ed2fdd68c1c8df2fbce8f25efc4f248393b6ccbbffd86d88f07e604c
 
 CREATE TABLE "hydra_client"
 (
@@ -209,6 +209,7 @@ CREATE INDEX hydra_oauth2_flow_client_id_idx ON hydra_oauth2_flow (client_id, ni
 CREATE UNIQUE INDEX hydra_oauth2_flow_consent_challenge_id_idx ON hydra_oauth2_flow (consent_challenge_id);
 CREATE UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx ON hydra_oauth2_flow (device_challenge_id);
 CREATE INDEX hydra_oauth2_flow_login_session_id_idx ON hydra_oauth2_flow (login_session_id);
+CREATE INDEX hydra_oauth2_flow_login_session_subject_idx ON hydra_oauth2_flow (nid, login_session_id, subject) WHERE login_session_id IS NOT NULL;
 CREATE INDEX hydra_oauth2_flow_previous_consents_idx ON hydra_oauth2_flow (subject, client_id, nid, consent_skip,
                                                                            consent_error, consent_remember);
 CREATE INDEX hydra_oauth2_flow_subject_idx ON hydra_oauth2_flow (subject, nid);

@@ -4,6 +4,7 @@
 package migratest
 
 import (
+	stdsql "database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -34,6 +35,7 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/sqlxx"
 )
 
 func snapshotFor(paths ...string) *cupaloy.Config {
@@ -176,6 +178,39 @@ func TestMigrations(t *testing.T) {
 					}
 				})
 
+				t.Run("case=hydra_oauth2_logout_request", func(t *testing.T) {
+					// Mirrors the legacy hydra_oauth2_logout_request row shape so we
+					// can continue snapshotting seeded rows until the follow-up PR
+					// drops the table. Application code no longer reads or writes
+					// here.
+					type legacyLogoutRequest struct {
+						ID                    string            `json:"challenge" db:"challenge"`
+						NID                   uuid.UUID         `json:"-" db:"nid"`
+						Subject               string            `json:"subject" db:"subject"`
+						SessionID             string            `json:"sid,omitempty" db:"sid"`
+						RequestURL            string            `json:"request_url" db:"request_url"`
+						RPInitiated           bool              `json:"rp_initiated" db:"rp_initiated"`
+						WasHandled            bool              `json:"-" db:"was_used"`
+						Verifier              string            `json:"-" db:"verifier"`
+						PostLogoutRedirectURI string            `json:"-" db:"redir_url"`
+						Accepted              bool              `json:"-" db:"accepted"`
+						Rejected              bool              `json:"-" db:"rejected"`
+						ClientID              stdsql.NullString `json:"-" db:"client_id"`
+						ExpiresAt             sqlxx.NullTime    `json:"expires_at" db:"expires_at"`
+						RequestedAt           sqlxx.NullTime    `json:"requested_at" db:"requested_at"`
+						Client                *client.Client    `json:"client" db:"-"`
+					}
+
+					var lrs []legacyLogoutRequest
+					require.NoError(t, c.RawQuery("SELECT * FROM hydra_oauth2_logout_request").All(&lrs))
+					require.Len(t, lrs, 7)
+
+					for _, s := range lrs {
+						s.Client = nil // legacy AfterFind eager-load isn't replicated; matches existing fixtures.
+						compareWithFixture(t, s, "hydra_oauth2_logout_request", s.ID)
+					}
+				})
+
 				t.Run("case=hydra_oauth2_obfuscated_authentication_session", func(t *testing.T) {
 					ss := []consent.ForcedObfuscatedLoginSession{}
 					require.NoError(t, c.All(&ss))
@@ -183,18 +218,6 @@ func TestMigrations(t *testing.T) {
 
 					for _, s := range ss {
 						compareWithFixture(t, s, "hydra_oauth2_obfuscated_authentication_session", fmt.Sprintf("%s_%s", s.Subject, s.ClientID))
-					}
-				})
-
-				t.Run("case=hydra_oauth2_logout_request", func(t *testing.T) {
-					lrs := []flow.LogoutRequest{}
-					require.NoError(t, c.All(&lrs))
-					require.Len(t, lrs, 7)
-
-					for _, s := range lrs {
-						assert.NotNil(t, s.Client)
-						s.Client = nil // clients are loaded eagerly, nil them for snapshot comparison
-						compareWithFixture(t, s, "hydra_oauth2_logout_request", s.ID)
 					}
 				})
 

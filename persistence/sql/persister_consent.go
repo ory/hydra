@@ -112,21 +112,60 @@ func (p *ConsentPersister) revokeConsentSession(whereStmt string, whereArgs ...i
 	}
 }
 
+// RevokeSubjectLoginSessionBatchSize bounds how many login sessions a single
+// RevokeSubjectLoginSession DELETE removes per statement, so the ON DELETE SET
+// NULL cascade into hydra_oauth2_flow stays well under CockroachDB's
+// per-transaction intent budget (kv.transaction.max_intents_bytes). It is a var
+// (not a const) only so tests can lower it to exercise multi-batch behavior.
+var RevokeSubjectLoginSessionBatchSize = 100
+
 func (p *Persister) RevokeSubjectLoginSession(ctx context.Context, subject string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectLoginSession")
 	defer otelx.End(span, &err)
 
-	err = p.QueryWithNetwork(ctx).Where("subject = ?", subject).Delete(&flow.LoginSession{})
-	if err != nil {
-		return sqlcon.HandleError(err)
+	nid := p.NetworkID(ctx)
+	total := 0
+	batches := 0
+	for {
+		// Honor the caller's deadline/cancellation between batches. Already
+		// committed batches stay deleted; the caller can retry to finish.
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return errors.WithStack(ctxErr)
+		}
+
+		// The nested SELECT is required because our MySQL version does not
+		// support LIMIT in an IN/ANY subquery. This form is portable across all
+		// supported dialects; the inner SELECT is served by the (subject, nid)
+		// index. The outer DELETE repeats the nid filter as defense in depth so
+		// the network boundary is enforced on the delete target itself, matching
+		// QueryWithNetwork.
+		var deleted int
+		/* #nosec G201 - RevokeSubjectLoginSessionBatchSize is a package-level integer variable, not user input. */
+		deleted, err = p.Connection(ctx).RawQuery(
+			fmt.Sprintf(`DELETE FROM hydra_oauth2_authentication_session WHERE nid = ? AND id IN (
+				SELECT id FROM (
+					SELECT id FROM hydra_oauth2_authentication_session WHERE nid = ? AND subject = ? LIMIT %d
+				) AS s
+			)`, RevokeSubjectLoginSessionBatchSize),
+			nid, nid, subject,
+		).ExecWithCount()
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		total += deleted
+		batches++
+		p.l.Debugf("Revoking subject login sessions: %d deleted so far", total)
+
+		if deleted < RevokeSubjectLoginSessionBatchSize {
+			break // Last partial batch -> the subject is fully drained.
+		}
 	}
 
-	// This confuses people, see https://github.com/ory/hydra/issues/1168
-	//
-	// count, _ := rows.RowsAffected()
-	// if count == 0 {
-	// 	 return errors.WithStack(x.ErrNotFound)
-	// }
+	span.SetAttributes(
+		attribute.Int("rows_deleted", total),
+		attribute.Int("batches", batches),
+	)
 
 	return nil
 }

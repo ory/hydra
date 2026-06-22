@@ -118,3 +118,33 @@ func HandleError(err error) error {
 
 	return errors.WithStack(err)
 }
+
+// IsForeignKeyViolation reports whether err is a foreign-key constraint
+// violation, e.g. deleting a parent row that a child row still references
+// under ON DELETE RESTRICT or NO ACTION.
+func IsForeignKeyViolation(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	type stater = interface {
+		error
+		SQLState() string
+	}
+
+	if e, ok := stderrs.AsType[stater](err); ok {
+		return e.SQLState() == "23503" // "foreign_key_violation" in Postgres / CockroachDB
+	}
+	if e, ok := stderrs.AsType[*pgconn.PgError](err); ok {
+		return e.Code == "23503"
+	}
+	if e, ok := stderrs.AsType[*mysql.MySQLError](err); ok {
+		// 1451: cannot delete or update a parent row (a foreign key constraint fails).
+		// https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html#error_er_row_is_referenced_2
+		return e.Number == 1451
+	}
+	if e, ok := stderrs.AsType[*sqlite.Error](err); ok {
+		return isSqliteForeignKeyViolation(e)
+	}
+	return false
+}

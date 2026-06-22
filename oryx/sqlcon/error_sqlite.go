@@ -11,6 +11,14 @@ import (
 	sqlite3lib "modernc.org/sqlite/lib"
 )
 
+// isSqliteForeignKeyViolation reports whether e is an SQLite foreign-key
+// constraint failure. SQLite's extended result code for this case is not
+// reported consistently by the driver, so we match on the stable error
+// message instead.
+func isSqliteForeignKeyViolation(e *sqlite.Error) bool {
+	return strings.Contains(e.Error(), "FOREIGN KEY constraint failed")
+}
+
 // handleSqlite handles the error iff (if and only if) it is an sqlite error
 func handleSqlite(e *sqlite.Error, err error) error {
 	// Code() returns the full extended error code.

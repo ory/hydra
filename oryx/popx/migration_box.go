@@ -26,13 +26,13 @@ import (
 type (
 	// MigrationBox is a embed migration box.
 	MigrationBox struct {
-		c                                  *pop.Connection
-		migrationsUp                       Migrations
-		migrationsDown                     Migrations
-		perMigrationTimeout                time.Duration
-		l                                  *logrusx.Logger
-		migrationContent                   MigrationContent
-		disableGoldenDatabase, hasTestData bool
+		c                     *pop.Connection
+		migrationsUp          Migrations
+		migrationsDown        Migrations
+		perMigrationTimeout   time.Duration
+		l                     *logrusx.Logger
+		migrationContent      MigrationContent
+		disableGoldenDatabase bool
 	}
 	MigrationContent   func(mf Migration, c *pop.Connection, r []byte, usingTemplate bool) (string, error)
 	MigrationBoxOption func(*MigrationBox)
@@ -91,7 +91,9 @@ var testdataPattern = regexp.MustCompile(`^(\d+)_testdata(|\.[a-zA-Z0-9]+).sql$`
 // WithTestdata adds testdata to the migration box.
 func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 	return func(m *MigrationBox) {
-		m.hasTestData = true
+		// Testdata may not change the golden-database hash,
+		// so it should not share or create a golden database.
+		m.disableGoldenDatabase = true
 		require.NoError(t, fs.WalkDir(testdata, ".", func(path string, info fs.DirEntry, err error) error {
 			if err != nil {
 				return errors.WithStack(err)

@@ -21,31 +21,31 @@ var _ MappedNullable = &OAuth2ClientTokenLifespans{}
 // OAuth2ClientTokenLifespans Lifespans of different token types issued for this OAuth 2.0 Client.
 type OAuth2ClientTokenLifespans struct {
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	AuthorizationCodeGrantAccessTokenLifespan *string `json:"authorization_code_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	AuthorizationCodeGrantAccessTokenLifespan *string `json:"authorization_code_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	AuthorizationCodeGrantIdTokenLifespan *string `json:"authorization_code_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	AuthorizationCodeGrantIdTokenLifespan *string `json:"authorization_code_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	AuthorizationCodeGrantRefreshTokenLifespan *string `json:"authorization_code_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	AuthorizationCodeGrantRefreshTokenLifespan *string `json:"authorization_code_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	ClientCredentialsGrantAccessTokenLifespan *string `json:"client_credentials_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	ClientCredentialsGrantAccessTokenLifespan *string `json:"client_credentials_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	DeviceAuthorizationGrantAccessTokenLifespan *string `json:"device_authorization_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	DeviceAuthorizationGrantAccessTokenLifespan *string `json:"device_authorization_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	DeviceAuthorizationGrantIdTokenLifespan *string `json:"device_authorization_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	DeviceAuthorizationGrantIdTokenLifespan *string `json:"device_authorization_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	DeviceAuthorizationGrantRefreshTokenLifespan *string `json:"device_authorization_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	DeviceAuthorizationGrantRefreshTokenLifespan *string `json:"device_authorization_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	ImplicitGrantAccessTokenLifespan *string `json:"implicit_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	ImplicitGrantAccessTokenLifespan *string `json:"implicit_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	ImplicitGrantIdTokenLifespan *string `json:"implicit_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	ImplicitGrantIdTokenLifespan *string `json:"implicit_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	JwtBearerGrantAccessTokenLifespan *string `json:"jwt_bearer_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	JwtBearerGrantAccessTokenLifespan *string `json:"jwt_bearer_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	RefreshTokenGrantAccessTokenLifespan *string `json:"refresh_token_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	RefreshTokenGrantAccessTokenLifespan *string `json:"refresh_token_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	RefreshTokenGrantIdTokenLifespan *string `json:"refresh_token_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	RefreshTokenGrantIdTokenLifespan *string `json:"refresh_token_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	RefreshTokenGrantRefreshTokenLifespan *string `json:"refresh_token_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
+	RefreshTokenGrantRefreshTokenLifespan *string `json:"refresh_token_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h))+$"`
 }
 
 // NewOAuth2ClientTokenLifespans instantiates a new OAuth2ClientTokenLifespans object

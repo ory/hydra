@@ -36,9 +36,9 @@ const tracingComponent = "github.com/ory/hydra/hsm"
 
 type KeyManager struct {
 	jwk.Manager
-	sync.RWMutex
 	Context
-	c config.DefaultProvider
+	c    config.DefaultProvider
+	lock *sync.RWMutex
 }
 
 var ErrPreGeneratedKeys = &fosite.RFC6749Error{
@@ -47,10 +47,43 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
+// tokenLocks serializes mutating PKCS#11 operations per HSM token within a
+// process. Several KeyManager instances can target the same token (for example
+// one registry per test). crypto11 gives each its own session pool, but SoftHSM
+// is not reliably thread-safe for concurrent key generation against a single
+// token. The lock is keyed by token identity so independent tokens never block
+// each other. The map is never pruned, but it holds one entry per distinct
+// token configured in this process — at most a handful — so it does not grow
+// with load.
+var tokenLocks sync.Map // tokenKey -> *sync.RWMutex
+
+// lockForToken returns the process-wide lock shared by all KeyManagers that
+// target the same HSM token.
+func lockForToken(c *config.DefaultProvider) *sync.RWMutex {
+	l, _ := tokenLocks.LoadOrStore(tokenKey(c), &sync.RWMutex{})
+	return l.(*sync.RWMutex)
+}
+
+// tokenKey identifies a token by the field crypto11 actually uses to select it:
+// the token label when set, otherwise the slot number. NewContext applies the
+// same precedence, so two configs that resolve to the same token always share a
+// lock even if the unused selector differs.
+func tokenKey(c *config.DefaultProvider) string {
+	if label := c.HSMTokenLabel(); label != "" {
+		return fmt.Sprintf("label\x00%s\x00%s", c.HSMLibraryPath(), label)
+	}
+	slot := -1
+	if s := c.HSMSlotNumber(); s != nil {
+		slot = *s
+	}
+	return fmt.Sprintf("slot\x00%s\x00%d", c.HSMLibraryPath(), slot)
+}
+
 func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
 	return &KeyManager{
 		Context: hsm,
 		c:       *config,
+		lock:    lockForToken(config),
 	}
 }
 
@@ -63,8 +96,8 @@ func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg
 			attribute.String("use", use)))
 	defer otelx.End(span, &err)
 
-	m.Lock()
-	defer m.Unlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	set = m.prefixKeySet(set)
 
@@ -118,8 +151,8 @@ func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (_ *jose.JSONW
 		trace.WithAttributes(attribute.String("set", set), attribute.String("kid", kid)))
 	defer otelx.End(span, &err)
 
-	m.RLock()
-	defer m.RUnlock()
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 
 	set = m.prefixKeySet(set)
 
@@ -144,8 +177,8 @@ func (m *KeyManager) GetKeySet(ctx context.Context, set string) (_ *jose.JSONWeb
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet", trace.WithAttributes(attribute.String("set", set)))
 	defer otelx.End(span, &err)
 
-	m.RLock()
-	defer m.RUnlock()
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 
 	set = m.prefixKeySet(set)
 
@@ -179,8 +212,8 @@ func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) (err error)
 			attribute.String("kid", kid)))
 	defer otelx.End(span, &err)
 
-	m.Lock()
-	defer m.Unlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	set = m.prefixKeySet(set)
 
@@ -204,8 +237,8 @@ func (m *KeyManager) DeleteKeySet(ctx context.Context, set string) (err error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKeySet", trace.WithAttributes(attribute.String("set", set)))
 	defer otelx.End(span, &err)
 
-	m.Lock()
-	defer m.Unlock()
+	m.lock.Lock()
+	defer m.lock.Unlock()
 
 	set = m.prefixKeySet(set)
 

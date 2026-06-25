@@ -14,7 +14,9 @@ import (
 	"crypto/x509"
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/ThalesGroup/crypto11"
 	"github.com/go-jose/go-jose/v3"
@@ -897,4 +899,139 @@ func createJSONWebKeys(keyPair *MockSignerDecrypter, kid string, alg string, use
 		CertificateThumbprintSHA1:   []uint8{},
 		CertificateThumbprintSHA256: []uint8{},
 	}}
+}
+
+// concurrencyProbe records the maximum number of key-generation calls observed
+// in flight at the same time.
+type concurrencyProbe struct {
+	mu      sync.Mutex
+	current int
+	max     int
+}
+
+func (p *concurrencyProbe) enter() {
+	p.mu.Lock()
+	p.current++
+	if p.current > p.max {
+		p.max = p.current
+	}
+	p.mu.Unlock()
+	// Hold the window open so genuine concurrency is observed reliably.
+	time.Sleep(10 * time.Millisecond)
+}
+
+func (p *concurrencyProbe) exit() {
+	p.mu.Lock()
+	p.current--
+	p.mu.Unlock()
+}
+
+func (p *concurrencyProbe) maxConcurrent() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.max
+}
+
+// newProbeKeyManager builds a KeyManager backed by a mock HSM context bound to
+// the given token label. Every ECDSA key generation invokes hook, which the
+// test uses to observe or coordinate concurrency.
+func newProbeKeyManager(t *testing.T, tokenLabel string, hook func()) *hsm.KeyManager {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	t.Cleanup(ctrl.Finish)
+
+	ecKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	require.NoError(t, err)
+	signer := NewMockSignerDecrypter(ctrl)
+	signer.EXPECT().Public().Return(&ecKey.PublicKey).AnyTimes()
+
+	mockCtx := NewMockContext(ctrl)
+	// deleteExistingKeySet finds no pre-existing keys.
+	mockCtx.EXPECT().FindKeyPairs(gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
+	mockCtx.EXPECT().
+		GenerateECDSAKeyPairWithAttributes(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(crypto11.AttributeSet, crypto11.AttributeSet, elliptic.Curve) (crypto11.Signer, error) {
+			hook()
+			return signer, nil
+		}).
+		AnyTimes()
+
+	c := config.MustNew(t, logrusx.New("", ""), configx.SkipValidation())
+	c.MustSet(t.Context(), config.HSMTokenLabel, tokenLabel)
+	return hsm.NewKeyManager(mockCtx, c)
+}
+
+// TestKeyManager_SerializesKeyGenerationPerToken asserts that key generation
+// against the same HSM token is serialized even across independent KeyManager
+// instances. SoftHSM is not reliably thread-safe for concurrent key generation
+// on a single token, so concurrent generation must never overlap.
+func TestKeyManager_SerializesKeyGenerationPerToken(t *testing.T) {
+	probe := &concurrencyProbe{}
+	hook := func() {
+		probe.enter()
+		probe.exit()
+	}
+
+	const token = "shared-token"
+	managers := []*hsm.KeyManager{
+		newProbeKeyManager(t, token, hook),
+		newProbeKeyManager(t, token, hook),
+	}
+
+	var wg sync.WaitGroup
+	for _, m := range managers {
+		for range 5 {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, err := m.GenerateAndPersistKeySet(t.Context(), uuid.New(), "", "ES256", "sig")
+				assert.NoError(t, err)
+			}()
+		}
+	}
+	wg.Wait()
+
+	assert.Equal(t, 1, probe.maxConcurrent(),
+		"key generation against the same HSM token must be serialized across KeyManager instances")
+}
+
+// TestKeyManager_DifferentTokensGenerateConcurrently asserts that distinct HSM
+// tokens never block each other: the per-token lock must be keyed by token
+// identity, not shared process-wide. Both generations must reach the HSM at the
+// same time; a single shared lock would deadlock this test.
+func TestKeyManager_DifferentTokensGenerateConcurrently(t *testing.T) {
+	const n = 2
+	entered := make(chan struct{}, n)
+	release := make(chan struct{})
+	hook := func() {
+		entered <- struct{}{}
+		<-release
+	}
+
+	managers := []*hsm.KeyManager{
+		newProbeKeyManager(t, "token-a", hook),
+		newProbeKeyManager(t, "token-b", hook),
+	}
+
+	var wg sync.WaitGroup
+	for _, m := range managers {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, err := m.GenerateAndPersistKeySet(t.Context(), uuid.New(), "", "ES256", "sig")
+			assert.NoError(t, err)
+		}()
+	}
+
+	// Both generations must be in flight simultaneously. If distinct tokens
+	// shared a lock, the second would never enter and this would time out.
+	for range n {
+		select {
+		case <-entered:
+		case <-time.After(5 * time.Second):
+			t.Fatal("key generation did not run concurrently across distinct HSM tokens")
+		}
+	}
+	close(release)
+	wg.Wait()
 }

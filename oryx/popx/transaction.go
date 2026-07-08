@@ -7,8 +7,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math/rand/v2"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jmoiron/sqlx"
@@ -114,7 +116,7 @@ func TransactionWithOptions(ctx context.Context, connection *pop.Connection, opt
 	// SQLite and unknown dialects: opts are ignored; use pop's default
 	// transaction path with concurrent-update retry handling.
 	var err error
-	for range MaxTransactionRetries {
+	for attempt := range MaxTransactionRetries {
 		err = conn.Transaction(func(tx *pop.Connection) error {
 			return callback(WithTransaction(ctx, tx), tx)
 		})
@@ -123,6 +125,16 @@ func TransactionWithOptions(ctx context.Context, connection *pop.Connection, opt
 		}
 		if !errors.Is(sqlcon.HandleError(err), sqlcon.ErrConcurrentUpdate()) {
 			return err
+		}
+		// Back off with jitter before retrying. SQLite in WAL mode fails a
+		// deferred transaction's read-to-write upgrade with
+		// SQLITE_BUSY_SNAPSHOT immediately (busy_timeout cannot help a stale
+		// snapshot), so an immediate retry under write contention can livelock
+		// through the whole retry budget.
+		select {
+		case <-ctx.Done():
+			return err
+		case <-time.After(time.Duration(attempt+1) * time.Duration(1+rand.IntN(3)) * time.Millisecond):
 		}
 	}
 	return err

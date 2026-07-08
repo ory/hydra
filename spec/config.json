@@ -1103,7 +1103,14 @@
       "title": "Feature flags",
       "type": "object",
       "additionalProperties": true,
-      "properties": {}
+      "properties": {
+        "legacy_allow_insecure_origins": {
+          "type": "boolean",
+          "title": "Allow legacy insecure (unbounded) wildcard CORS origins",
+          "description": "If true, restores legacy CORS matching where wildcard origins are not required to be bounded at a registrable domain. Only effective in the Ory Network for grandfathered projects. Insecure and slated for removal.",
+          "default": false
+        }
+      }
     }
   },
   "additionalProperties": false

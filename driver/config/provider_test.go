@@ -91,6 +91,9 @@ func TestCORSOptions(t *testing.T) {
 	conf, enabled := p.CORSPublic(ctx)
 	assert.True(t, enabled)
 
+	// configx sets AllowOriginVaryRequestFunc (boundary-safe matching); a func
+	// value is not comparable, so drop it before the struct equality.
+	conf.AllowOriginVaryRequestFunc = nil
 	assert.EqualValues(t, cors.Options{
 		AllowedOrigins:   []string{},
 		AllowedMethods:   []string{"POST", "GET", "PUT", "PATCH", "DELETE", "CONNECT", "HEAD", "OPTIONS", "TRACE"},
@@ -128,6 +131,14 @@ func TestPublicAllowDynamicRegistration(t *testing.T) {
 	p = newProvider(t, configx.WithValue(KeyPublicAllowDynamicRegistration, true))
 	value = p.PublicAllowDynamicRegistration(t.Context())
 	assert.True(t, value)
+}
+
+func TestLegacyAllowInsecureOrigins(t *testing.T) {
+	p := newProvider(t)
+	assert.False(t, p.LegacyAllowInsecureOrigins(t.Context()), "must default to false (strict)")
+
+	p = newProvider(t, configx.WithValue(KeyFeatureFlagsLegacyAllowInsecureOrigins, true))
+	assert.True(t, p.LegacyAllowInsecureOrigins(t.Context()))
 }
 
 func TestProviderIssuerURL(t *testing.T) {
@@ -243,10 +254,14 @@ func TestProviderValidates(t *testing.T) {
 
 	gc, enabled := c.CORSAdmin(ctx)
 	assert.False(t, enabled)
+	// configx sets AllowOriginVaryRequestFunc (boundary-safe matching); a func
+	// value is not comparable, so drop it before the struct equality.
+	gc.AllowOriginVaryRequestFunc = nil
 	assert.Equal(t, expectedCors, gc)
 
 	gc, enabled = c.CORSPublic(ctx)
 	assert.False(t, enabled)
+	gc.AllowOriginVaryRequestFunc = nil
 	assert.Equal(t, expectedCors, gc)
 
 	assert.Equal(t, []string{"127.0.0.1/32"}, c.Source(ctx).Strings("serve.tls.allow_termination_from"))

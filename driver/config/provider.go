@@ -122,6 +122,7 @@ const (
 	KeyRefreshTokenHook                          = "oauth2.refresh_token_hook" // #nosec G101
 	KeyTokenHook                                 = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
+	KeyFeatureFlagsLegacyAllowInsecureOrigins    = "feature_flags.legacy_allow_insecure_origins"
 )
 
 const DSNMemory = "memory"
@@ -814,4 +815,11 @@ func (p *DefaultProvider) GetPaginationEncryptionKeys(ctx context.Context) [][32
 		hashed[i] = sha512.Sum512_256([]byte(secrets[i]))
 	}
 	return hashed
+}
+
+// LegacyAllowInsecureOrigins restores legacy CORS matching where wildcard
+// origins need not be bounded at a registrable domain. Insecure; only set by
+// the Ory Network for grandfathered projects. Default false.
+func (p *DefaultProvider) LegacyAllowInsecureOrigins(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyFeatureFlagsLegacyAllowInsecureOrigins)
 }

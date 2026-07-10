@@ -83,6 +83,9 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 		if c.BackChannelLogoutURI != "" {
 			values["backchannel_logout_uri"] = c.BackChannelLogoutURI
 		}
+		if c.SectorIdentifierURI != "" {
+			values["sector_identifier_uri"] = c.SectorIdentifierURI
+		}
 
 		for k, v := range c.RequestURIs {
 			if v != "" {

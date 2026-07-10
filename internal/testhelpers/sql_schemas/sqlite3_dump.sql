@@ -1,4 +1,4 @@
--- migrations hash: 1817b52e8c4e0f020e6951d16d6ce1d471061f23f9e61bfd4d97edac653791705a192ed6ed2fdd68c1c8df2fbce8f25efc4f248393b6ccbbffd86d88f07e604c
+-- migrations hash: a53dde0328b622dc65a2605bf45fba99db7dbdfa66a8be614c503d1fce70e18fafe818939e478b61264833074f393a3faf590c9b5c0c998256551964c98a4ad6
 
 CREATE TABLE "hydra_client"
 (

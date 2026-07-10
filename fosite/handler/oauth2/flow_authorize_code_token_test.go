@@ -6,6 +6,7 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -477,6 +478,10 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 			refreshTokenStrategy *internal.MockRefreshTokenStrategy,
 		)
 		expectError error
+		// expectStatusCode, when non-zero, asserts the HTTP status the
+		// client would receive — i.e. the outermost RFC6749 error's code,
+		// which is what masking a grant error as a server error changes.
+		expectStatusCode int
 	}{
 		{
 			description: "transaction should be committed successfully if no errors occur",
@@ -620,6 +625,67 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
+		},
+		{
+			description: "a client-facing grant error from a transactional storage call is preserved, not masked as a server error",
+			setup: func(
+				t *testing.T,
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(2)
+
+				// A losing concurrent redemption: InvalidateAuthorizeCodeSession
+				// reports the code was already used by mapping its unique
+				// violation to ErrInvalidGrant.
+				authorizeCodeStorage.
+					EXPECT().
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(request, nil).
+					Times(1)
+				authorizeCodeStorage.
+					EXPECT().
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(fosite.ErrInvalidGrant.WithHint("Authorization code has already been used.")).
+					Times(1)
+
+				// Set up transaction expectations
+				mockTransactional.
+					EXPECT().
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
+					Times(1)
+			},
+			expectError:      fosite.ErrInvalidGrant,
+			expectStatusCode: http.StatusBadRequest,
 		},
 		{
 			description: "transaction should be rolled back if `CreateAccessTokenSession` returns an error",
@@ -980,6 +1046,10 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 			// invoke function under test
 			err = handler.PopulateTokenEndpointResponse(propagatedContext, request, fosite.NewAccessResponse())
 			assert.ErrorIs(t, err, c.expectError)
+			if c.expectStatusCode != 0 {
+				assert.Equal(t, c.expectStatusCode, fosite.ErrorToRFC6749Error(err).StatusCode(),
+					"client-facing status code")
+			}
 		})
 	}
 }

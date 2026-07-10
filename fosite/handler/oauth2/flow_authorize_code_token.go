@@ -164,6 +164,14 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 		return nil
 	})
 	if err != nil {
+		// A storage call inside the transaction may return a deliberate
+		// client-facing grant error (e.g. invalid_grant when a code was
+		// already used). Preserve its status instead of masking it as a
+		// server error, so a losing concurrent redemption returns 400
+		// invalid_grant rather than 500.
+		if errors.Is(err, fosite.ErrInvalidGrant) {
+			return errorsx.WithStack(err)
+		}
 		return errors.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 

@@ -6,4 +6,5 @@ package dbal
 const (
 	DriverMySQL       = "mysql"
 	DriverCockroachDB = "cockroach"
+	DriverPostgreSQL  = "postgres"
 )

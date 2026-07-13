@@ -200,6 +200,29 @@ func (w worker) eval(ctx context.Context, processParams []byte) (output string, 
 		semconv.ProcessPID(w.cmd.Process.Pid)))
 	defer otelx.End(span, &err)
 
+	// The worker is exclusively acquired, so the schedstat delta over this
+	// evaluation is attributable to it. cpu_time_us is time actually spent on
+	// a CPU; runqueue_wait_us is time runnable but waiting for one. Span wall
+	// time far exceeding their sum means the process was not even runnable,
+	// e.g. dequeued by cgroup CPU throttling.
+	//
+	// A kernel without CONFIG_SCHED_INFO reports "0 0 0" instead of failing
+	// the read. The worker has already spent CPU time on its warm-up
+	// evaluation, so a zero cpuTime means the fields are dead — skip them
+	// rather than record misleading zeros.
+	if before, ok := readSchedstat(w.cmd.Process.Pid); ok && before.cpuTime > 0 {
+		defer func() {
+			after, ok := readSchedstat(w.cmd.Process.Pid)
+			if !ok {
+				return
+			}
+			span.SetAttributes(
+				attribute.Int64("jsonnet.worker.cpu_time_us", (after.cpuTime-before.cpuTime).Microseconds()),
+				attribute.Int64("jsonnet.worker.runqueue_wait_us", (after.runqueueWait-before.runqueueWait).Microseconds()),
+			)
+		}()
+	}
+
 	select {
 	case <-ctx.Done():
 		return "", ctx.Err()

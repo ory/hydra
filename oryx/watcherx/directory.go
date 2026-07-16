@@ -35,7 +35,7 @@ func WatchDirectory(ctx context.Context, dir string, c EventChannel) (Watcher, e
 	}
 
 	dw := &directoryWatcher{
-		dispatcher: newDispatcher(),
+		dispatcher: newDispatcher(ctx),
 		c:          c,
 		dir:        dir,
 		subDirs:    subDirs,

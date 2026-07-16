@@ -39,7 +39,7 @@ func WatchFile(ctx context.Context, file string, c EventChannel) (Watcher, error
 			return nil, errors.WithStack(err)
 		}
 	}
-	d := newDispatcher()
+	d := newDispatcher(ctx)
 	go streamFileEvents(ctx, watcher, c, d.trigger, d.done, file, resolvedFile)
 	return d, nil
 }

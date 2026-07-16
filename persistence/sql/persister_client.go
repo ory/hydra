@@ -69,15 +69,29 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 	)
 	defer otelx.End(span, &err)
 
+	defer func() {
+		if err == nil {
+			events.Trace(ctx, events.ClientUpdated,
+				events.WithClientID(cl.ID),
+				events.WithClientName(cl.Name))
+		}
+	}()
+
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		o, err := p.GetConcreteClient(ctx, cl.GetID())
+		previous, err := p.GetConcreteClient(ctx, cl.GetID())
 		if err != nil {
 			return err
 		}
 
 		if cl.Secret == "" {
-			cl.Secret = string(o.GetHashedSecret())
+			// Secret not being changed: keep it.
+			cl.Secret = previous.Secret
+			if cl.RotatedSecrets == nil {
+				// Keep rotated secrets unless explicitly cleared.
+				cl.RotatedSecrets = previous.RotatedSecrets
+			}
 		} else {
+			// New secret provided: hash it
 			h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
 			if err != nil {
 				return err
@@ -86,7 +100,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		}
 
 		// Ensure ID is the same
-		cl.ID = o.ID
+		cl.ID = previous.ID
 
 		if err = cl.BeforeSave(c); err != nil {
 			return sqlcon.HandleError(err)
@@ -98,10 +112,6 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		} else if count == 0 {
 			return sqlcon.HandleError(sqlcon.ErrNoRows())
 		}
-
-		events.Trace(ctx, events.ClientUpdated,
-			events.WithClientID(cl.ID),
-			events.WithClientName(cl.Name))
 
 		return sqlcon.HandleError(err)
 	})

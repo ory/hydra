@@ -229,7 +229,7 @@
         "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "put": {
-        "description": "Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,\notherwise the existing secret is used.\n\nIf set, the secret is echoed in the response. It is not possible to retrieve it later on.\n\nOAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "description": "Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,\notherwise the existing secret is used. Rotated secrets will be cleared if you pass a new `client_secret`.\n\nIf set, the secret is echoed in the response. It is not possible to retrieve it later on.\n\nTo perform a seamless client secret rotation, use the `rotateOAuth2ClientSecret` endpoint instead.\n\nOAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
         ],
@@ -322,7 +322,7 @@
         "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "patch": {
-        "description": "Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "description": "Patch an existing OAuth 2.0 Client using JSON Patch. If you update\n`client_secret`, the secret will be updated and returned via the API. This is\nthe only time you will be able to retrieve the client secret. Passing a new\n`client_secret` will clear all rotated secrets.\n\nTo perform a seamless client secret rotation, use the `rotateOAuth2ClientSecret` endpoint instead.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
         ],
@@ -419,6 +419,86 @@
           }
         },
         "x-ory-ratelimit-bucket": "hydra-admin-low"
+      }
+    },
+    "/admin/clients/{id}/secrets/rotate": {
+      "post": {
+        "description": "Rotates an OAuth 2.0 client's secrets. The old secret will remain valid for\nauthentication, allowing for zero-downtime secret rotations. A new secret\nwill be generated and returned in the response.\n\nUp to five rotated secrets are retained. Use the\n`deleteRotatedOAuth2ClientSecrets` endpoint to remove old rotated secrets\nwhen they are no longer needed.",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Rotate OAuth 2.0 Client Secret",
+        "operationId": "rotateOAuth2ClientSecret",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "OAuth 2.0 Client ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "404": {
+            "$ref": "#/responses/errorOAuth2NotFound"
+          },
+          "default": {
+            "$ref": "#/responses/errorOAuth2Default"
+          }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
+      },
+      "delete": {
+        "description": "Removes all rotated secrets from an OAuth 2.0 client. This should be called after all services\nhave been updated to use the new secret and the old secrets are no longer needed.",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Delete Rotated OAuth 2.0 Client Secrets",
+        "operationId": "deleteRotatedOAuth2ClientSecrets",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "OAuth 2.0 Client ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "404": {
+            "$ref": "#/responses/errorOAuth2NotFound"
+          },
+          "default": {
+            "$ref": "#/responses/errorOAuth2Default"
+          }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/keys/{set}": {
@@ -3078,7 +3158,7 @@
           }
         },
         "response_types": {
-          "description": "OAuth 2.0 Client Response Types\n\nAn array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint. Can be one of:\n\nNeeded for OpenID Connect Implicit Grant:\nReturns ID Token to redirect URI: `id_token`\nReturns Access token redirect URI: `token`\nNeeded for Authorization Code Grant: `code`",
+          "description": "OAuth 2.0 Client Response Types\n\nAn array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint. Possible values are:\n\n`code` for Authorization Code Grant.\n`token` or `id_token` or `token id_token` for OpenID Connect Implicit Grant (not recommended).\n`code token` or `code id_token` or `code token id_token` for OpenID Connect Hybrid Flow (not recommended).",
           "type": "array",
           "items": {
             "type": "string"

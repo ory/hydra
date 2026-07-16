@@ -225,9 +225,12 @@ paths:
       x-ory-ratelimit-bucket: hydra-admin-high
     patch:
       description: |-
-        Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`
-        the secret will be updated and returned via the API. This is the
-        only time you will be able to retrieve the client secret, so write it down and keep it safe.
+        Patch an existing OAuth 2.0 Client using JSON Patch. If you update
+        `client_secret`, the secret will be updated and returned via the API. This is
+        the only time you will be able to retrieve the client secret. Passing a new
+        `client_secret` will clear all rotated secrets.
+
+        To perform a seamless client secret rotation, use the `rotateOAuth2ClientSecret` endpoint instead.
 
         OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
@@ -267,9 +270,11 @@ paths:
     put:
       description: |-
         Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,
-        otherwise the existing secret is used.
+        otherwise the existing secret is used. Rotated secrets will be cleared if you pass a new `client_secret`.
 
         If set, the secret is echoed in the response. It is not possible to retrieve it later on.
+
+        To perform a seamless client secret rotation, use the `rotateOAuth2ClientSecret` endpoint instead.
 
         OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
@@ -345,6 +350,70 @@ paths:
       tags:
       - oAuth2
       x-ory-ratelimit-bucket: hydra-admin-low
+  /admin/clients/{id}/secrets/rotate:
+    delete:
+      description: |-
+        Removes all rotated secrets from an OAuth 2.0 client. This should be called after all services
+        have been updated to use the new secret and the old secrets are no longer needed.
+      operationId: deleteRotatedOAuth2ClientSecrets
+      parameters:
+      - description: OAuth 2.0 Client ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuth2Client"
+          description: oAuth2Client
+        "404":
+          $ref: "#/components/responses/errorOAuth2NotFound"
+        default:
+          $ref: "#/components/responses/errorOAuth2Default"
+      summary: Delete Rotated OAuth 2.0 Client Secrets
+      tags:
+      - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
+    post:
+      description: |-
+        Rotates an OAuth 2.0 client's secrets. The old secret will remain valid for
+        authentication, allowing for zero-downtime secret rotations. A new secret
+        will be generated and returned in the response.
+
+        Up to five rotated secrets are retained. Use the
+        `deleteRotatedOAuth2ClientSecrets` endpoint to remove old rotated secrets
+        when they are no longer needed.
+      operationId: rotateOAuth2ClientSecret
+      parameters:
+      - description: OAuth 2.0 Client ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuth2Client"
+          description: oAuth2Client
+        "404":
+          $ref: "#/components/responses/errorOAuth2NotFound"
+        default:
+          $ref: "#/components/responses/errorOAuth2Default"
+      summary: Rotate OAuth 2.0 Client Secret
+      tags:
+      - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/keys/{set}:
     delete:
       description: |-
@@ -3146,12 +3215,11 @@ components:
             OAuth 2.0 Client Response Types
 
             An array of the OAuth 2.0 response type strings that the client can
-            use at the authorization endpoint. Can be one of:
+            use at the authorization endpoint. Possible values are:
 
-            Needed for OpenID Connect Implicit Grant:
-            Returns ID Token to redirect URI: `id_token`
-            Returns Access token redirect URI: `token`
-            Needed for Authorization Code Grant: `code`
+            `code` for Authorization Code Grant.
+            `token` or `id_token` or `token id_token` for OpenID Connect Implicit Grant (not recommended).
+            `code token` or `code id_token` or `code token id_token` for OpenID Connect Hybrid Flow (not recommended).
           items:
             type: string
           type: array

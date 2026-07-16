@@ -1,4 +1,4 @@
--- migrations hash: a53dde0328b622dc65a2605bf45fba99db7dbdfa66a8be614c503d1fce70e18fafe818939e478b61264833074f393a3faf590c9b5c0c998256551964c98a4ad6
+-- migrations hash: 14de04dcdbd3e9b00922807be554550705bf44b836351e0eeffdac2871efff8c5cc087a08319b435d9a66cb6d9b16eed397a786833efa790956304dadc6229d8
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -71,6 +71,7 @@ CREATE TABLE `hydra_client` (
   `device_authorization_grant_id_token_lifespan` bigint DEFAULT NULL,
   `device_authorization_grant_access_token_lifespan` bigint DEFAULT NULL,
   `device_authorization_grant_refresh_token_lifespan` bigint DEFAULT NULL,
+  `rotated_secrets` json DEFAULT NULL,
   PRIMARY KEY (`id`,`nid`),
   UNIQUE KEY `hydra_client_id_key` (`id`,`nid`),
   KEY `pk_deprecated` (`pk_deprecated`),

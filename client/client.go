@@ -21,8 +21,9 @@ import (
 )
 
 var (
-	_ fosite.OpenIDConnectClient = (*Client)(nil)
-	_ fosite.Client              = (*Client)(nil)
+	_ fosite.OpenIDConnectClient      = (*Client)(nil)
+	_ fosite.Client                   = (*Client)(nil)
+	_ fosite.ClientWithSecretRotation = (*Client)(nil)
 )
 
 // OAuth 2.0 Client
@@ -51,6 +52,12 @@ type Client struct {
 	// never again. The secret is kept in hashed format and is not recoverable once lost.
 	Secret string `json:"client_secret,omitempty" db:"client_secret"`
 
+	// OAuth 2.0 Client Rotated Secrets
+	//
+	// RotatedSecrets holds previously rotated secrets that are still valid for authentication.
+	// This allows for secret rotation without downtime. Secrets are stored in hashed format.
+	RotatedSecrets sqlxx.StringSliceJSONFormat `json:"-" db:"rotated_secrets" faker:"-"`
+
 	// OAuth 2.0 Client Redirect URIs
 	//
 	// RedirectURIs is an array of allowed redirect urls for the client.
@@ -74,12 +81,11 @@ type Client struct {
 	// OAuth 2.0 Client Response Types
 	//
 	// An array of the OAuth 2.0 response type strings that the client can
-	// use at the authorization endpoint. Can be one of:
+	// use at the authorization endpoint. Possible values are:
 	//
-	// - Needed for OpenID Connect Implicit Grant:
-	//   - Returns ID Token to redirect URI: `id_token`
-	//   - Returns Access token redirect URI: `token`
-	// - Needed for Authorization Code Grant: `code`
+	// - `code` for Authorization Code Grant.
+	// - `token` or `id_token` or `token id_token` for OpenID Connect Implicit Grant (not recommended).
+	// - `code token` or `code id_token` or `code token id_token` for OpenID Connect Hybrid Flow (not recommended).
 	ResponseTypes sqlxx.StringSliceJSONFormat `json:"response_types" db:"response_types"`
 
 	// OAuth 2.0 Client Scope
@@ -430,6 +436,17 @@ func (c *Client) GetRedirectURIs() []string {
 
 func (c *Client) GetHashedSecret() []byte {
 	return []byte(c.Secret)
+}
+
+func (c *Client) GetRotatedHashes() [][]byte {
+	if len(c.RotatedSecrets) == 0 {
+		return nil
+	}
+	hashes := make([][]byte, len(c.RotatedSecrets))
+	for i, secret := range c.RotatedSecrets {
+		hashes[i] = []byte(secret)
+	}
+	return hashes
 }
 
 func (c *Client) GetScopes() fosite.Arguments {

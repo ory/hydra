@@ -99,7 +99,7 @@ type OAuth2Client struct {
 	RequestObjectSigningAlg *string `json:"request_object_signing_alg,omitempty"`
 	// OpenID Connect Request URIs  Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the contents of the files referenced by these URIs and not retrieve them at the time they are used in a request. OPs can require that request_uri values used be pre-registered with the require_request_uri_registration discovery parameter.
 	RequestUris []string `json:"request_uris,omitempty"`
-	// OAuth 2.0 Client Response Types  An array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint. Can be one of:  Needed for OpenID Connect Implicit Grant: Returns ID Token to redirect URI: `id_token` Returns Access token redirect URI: `token` Needed for Authorization Code Grant: `code`
+	// OAuth 2.0 Client Response Types  An array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint. Possible values are:  `code` for Authorization Code Grant. `token` or `id_token` or `token id_token` for OpenID Connect Implicit Grant (not recommended). `code token` or `code id_token` or `code token id_token` for OpenID Connect Hybrid Flow (not recommended).
 	ResponseTypes []string `json:"response_types,omitempty"`
 	// OAuth 2.0 Client Scope  Scope is a string containing a space-separated list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client can use when requesting access tokens.
 	Scope *string `json:"scope,omitempty"`

@@ -1,4 +1,4 @@
--- migrations hash: a53dde0328b622dc65a2605bf45fba99db7dbdfa66a8be614c503d1fce70e18fafe818939e478b61264833074f393a3faf590c9b5c0c998256551964c98a4ad6
+-- migrations hash: 14de04dcdbd3e9b00922807be554550705bf44b836351e0eeffdac2871efff8c5cc087a08319b435d9a66cb6d9b16eed397a786833efa790956304dadc6229d8
 
 
 
@@ -76,7 +76,8 @@ CREATE TABLE public.hydra_client (
     skip_logout_consent boolean,
     device_authorization_grant_id_token_lifespan bigint,
     device_authorization_grant_access_token_lifespan bigint,
-    device_authorization_grant_refresh_token_lifespan bigint
+    device_authorization_grant_refresh_token_lifespan bigint,
+    rotated_secrets jsonb
 );
 
 ALTER TABLE public.hydra_client OWNER TO postgres;

@@ -4156,6 +4156,10 @@
                     "type": "string",
                     "x-formData-name": "code"
                   },
+                  "code_verifier": {
+                    "type": "string",
+                    "x-formData-name": "code_verifier"
+                  },
                   "grant_type": {
                     "required": [
                       "grant_type"

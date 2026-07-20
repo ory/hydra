@@ -2247,6 +2247,11 @@
             "type": "string",
             "name": "client_id",
             "in": "formData"
+          },
+          {
+            "type": "string",
+            "name": "code_verifier",
+            "in": "formData"
           }
         ],
         "responses": {

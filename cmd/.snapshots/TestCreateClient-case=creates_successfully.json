@@ -1,15 +1,10 @@
 {
-  "client_name": "",
   "client_secret_expires_at": 0,
-  "client_uri": "",
   "grant_types": [
     "authorization_code"
   ],
   "jwks": {},
-  "logo_uri": "",
   "metadata": {},
-  "owner": "",
-  "policy_uri": "",
   "request_object_signing_alg": "RS256",
   "response_types": [
     "code"
@@ -19,6 +14,5 @@
   "skip_logout_consent": false,
   "subject_type": "public",
   "token_endpoint_auth_method": "client_secret_basic",
-  "tos_uri": "",
   "userinfo_signed_response_alg": "none"
 }

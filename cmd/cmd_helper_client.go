@@ -68,6 +68,57 @@ func clientFromFlags(cmd *cobra.Command) (hydra.OAuth2Client, error) {
 	}, nil
 }
 
+// clientPatchFromFlags returns a JSON Patch document covering exactly those
+// client flags that were set on the command line, so that an update changes
+// only the provided fields and leaves the rest of the client untouched.
+func clientPatchFromFlags(cmd *cobra.Command) []hydra.JsonPatch {
+	str := func(flag string) any { return flagx.MustGetString(cmd, flag) }
+	strSlice := func(flag string) any { return flagx.MustGetStringSlice(cmd, flag) }
+	boolean := func(flag string) any { return flagx.MustGetBool(cmd, flag) }
+
+	patch := []hydra.JsonPatch{}
+	for _, f := range []struct {
+		flag  string
+		path  string
+		value func(flag string) any
+	}{
+		{flagClientAccessTokenStrategy, "/access_token_strategy", str},
+		{flagClientAllowedCORSOrigin, "/allowed_cors_origins", strSlice},
+		{flagClientAudience, "/audience", strSlice},
+		{flagClientBackChannelLogoutSessionRequired, "/backchannel_logout_session_required", boolean},
+		{flagClientBackchannelLogoutCallback, "/backchannel_logout_uri", str},
+		{flagClientName, "/client_name", str},
+		{flagClientSecret, "/client_secret", str},
+		{flagClientClientURI, "/client_uri", str},
+		{flagClientContact, "/contacts", strSlice},
+		{flagClientFrontChannelLogoutSessionRequired, "/frontchannel_logout_session_required", boolean},
+		{flagClientFrontChannelLogoutCallback, "/frontchannel_logout_uri", str},
+		{flagClientGrantType, "/grant_types", strSlice},
+		{flagClientJWKSURI, "/jwks_uri", str},
+		{flagClientLogoURI, "/logo_uri", str},
+		{flagClientMetadata, "/metadata", func(flag string) any { return json.RawMessage(flagx.MustGetString(cmd, flag)) }},
+		{flagClientOwner, "/owner", str},
+		{flagClientPolicyURI, "/policy_uri", str},
+		{flagClientPostLogoutCallback, "/post_logout_redirect_uris", strSlice},
+		{flagClientRedirectURI, "/redirect_uris", strSlice},
+		{flagClientRequestObjectSigningAlg, "/request_object_signing_alg", str},
+		{flagClientRequestURI, "/request_uris", strSlice},
+		{flagClientResponseType, "/response_types", strSlice},
+		{flagClientScope, "/scope", func(flag string) any { return strings.Join(flagx.MustGetStringSlice(cmd, flag), " ") }},
+		{flagClientSectorIdentifierURI, "/sector_identifier_uri", str},
+		{flagClientSkipConsent, "/skip_consent", boolean},
+		{flagClientLogoutSkipConsent, "/skip_logout_consent", boolean},
+		{flagClientSubjectType, "/subject_type", str},
+		{flagClientTokenEndpointAuthMethod, "/token_endpoint_auth_method", str},
+		{flagClientTOSURI, "/tos_uri", str},
+	} {
+		if cmd.Flags().Changed(f.flag) {
+			patch = append(patch, hydra.JsonPatch{Op: "replace", Path: f.path, Value: f.value(f.flag)})
+		}
+	}
+	return patch
+}
+
 func registerEncryptFlags(flags *pflag.FlagSet) {
 	// encrypt client secret options
 	flags.String(cli.FlagEncryptionPGPKey, "", "Base64 encoded PGP encryption key for encrypting client secret.")

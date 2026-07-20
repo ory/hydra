@@ -10,15 +10,10 @@
   "metadata": {},
   "owner": "",
   "policy_uri": "",
-  "request_object_signing_alg": "RS256",
-  "response_types": [
-    "code"
-  ],
   "scope": "offline_access offline openid",
   "skip_consent": false,
-  "skip_logout_consent": false,
   "subject_type": "public",
-  "token_endpoint_auth_method": "client_secret_basic",
+  "token_endpoint_auth_method": "client_secret_post",
   "tos_uri": "",
   "userinfo_signed_response_alg": "none"
 }

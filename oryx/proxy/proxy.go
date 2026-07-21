@@ -13,6 +13,7 @@ import (
 
 	"github.com/rs/cors"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type (
@@ -70,6 +71,7 @@ type (
 
 const (
 	hostConfigKey contextKey = "host config"
+	serverSpanKey contextKey = "server span"
 )
 
 func (c *HostConfig) setScheme(r *httputil.ProxyRequest) {
@@ -95,7 +97,16 @@ func (c *HostConfig) setHost(r *httputil.ProxyRequest) {
 // rewriter is a custom internal function for altering a http.Request
 func rewriter(o *options) func(*httputil.ProxyRequest) {
 	return func(r *httputil.ProxyRequest) {
+		// Stash the server-side span so that modifyResponse can restore it as
+		// the active span before the response middlewares run. Without a valid
+		// span there is nothing worth restoring: replacing the transport's
+		// client span with a noop span would orphan the middleware spans.
 		ctx := r.Out.Context()
+		if s := trace.SpanFromContext(ctx); s.SpanContext().IsValid() {
+			ctx = context.WithValue(ctx, serverSpanKey, s)
+			r.Out = r.Out.WithContext(ctx)
+		}
+
 		ctx, span := otel.GetTracerProvider().Tracer("").Start(ctx, "x.proxy")
 		defer span.End()
 
@@ -156,6 +167,16 @@ func rewriter(o *options) func(*httputil.ProxyRequest) {
 // modifyResponse is a custom internal function for altering a http.Response
 func modifyResponse(o *options) func(*http.Response) error {
 	return func(r *http.Response) error {
+		// An instrumented transport (otelhttp) clones the outbound request with
+		// its HTTP client span as the active span and ends that span once the
+		// response body is consumed. Restore the server-side span stashed in
+		// rewriter so that spans started by the response middlewares are
+		// parented to the still-open server span instead of the ended client
+		// span.
+		if span, ok := r.Request.Context().Value(serverSpanKey).(trace.Span); ok {
+			r.Request = r.Request.WithContext(trace.ContextWithSpan(r.Request.Context(), span))
+		}
+
 		_, c, err := o.getHostConfig(r.Request.Context(), r.Request)
 		if err != nil {
 			return err

@@ -1477,9 +1477,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								gen := func(token *oauth2.Token) {
 									defer wg.Done()
 
+									// The unlock must be deferred: a failing require inside
+									// refreshTokens exits this goroutine via runtime.Goexit, so a
+									// plain unlock after the call never runs, deadlocking the
+									// sibling goroutines and hiding the failure until the test
+									// times out.
 									mtx.Lock()
+									defer mtx.Unlock()
 									generations[i+1] = append(generations[i+1], refreshTokens(t, token))
-									mtx.Unlock()
 								}
 
 								for _, token := range generations[i] {

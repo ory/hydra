@@ -101,12 +101,9 @@ func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 		eg.Go(func() error {
 			k, err := h.r.KeyManager().GetKeySet(ctx, set)
 			if errors.Is(err, x.ErrNotFound) {
-				h.r.Logger().Warnf("JSON Web Key Set %q does not exist yet, generating new key pair...", set)
-				k, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, "", string(jose.RS256), "sig")
-				if err != nil {
-					return err
-				}
-			} else if err != nil {
+				k, err = getOrGenerateKeySet(ctx, h.r, set, "", string(jose.RS256), "sig")
+			}
+			if err != nil {
 				return err
 			}
 			keys[i] = ExcludePrivateKeys(k)

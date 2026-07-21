@@ -24,7 +24,7 @@ require (
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.4.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/jackc/pgx/v5 v5.9.2
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/magiconair/properties v1.8.9
 	github.com/mattn/goveralls v0.0.12
 	github.com/miekg/pkcs11 v1.1.1

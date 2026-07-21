@@ -113,7 +113,7 @@ func ParseQueryParams(keys [][32]byte, q url.Values) ([]Option, error) {
 // falls back to using the fallbackEncryptionKey and returns an error if that also fails.
 func ParsePageToken(keys [][32]byte, raw string) (t PageToken, err error) {
 	for i := range keys {
-		err = errors.WithStack(t.decrypt(&keys[i], raw))
+		err = errors.WithStack(t.decrypt(keys[i], raw))
 		if errors.Is(err, ErrInvalidPaginationToken()) {
 			continue
 		}

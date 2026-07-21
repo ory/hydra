@@ -65,7 +65,6 @@ require (
 	github.com/spf13/cast v1.9.2
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
-	github.com/ssoready/hyrumtoken v1.0.0
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.19.0
 	github.com/tidwall/sjson v1.2.5

@@ -9,7 +9,7 @@
     "watch": "nodemon ./src/index.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.1",
+    "body-parser": "^1.20.6",
     "dotenv": "^7.0.0",
     "express": "^4.21.2",
     "express-session": "^1.17.0",
@@ -29,6 +29,8 @@
   "overrides": {
     "node-forge": "1.4.0",
     "path-to-regexp": "0.1.13",
-    "qs": "6.15.2"
+    "qs": "6.15.2",
+    "brace-expansion": "1.1.16",
+    "morgan": "1.11.0"
   }
 }

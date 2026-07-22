@@ -157,7 +157,7 @@ func TestHandler(t *testing.T) {
 	}
 
 	fetch := func(t *testing.T, url string) (string, *http.Response) {
-		res, err := http.Get(url)
+		res, err := testhelpers.NewTestClient(t).Get(url)
 		require.NoError(t, err)
 		defer func() { _ = res.Body.Close() }()
 		body, err := io.ReadAll(res.Body)
@@ -170,7 +170,7 @@ func TestHandler(t *testing.T) {
 		require.NoError(t, err)
 		r.Header.Set("Authorization", "Bearer "+token)
 		r.Header.Set("Accept", "application/json")
-		res, err := http.DefaultClient.Do(r)
+		res, err := testhelpers.NewTestClient(t).Do(r)
 		require.NoError(t, err)
 		defer func() { _ = res.Body.Close() }()
 		out, err := io.ReadAll(res.Body)

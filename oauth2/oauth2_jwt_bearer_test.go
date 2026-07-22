@@ -367,7 +367,7 @@ func TestJWTBearer(t *testing.T) {
 				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
 				require.NoError(t, err)
 
-				res, err := http.DefaultClient.PostForm(reg.Config().OAuth2TokenURL(ctx).String(), url.Values{
+				res, err := testhelpers.NewTestClient(t).PostForm(reg.Config().OAuth2TokenURL(ctx).String(), url.Values{
 					"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
 					"assertion":  {token},
 				})

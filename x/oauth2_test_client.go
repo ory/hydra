@@ -26,9 +26,33 @@ func NewEmptyCookieJar(t testing.TB) *cookiejar.Jar {
 	return c
 }
 
+// NewTestTransport returns a transport dedicated to a single test client.
+//
+// Tests spin up short-lived httptest.Server instances and close them when the
+// test finishes. httptest.Server.Close unconditionally calls
+// http.DefaultTransport.CloseIdleConnections as a courtesy for users of the
+// default transport. When parallel subtests share http.DefaultTransport (the
+// zero value of http.Client.Transport), one subtest closing its server tears
+// down idle connections that another subtest's in-flight request is using,
+// surfacing as "http: CloseIdleConnections called". Giving every test client
+// its own transport means that courtesy close only ever affects the unused
+// global transport, never a live test client.
+func NewTestTransport(t testing.TB) *http.Transport {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	t.Cleanup(transport.CloseIdleConnections)
+	return transport
+}
+
+// NewTestClient returns a jar-less client with a dedicated transport, see
+// NewTestTransport.
+func NewTestClient(t testing.TB) *http.Client {
+	return &http.Client{Transport: NewTestTransport(t)}
+}
+
 func NewEmptyJarClient(t testing.TB) *http.Client {
 	return &http.Client{
-		Jar: NewEmptyCookieJar(t),
+		Jar:       NewEmptyCookieJar(t),
+		Transport: NewTestTransport(t),
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			//t.Logf("Redirect to %s", req.URL.String())
 
@@ -65,6 +89,9 @@ func PerformAuthCodeFlow(ctx context.Context, t *testing.T, baseClient *http.Cli
 	}
 	if cl.Jar == nil {
 		cl.Jar = NewEmptyCookieJar(t)
+	}
+	if cl.Transport == nil {
+		cl.Transport = NewTestTransport(t)
 	}
 	cl.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
 

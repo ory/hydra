@@ -589,7 +589,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				)
 
 				withWrongClientAfterLogin := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -604,7 +605,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					},
 				}
 				withWrongClientAfterConsent := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -620,7 +622,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				}
 
 				withWrongScopeAfterLogin := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -636,7 +639,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				}
 
 				withWrongScopeAfterConsent := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -1801,7 +1805,7 @@ func createVerifiableCredential(
 	require.NoError(t, json.NewEncoder(&body).Encode(createVerifiableCredentialReq))
 	req := httpx.MustNewRequest("POST", reg.Config().CredentialsEndpointURL(ctx).String(), &body, "application/json")
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-	res, err := http.DefaultClient.Do(req)
+	res, err := testhelpers.NewTestClient(t).Do(req)
 	require.NoError(t, err)
 	defer res.Body.Close() //nolint:errcheck
 
@@ -1830,7 +1834,7 @@ func doPrimingRequest(
 	require.NoError(t, json.NewEncoder(&body).Encode(createVerifiableCredentialReq))
 	req := httpx.MustNewRequest("POST", reg.Config().CredentialsEndpointURL(ctx).String(), &body, "application/json")
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-	res, err := http.DefaultClient.Do(req)
+	res, err := testhelpers.NewTestClient(t).Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -2085,7 +2089,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						tc.cj = testhelpers.NewEmptyCookieJar(t)
 					}
 
-					resp, err := (&http.Client{Jar: tc.cj}).Do(req)
+					resp, err := (&http.Client{Jar: tc.cj, Transport: testhelpers.NewTestTransport(t)}).Do(req)
 					require.NoError(t, err, tc.authURL, publicTs.URL)
 					defer resp.Body.Close() //nolint:errcheck
 
@@ -2109,7 +2113,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 					t.Run("case=userinfo", func(t *testing.T) {
 						makeRequest := func(req *http.Request) *http.Response {
-							resp, err = http.DefaultClient.Do(req)
+							resp, err = testhelpers.NewTestClient(t).Do(req)
 							require.NoError(t, err)
 							return resp
 						}
@@ -2182,7 +2186,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						req, err := http.NewRequest("GET", publicTs.URL+"/userinfo", nil)
 						require.NoError(t, err)
 						req.Header.Add("Authorization", "bearer "+token.AccessToken)
-						res, err := http.DefaultClient.Do(req)
+						res, err := testhelpers.NewTestClient(t).Do(req)
 						require.NoError(t, err)
 						assert.EqualValues(t, http.StatusUnauthorized, res.StatusCode)
 					})
@@ -2460,7 +2464,7 @@ func testRefresh(t *testing.T, token *oauth2.Token, u string, sleep bool) (*http
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth(oauthClientConfig.ClientID, oauthClientConfig.ClientSecret)
 
-	return http.DefaultClient.Do(req)
+	return testhelpers.NewTestClient(t).Do(req)
 }
 
 func withScope(scope string) func(*client.Client) {

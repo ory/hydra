@@ -317,7 +317,7 @@ func TestUserinfo(t *testing.T) {
 			req, err := http.NewRequest("GET", ts.URL+"/userinfo", nil)
 			require.NoError(t, err)
 			req.Header.Set("Authorization", "Bearer access-token")
-			resp, err := http.DefaultClient.Do(req)
+			resp, err := testhelpers.NewTestClient(t).Do(req)
 			require.NoError(t, err)
 			t.Cleanup(func() { _ = resp.Body.Close() })
 			body, err := io.ReadAll(resp.Body)
@@ -354,7 +354,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		ts := httptest.NewServer(r)
 		defer ts.Close()
 
-		res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
+		res, err := testhelpers.NewTestClient(t).Get(ts.URL + "/.well-known/openid-configuration")
 		require.NoError(t, err)
 		defer func() { _ = res.Body.Close() }()
 
@@ -399,7 +399,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 		ts := httptest.NewServer(r)
 		defer ts.Close()
 
-		res, err := http.Get(ts.URL + "/.well-known/oauth-authorization-server")
+		res, err := testhelpers.NewTestClient(t).Get(ts.URL + "/.well-known/oauth-authorization-server")
 		require.NoError(t, err)
 		defer func() { _ = res.Body.Close() }()
 

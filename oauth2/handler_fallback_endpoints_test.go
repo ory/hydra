@@ -31,7 +31,7 @@ func TestHandlerConsent(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	res, err := http.Get(ts.URL + oauth2.DefaultConsentPath)
+	res, err := testhelpers.NewTestClient(t).Get(ts.URL + oauth2.DefaultConsentPath)
 	assert.Nil(t, err)
 	defer func() { _ = res.Body.Close() }()
 

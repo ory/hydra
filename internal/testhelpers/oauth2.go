@@ -236,6 +236,8 @@ func InsecureDecodeJWT(t require.TestingT, token string) []byte {
 var (
 	NewEmptyCookieJar = x.NewEmptyCookieJar
 	NewEmptyJarClient = x.NewEmptyJarClient
+	NewTestClient     = x.NewTestClient
+	NewTestTransport  = x.NewTestTransport
 )
 
 func AssertTokenValid(t *testing.T, accessOrIDToken gjson.Result, sub string) {

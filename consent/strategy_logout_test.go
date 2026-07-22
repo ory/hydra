@@ -217,12 +217,12 @@ func TestLogoutFlows(t *testing.T) {
 		t.Run("method=get", func(t *testing.T) {
 			t.Parallel()
 			_, _, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			logoutAndExpectPostLogoutPage(t, publicTS.URL, new(http.Client), http.MethodGet, url.Values{}, defaultRedirectedMessage)
+			logoutAndExpectPostLogoutPage(t, publicTS.URL, testhelpers.NewTestClient(t), http.MethodGet, url.Values{}, defaultRedirectedMessage)
 		})
 		t.Run("method=post", func(t *testing.T) {
 			t.Parallel()
 			_, _, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			logoutAndExpectPostLogoutPage(t, publicTS.URL, new(http.Client), http.MethodPost, url.Values{}, defaultRedirectedMessage)
+			logoutAndExpectPostLogoutPage(t, publicTS.URL, testhelpers.NewTestClient(t), http.MethodPost, url.Values{}, defaultRedirectedMessage)
 		})
 	})
 
@@ -232,12 +232,12 @@ func TestLogoutFlows(t *testing.T) {
 		t.Run("method=get", func(t *testing.T) {
 			t.Parallel()
 			_, _, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			logoutAndExpectErrorPage(t, publicTS.URL, new(http.Client), http.MethodGet, url.Values{"state": {"foobar"}}, expectedMessage)
+			logoutAndExpectErrorPage(t, publicTS.URL, testhelpers.NewTestClient(t), http.MethodGet, url.Values{"state": {"foobar"}}, expectedMessage)
 		})
 		t.Run("method=post", func(t *testing.T) {
 			t.Parallel()
 			_, _, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			logoutAndExpectErrorPage(t, publicTS.URL, new(http.Client), http.MethodPost, url.Values{"state": {"foobar"}}, expectedMessage)
+			logoutAndExpectErrorPage(t, publicTS.URL, testhelpers.NewTestClient(t), http.MethodPost, url.Values{"state": {"foobar"}}, expectedMessage)
 		})
 	})
 
@@ -247,12 +247,12 @@ func TestLogoutFlows(t *testing.T) {
 		t.Run("method=get", func(t *testing.T) {
 			t.Parallel()
 			_, _, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			logoutAndExpectErrorPage(t, publicTS.URL, new(http.Client), http.MethodGet, url.Values{"post_logout_redirect_uri": {"foobar"}}, expectedMessage)
+			logoutAndExpectErrorPage(t, publicTS.URL, testhelpers.NewTestClient(t), http.MethodGet, url.Values{"post_logout_redirect_uri": {"foobar"}}, expectedMessage)
 		})
 		t.Run("method=post", func(t *testing.T) {
 			t.Parallel()
 			_, _, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			logoutAndExpectErrorPage(t, publicTS.URL, new(http.Client), http.MethodPost, url.Values{"post_logout_redirect_uri": {"foobar"}}, expectedMessage)
+			logoutAndExpectErrorPage(t, publicTS.URL, testhelpers.NewTestClient(t), http.MethodPost, url.Values{"post_logout_redirect_uri": {"foobar"}}, expectedMessage)
 		})
 	})
 
@@ -261,13 +261,13 @@ func TestLogoutFlows(t *testing.T) {
 		t.Run("method=get", func(t *testing.T) {
 			t.Parallel()
 			_, reg, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			browser := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist")}
+			browser := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist"), Transport: testhelpers.NewTestTransport(t)}
 			logoutAndExpectPostLogoutPage(t, publicTS.URL, browser, http.MethodGet, url.Values{}, defaultRedirectedMessage)
 		})
 		t.Run("method=post", func(t *testing.T) {
 			t.Parallel()
 			_, reg, publicTS, _, _ := makeDeps(t, defaultLogoutURL)
-			browser := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist")}
+			browser := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist"), Transport: testhelpers.NewTestTransport(t)}
 			logoutAndExpectPostLogoutPage(t, publicTS.URL, browser, http.MethodPost, url.Values{}, defaultRedirectedMessage)
 		})
 	})
@@ -511,7 +511,7 @@ func TestLogoutFlows(t *testing.T) {
 		t.Parallel()
 		_, reg, publicTS, _, adminApi := makeDeps(t, defaultLogoutURL)
 		setupCheckAndAcceptLogoutHandler(t, reg, adminApi, nil, nil)
-		logoutAndExpectErrorPage(t, publicTS.URL, http.DefaultClient, http.MethodGet, url.Values{
+		logoutAndExpectErrorPage(t, publicTS.URL, testhelpers.NewTestClient(t), http.MethodGet, url.Values{
 			"logout_verifier": {"an-invalid-verifier"},
 		}, "Description: Unable to locate the requested resource")
 	})
@@ -829,7 +829,8 @@ func TestLogoutFlows(t *testing.T) {
 
 		// Use another browser (without session cookie) to make the logout request:
 		otherBrowser := &http.Client{
-			Jar: testhelpers.NewEmptyCookieJar(t),
+			Jar:       testhelpers.NewEmptyCookieJar(t),
+			Transport: testhelpers.NewTestTransport(t),
 		}
 		// Capture the request with the logout verifier to test reuse detection later.
 		var verifiedLogoutReq *http.Request
@@ -918,7 +919,7 @@ func TestLogoutFlows(t *testing.T) {
 	t.Run("case=should logout in headless flow with non-existing sid", func(t *testing.T) {
 		t.Parallel()
 		fakeKratos, _, _, adminTS, _ := makeDeps(t, defaultLogoutURL)
-		logoutViaHeadlessAndExpectNoContent(t, adminTS.URL, new(http.Client), url.Values{"sid": {"non-existing-sid"}})
+		logoutViaHeadlessAndExpectNoContent(t, adminTS.URL, testhelpers.NewTestClient(t), url.Values{"sid": {"non-existing-sid"}})
 		assert.False(t, fakeKratos.DisableSessionWasCalled)
 	})
 
@@ -942,7 +943,7 @@ func TestLogoutFlows(t *testing.T) {
 	t.Run("case=should fail headless logout because neither sid nor subject were provided", func(t *testing.T) {
 		t.Parallel()
 		fakeKratos, _, _, adminTS, _ := makeDeps(t, defaultLogoutURL)
-		logoutViaHeadlessAndExpectError(t, adminTS.URL, new(http.Client), url.Values{}, `Either 'subject' or 'sid' query parameters need to be defined.`)
+		logoutViaHeadlessAndExpectError(t, adminTS.URL, testhelpers.NewTestClient(t), url.Values{}, `Either 'subject' or 'sid' query parameters need to be defined.`)
 		assert.False(t, fakeKratos.DisableSessionWasCalled)
 	})
 }

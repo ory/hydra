@@ -52,7 +52,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		}
 		IDKS, _ := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
-		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
+		res, err := testhelpers.NewTestClient(t).Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
 		defer res.Body.Close() //nolint:errcheck
 
@@ -102,7 +102,7 @@ func TestHandlerWellKnown(t *testing.T) {
 			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		}
 
-		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
+		res, err := testhelpers.NewTestClient(t).Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
 		defer res.Body.Close() //nolint:errcheck
 

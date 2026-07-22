@@ -173,7 +173,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", nil),
 			testhelpers.HTTPServerNoExpectedCallHandler(t))
 
-		hc := new(http.Client)
+		hc := testhelpers.NewTestClient(t)
 		hc.Jar = DropCookieJar(regexp.MustCompile("ory_hydra_.*_csrf_.*"))
 		makeRequestAndExpectError(t, hc, c, url.Values{}, "No CSRF value available in the session cookie.")
 	})
@@ -417,7 +417,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			}))
 		hc := &http.Client{
 			Jar:       testhelpers.NewEmptyCookieJar(t),
-			Transport: &http.Transport{},
+			Transport: testhelpers.NewTestTransport(t),
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
 			},
@@ -505,7 +505,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 			hc := &http.Client{
 				Jar:       hc.Jar,
-				Transport: &http.Transport{},
+				Transport: testhelpers.NewTestTransport(t),
 				CheckRedirect: func(req *http.Request, via []*http.Request) error {
 					return http.ErrUseLastResponse
 				},
@@ -596,7 +596,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			}))
 		hc := &http.Client{
 			Jar:       testhelpers.NewEmptyCookieJar(t),
-			Transport: &http.Transport{},
+			Transport: testhelpers.NewTestTransport(t),
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
 			},
@@ -1044,7 +1044,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		c := createDefaultClient(t)
 		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, subject, nil), acceptConsentHandler(t, nil))
 
-		hc := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist")}
+		hc := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist"), Transport: testhelpers.NewTestTransport(t)}
 		makeRequestAndExpectError(t, hc, c, url.Values{"prompt": {"none"}}, "The Authorization Server requires End-User authentication.")
 	})
 

@@ -6,6 +6,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/flagx"
 
@@ -41,18 +42,29 @@ To get the JSON Web Key Set as only public keys:
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}
 
-				sets.Keys = append(sets.Keys, key.Keys...)
+				sets.Keys = append(sets.Keys, newOutputJsonWebKeys(set, key.Keys)...)
+			}
+			if len(args) == 1 {
+				sets.Set = args[0]
 			}
 
 			if flagx.MustGetBool(cmd, "public") {
-				sets.Keys, err = jwk.OnlyPublicSDKKeys(sets.Keys)
+				keys := make([]hydra.JsonWebKey, len(sets.Keys))
+				for i, key := range sets.Keys {
+					keys[i] = key.JsonWebKey
+				}
+				keys, err = jwk.OnlyPublicSDKKeys(keys)
 				if err != nil {
 					return err
+				}
+				// OnlyPublicSDKKeys preserves order, so the set names still line up.
+				for i, key := range keys {
+					sets.Keys[i].JsonWebKey = key
 				}
 			}
 
 			if len(sets.Keys) == 1 {
-				cmdx.PrintRow(cmd, outputJsonWebKey{Set: args[0], JsonWebKey: sets.Keys[0]})
+				cmdx.PrintRow(cmd, sets.Keys[0])
 			} else if len(sets.Keys) > 1 {
 				cmdx.PrintTable(cmd, sets)
 			}

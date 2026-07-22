@@ -55,7 +55,7 @@ func NewCreateJWKSCmd() *cobra.Command {
 				}
 			}
 
-			cmdx.PrintTable(cmd, &outputJSONWebKeyCollection{Keys: jwks.Keys, Set: args[0]})
+			cmdx.PrintTable(cmd, &outputJSONWebKeyCollection{Set: args[0], Keys: newOutputJsonWebKeys(args[0], jwks.Keys)})
 			return nil
 		},
 	}

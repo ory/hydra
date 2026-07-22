@@ -127,7 +127,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 				}
 			}
 
-			cmdx.PrintTable(cmd, &outputJSONWebKeyCollection{Set: set, Keys: imported})
+			cmdx.PrintTable(cmd, &outputJSONWebKeyCollection{Set: set, Keys: newOutputJsonWebKeys(set, imported)})
 			if len(failed) != 0 {
 				cmdx.PrintErrors(cmd, failed)
 				return cmdx.FailSilently(cmd)

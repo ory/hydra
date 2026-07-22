@@ -54,15 +54,15 @@ func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic, corsMiddleware fu
 }
 
 func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
-	r.GET(KeyHandlerPath+"/{set}/{key}", h.getJsonWebKey)
+	r.GET(KeyHandlerPath+"/{set}/{kid}", h.getJsonWebKey)
 	r.GET(KeyHandlerPath+"/{set}", h.getJsonWebKeySet)
 
 	r.POST(KeyHandlerPath+"/{set}", h.createJsonWebKeySet)
 
-	r.PUT(KeyHandlerPath+"/{set}/{key}", h.adminUpdateJsonWebKey)
+	r.PUT(KeyHandlerPath+"/{set}/{kid}", h.adminUpdateJsonWebKey)
 	r.PUT(KeyHandlerPath+"/{set}", h.setJsonWebKeySet)
 
-	r.DELETE(KeyHandlerPath+"/{set}/{key}", h.deleteJsonWebKey)
+	r.DELETE(KeyHandlerPath+"/{set}/{kid}", h.deleteJsonWebKey)
 	r.DELETE(KeyHandlerPath+"/{set}", h.adminDeleteJsonWebKeySet)
 }
 
@@ -162,8 +162,8 @@ type _ struct {
 //	Extensions:
 //	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) getJsonWebKey(w http.ResponseWriter, r *http.Request) {
-	var setName = r.PathValue("set")
-	var keyName = r.PathValue("key")
+	setName := r.PathValue("set")
+	keyName := r.PathValue("kid")
 
 	keys, err := h.r.KeyManager().GetKey(r.Context(), setName, keyName)
 	if err != nil {
@@ -209,7 +209,7 @@ type _ struct {
 //	Extensions:
 //	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) getJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
-	var setName = r.PathValue("set")
+	setName := r.PathValue("set")
 
 	keys, err := h.r.KeyManager().GetKeySet(r.Context(), setName)
 	if err != nil {
@@ -270,6 +270,8 @@ type createJsonWebKeySetBody struct {
 //
 // This endpoint is capable of generating JSON Web Key Sets for you. There are different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymmetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
 //
+// If the set already exists, the newly generated key is added to it and all existing keys are kept. This allows you to rotate keys: tokens signed with an older key in the set remain verifiable. Exception: when Ory Hydra is configured to use a Hardware Security Module (HSM), generating a key replaces the set, which then contains only the new key. To replace a set and all of its keys instead, use the `setJsonWebKeySet` operation (`PUT /admin/keys/{set}`).
+//
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
 //	Consumes:
@@ -288,7 +290,7 @@ type createJsonWebKeySetBody struct {
 //	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var keyRequest createJsonWebKeySetBody
-	var set = r.PathValue("set")
+	set := r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
@@ -323,6 +325,8 @@ type _ struct {
 //
 // Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 //
+// This operation replaces the entire JSON Web Key Set: keys that exist in the set but are not part of the request body are deleted. To add a newly generated key to the set while keeping the existing keys, use the `createJsonWebKeySet` operation (`POST /admin/keys/{set}`).
+//
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
 //	Consumes:
@@ -341,7 +345,7 @@ type _ struct {
 //	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var keySet jose.JSONWebKeySet
-	var set = r.PathValue("set")
+	set := r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
@@ -382,6 +386,8 @@ type _ struct {
 //
 // Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 //
+// Warning: the key is created or updated under the `kid` given in the request body. The `{kid}` path parameter exists for historical reasons only: it is ignored and not validated against the body.
+//
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
 //	Consumes:
@@ -400,7 +406,10 @@ type _ struct {
 //	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request) {
 	var key jose.JSONWebKey
-	var set = r.PathValue("set")
+	// The {kid} path parameter is intentionally not read: it has never been
+	// validated against the body, and enforcing a match now would break clients
+	// that rely on the historic behavior.
+	set := r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
@@ -448,7 +457,7 @@ type _ struct {
 //	Extensions:
 //	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
-	var setName = r.PathValue("set")
+	setName := r.PathValue("set")
 
 	if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -500,7 +509,7 @@ type _ struct {
 //	Extensions:
 //	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) deleteJsonWebKey(w http.ResponseWriter, r *http.Request) {
-	setName, keyName := r.PathValue("set"), r.PathValue("key")
+	setName, keyName := r.PathValue("set"), r.PathValue("kid")
 
 	if err := h.r.KeyManager().DeleteKey(r.Context(), setName, keyName); err != nil {
 		h.r.Writer().WriteError(w, r, err)

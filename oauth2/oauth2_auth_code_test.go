@@ -1369,22 +1369,36 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						return token
 					}
 
-					refreshTokens := func(t *testing.T, token *oauth2.Token) *oauth2.Token {
+					// refreshTokenExchange performs only the grace-window-critical part of a
+					// refresh: it rotates the token via the token endpoint and returns the new
+					// token plus the issued-at time captured just before the exchange. Keep this
+					// fast — when a token is refreshed twice within the rotation grace period, the
+					// two exchanges must happen close together, so the slow assertions live in
+					// assertRefreshedToken, which runs afterwards.
+					refreshTokenExchange := func(t *testing.T, token *oauth2.Token) (*oauth2.Token, time.Time) {
 						require.NotEmpty(t, token.RefreshToken)
 						token.Expiry = time.Now().Add(-time.Hour * 24)
 						iat := time.Now()
 						refreshedToken, err := conf.TokenSource(context.Background(), token).Token()
 						require.NoError(t, err)
+						return refreshedToken, iat
+					}
 
-						require.NotEqual(t, token.AccessToken, refreshedToken.AccessToken)
-						require.NotEqual(t, token.RefreshToken, refreshedToken.RefreshToken)
-						require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
+					assertRefreshedToken := func(t *testing.T, prev, refreshed *oauth2.Token, iat time.Time) {
+						require.NotEqual(t, prev.AccessToken, refreshed.AccessToken)
+						require.NotEqual(t, prev.RefreshToken, refreshed.RefreshToken)
+						require.NotEqual(t, prev.Extra("id_token"), refreshed.Extra("id_token"))
 
-						introspectAccessToken(t, conf, refreshedToken, subject)
-						assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
-						assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
-						assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
-						return refreshedToken
+						introspectAccessToken(t, conf, refreshed, subject)
+						assertJWTAccessToken(t, strategy, conf, refreshed, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
+						assertIDToken(t, refreshed, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+						assertRefreshToken(t, refreshed, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+					}
+
+					refreshTokens := func(t *testing.T, token *oauth2.Token) *oauth2.Token {
+						refreshed, iat := refreshTokenExchange(t, token)
+						assertRefreshedToken(t, token, refreshed, iat)
+						return refreshed
 					}
 
 					assertInactive := func(t *testing.T, token string, c *oauth2.Config) {
@@ -1398,12 +1412,18 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
 
 						token := issueTokens(t)
-						_ = refreshTokens(t, token)
 
-						assertInactive(t, token.AccessToken, conf) // Original access token is invalid
+						// Refresh the same token twice within the grace period. Keep the two
+						// exchanges close together — only a single cheap introspect runs between
+						// them — and defer the slow assertions until afterwards, so a loaded shard
+						// can not push the second refresh past the grace window.
+						refreshed1, iat1 := refreshTokenExchange(t, token)
+						assertInactive(t, token.AccessToken, conf) // Original access token is invalid after the first graceful refresh.
+						refreshed2, iat2 := refreshTokenExchange(t, token)
 
-						_ = refreshTokens(t, token)
-						assertInactive(t, token.AccessToken, conf) // Original access token is still invalid
+						assertRefreshedToken(t, token, refreshed1, iat1)
+						assertRefreshedToken(t, token, refreshed2, iat2)
+						assertInactive(t, token.AccessToken, conf) // Original access token is still invalid.
 					})
 
 					t.Run("an expired refresh token can not be used even if we are in the grace period", func(t *testing.T) {
@@ -1469,37 +1489,44 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							// Start from the first generation. For every next generation, we refresh all the tokens of the previous generation twice.
 							for i := range len(generations) - 1 {
 								// Loop invariants:
-								// - `generations` is constant is size (it is right-sized when created), thus it is safe to index it concurrently.
+								// - `generations` is constant in size (it is right-sized when created), thus it is safe to index it concurrently.
 								// - The current generation (`generations[i]`) is constant in size, thus it is safe to iterate over it.
-								// - The next generation (`generations[i+1]`) is *not* constant in size. Elements are appended to it concurrently, and thus it is guarded by `mtx`.
-								// - Elements of the current generation *are* modified in `refreshToken` (!), and thus are guarded by `mtx`.
-								// - Elements of the current and next generation are concurrently read/written inside the `gen` function, and thus are guarded by `mtx`.
+								// - Each token of the current generation is owned by exactly one worker, which refreshes it twice. No other goroutine touches that token, so the token mutation and the two exchanges need no locking.
+								// - The next generation (`generations[i+1]`) is *not* constant in size. Workers append to it concurrently, so only the append is guarded by `mtx`.
 								generations[i+1] = make([]*oauth2.Token, 0, len(generations[i])*2)
 								mtx := sync.Mutex{}
 
 								var wg sync.WaitGroup
-								gen := func(token *oauth2.Token) {
+								worker := func(token *oauth2.Token) {
 									defer wg.Done()
 
-									// The unlock must be deferred: a failing require inside
-									// refreshTokens exits this goroutine via runtime.Goexit, so a
-									// plain unlock after the call never runs, deadlocking the
-									// sibling goroutines and hiding the failure until the test
-									// times out.
+									// Refresh the same token twice back-to-back. The only work between
+									// the first exchange (which sets first_used_at) and the second is a
+									// single token-endpoint round trip, so the second refresh stays
+									// comfortably inside the grace period even on a loaded CI shard. The
+									// slow assertions run afterwards, outside the grace window.
+									refreshed1, iat1 := refreshTokenExchange(t, token)
+									refreshed2, iat2 := refreshTokenExchange(t, token)
+
+									assertRefreshedToken(t, token, refreshed1, iat1)
+									assertRefreshedToken(t, token, refreshed2, iat2)
+
+									// The unlock is deferred so that the mutex is released even if a
+									// future change adds a failing require after the lock, which would
+									// otherwise exit this goroutine via runtime.Goexit and deadlock the
+									// siblings.
 									mtx.Lock()
 									defer mtx.Unlock()
-									generations[i+1] = append(generations[i+1], refreshTokens(t, token))
+									generations[i+1] = append(generations[i+1], refreshed1, refreshed2)
 								}
 
 								for _, token := range generations[i] {
-									wg.Add(2)
+									wg.Add(1)
 									if dbName != "cockroach" {
-										// We currently only support TX retries on cockroach
-										gen(token)
-										gen(token)
+										// We currently only support TX retries on cockroach.
+										worker(token)
 									} else {
-										go gen(token)
-										go gen(token)
+										go worker(token)
 									}
 								}
 

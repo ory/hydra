@@ -381,6 +381,8 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath, url.PathEscape(c.GetID())).String()
+
 	h.r.Writer().Write(w, r, &c)
 }
 
@@ -658,6 +660,7 @@ func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 
 	c.Secret = ""
 	c.Metadata = nil
+	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath, url.PathEscape(c.GetID())).String()
 	h.r.Writer().Write(w, r, c)
 }
 

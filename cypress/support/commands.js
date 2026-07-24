@@ -92,6 +92,18 @@ Cypress.Commands.add(
           cy.get("#reject").click()
         }
       }
+
+      // On success the browser is redirected back to the client's callback,
+      // which renders {"result":"success"}. Wait for that page before
+      // returning so callers that immediately read session state (cookies,
+      // /session/check) don't race the in-flight redirect. Skipping this is
+      // the root cause of the logout suite's flakiness.
+      const expectSuccess =
+        (skipLogin || acceptLogin) && (skipConsent || acceptConsent)
+      if (expectSuccess) {
+        cy.location("pathname").should("include", `/${path}/callback`)
+        cy.contains('"result":"success"')
+      }
     }
 
     if (doCreateClient) {

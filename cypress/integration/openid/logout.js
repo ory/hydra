@@ -1,9 +1,74 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-import { deleteClients, prng } from "../../helpers"
+import { createClient, deleteClients, prng } from "../../helpers"
 
 const accessTokenStrategies = ["opaque", "jwt"]
+
+// The logout flow depends on the login session cookies surviving between the
+// sequential tests in each suite. This includes Hydra's browser session cookie:
+// without it, /oauth2/sessions/logout skips the confirmation page and redirects
+// straight to the fallback success page.
+const preserveLogoutSessionCookies = () => {
+  Cypress.Cookies.preserveOnce(
+    "oauth2_authentication_session",
+    "oauth2_authentication_session_insecure",
+    "ory_hydra_session_dev",
+    "connect.sid",
+  )
+}
+
+const clearLogoutSessionCookies = () => {
+  cy.clearCookies({ domain: null })
+}
+
+const rememberLogin = (client, doCreateClient = true) => {
+  cy.authCodeFlow(
+    client,
+    {
+      login: { remember: true },
+      consent: {
+        scope: ["openid"],
+        remember: true,
+      },
+      createClient: doCreateClient,
+    },
+    "openid",
+  )
+}
+
+// Poll the client's session state until it reaches the expected value or the
+// attempt budget runs out. A cookie that is written or rotated slightly late
+// then recovers on the next poll instead of failing the whole run.
+const expectSession = (expected, attempts = 20) => {
+  cy.request(`${Cypress.env("client_url")}/openid/session/check`)
+    .its("body")
+    .then(({ has_session }) => {
+      if (has_session === expected) {
+        return
+      }
+      if (attempts <= 1) {
+        expect(has_session, "has_session").to.equal(expected)
+        return
+      }
+      cy.wait(250)
+      expectSession(expected, attempts - 1)
+    })
+}
+
+const ensureSession = (client, doCreateClient = true) => {
+  cy.request(`${Cypress.env("client_url")}/openid/session/check`)
+    .its("body")
+    .then(({ has_session }) => {
+      if (has_session) {
+        return
+      }
+      clearLogoutSessionCookies()
+      rememberLogin(client, doCreateClient)
+    })
+
+  expectSession(true)
+}
 
 accessTokenStrategies.forEach((accessTokenStrategy) => {
   describe("access_token_strategy=" + accessTokenStrategy, function () {
@@ -26,51 +91,33 @@ accessTokenStrategies.forEach((accessTokenStrategy) => {
       })
 
       describe("logout without id_token_hint", () => {
-        beforeEach(() => {
-          Cypress.Cookies.preserveOnce(
-            "oauth2_authentication_session",
-            "oauth2_authentication_session_insecure",
-            "connect.sid",
-          )
-        })
+        beforeEach(preserveLogoutSessionCookies)
+
+        let client
 
         before(() => {
           deleteClients()
+
+          createClient({
+            ...nc(),
+            backchannel_logout_uri: `${Cypress.env(
+              "client_url",
+            )}/openid/session/end/bc`,
+          }).then((createdClient) => {
+            client = createdClient
+          })
         })
 
-        const client = {
-          ...nc(),
-          backchannel_logout_uri: `${Cypress.env(
-            "client_url",
-          )}/openid/session/end/bc`,
-        }
-
         it("should log in and remember login without id_token_hint", function () {
-          cy.authCodeFlow(
-            client,
-            {
-              login: { remember: true },
-              consent: {
-                scope: ["openid"],
-                remember: true,
-              },
-            },
-            "openid",
-          )
+          clearLogoutSessionCookies()
 
-          cy.request(`${Cypress.env("client_url")}/openid/session/check`)
-            .its("body")
-            .then(({ has_session }) => {
-              expect(has_session).to.be.true
-            })
+          rememberLogin(client, false)
+
+          expectSession(true)
         })
 
         it("should show the logout page and complete logout without id_token_hint", () => {
-          // cy.request(`${Cypress.env('client_url')}/openid/session/check`)
-          //   .its('body')
-          //   .then(({ has_session }) => {
-          //     expect(has_session).to.be.true;
-          //   });
+          ensureSession(client, false)
 
           cy.visit(`${Cypress.env("client_url")}/openid/session/end?simple=1`, {
             failOnStatusCode: false,
@@ -102,14 +149,8 @@ accessTokenStrategies.forEach((accessTokenStrategy) => {
       })
 
       // The Back-Channel test should run before the front-channel test because otherwise both tests need a long time to finish.
-      describe.only("Back-Channel", () => {
-        beforeEach(() => {
-          Cypress.Cookies.preserveOnce(
-            "oauth2_authentication_session",
-            "oauth2_authentication_session_insecure",
-            "connect.sid",
-          )
-        })
+      describe("Back-Channel", () => {
+        beforeEach(preserveLogoutSessionCookies)
 
         before(() => {
           deleteClients()
@@ -123,31 +164,15 @@ accessTokenStrategies.forEach((accessTokenStrategy) => {
         }
 
         it("should log in and remember login with back-channel", function () {
-          cy.authCodeFlow(
-            client,
-            {
-              login: { remember: true },
-              consent: {
-                scope: ["openid"],
-                remember: true,
-              },
-            },
-            "openid",
-          )
+          clearLogoutSessionCookies()
 
-          cy.request(`${Cypress.env("client_url")}/openid/session/check`)
-            .its("body")
-            .then(({ has_session }) => {
-              expect(has_session).to.be.true
-            })
+          rememberLogin(client)
+
+          expectSession(true)
         })
 
         it("should show the logout page and complete logout with back-channel", () => {
-          cy.request(`${Cypress.env("client_url")}/openid/session/check`)
-            .its("body")
-            .then(({ has_session }) => {
-              expect(has_session).to.be.true
-            })
+          ensureSession(client)
 
           cy.visit(`${Cypress.env("client_url")}/openid/session/end`, {
             failOnStatusCode: false,
@@ -160,22 +185,12 @@ accessTokenStrategies.forEach((accessTokenStrategy) => {
             "Your log out request however succeeded.",
           )
 
-          cy.request(`${Cypress.env("client_url")}/openid/session/check`)
-            .its("body")
-            .then(({ has_session }) => {
-              expect(has_session).to.be.false
-            })
+          expectSession(false)
         })
       })
 
       describe("Front-Channel", () => {
-        beforeEach(() => {
-          Cypress.Cookies.preserveOnce(
-            "oauth2_authentication_session",
-            "oauth2_authentication_session_insecure",
-            "connect.sid",
-          )
-        })
+        beforeEach(preserveLogoutSessionCookies)
 
         before(() => {
           deleteClients()
@@ -189,31 +204,15 @@ accessTokenStrategies.forEach((accessTokenStrategy) => {
         }
 
         it("should log in and remember login with front-channel", () => {
-          cy.authCodeFlow(
-            client,
-            {
-              login: { remember: true },
-              consent: {
-                scope: ["openid"],
-                remember: true,
-              },
-            },
-            "openid",
-          )
+          clearLogoutSessionCookies()
 
-          cy.request(`${Cypress.env("client_url")}/openid/session/check`)
-            .its("body")
-            .then(({ has_session }) => {
-              expect(has_session).to.be.true
-            })
+          rememberLogin(client)
+
+          expectSession(true)
         })
 
         it("should show the logout page and complete logout with front-channel", () => {
-          cy.request(`${Cypress.env("client_url")}/openid/session/check`)
-            .its("body")
-            .then(({ has_session }) => {
-              expect(has_session).to.be.true
-            })
+          ensureSession(client)
 
           cy.visit(`${Cypress.env("client_url")}/openid/session/end`, {
             failOnStatusCode: false,
@@ -226,11 +225,7 @@ accessTokenStrategies.forEach((accessTokenStrategy) => {
             "Your log out request however succeeded.",
           )
 
-          cy.request(`${Cypress.env("client_url")}/openid/session/check`)
-            .its("body")
-            .then(({ has_session }) => {
-              expect(has_session).to.be.false
-            })
+          expectSession(false)
         })
       })
     })

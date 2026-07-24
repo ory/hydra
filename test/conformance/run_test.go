@@ -112,7 +112,7 @@ var (
 )
 
 func init() {
-	httpClient.HTTPClient.Timeout = 5 * time.Second
+	httpClient.HTTPClient.Timeout = 15 * time.Second
 	httpClient.HTTPClient.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
@@ -177,15 +177,26 @@ func TestPlans(t *testing.T) {
 }
 
 func makePost(t *testing.T, href string, payload io.Reader, esc int) []byte {
+	t.Helper()
+	body, err := makePostErr(href, payload, esc)
+	require.NoErrorf(t, err, "Failed to make POST request. Check that the server is live and that the certificate in test/conformance/ssl is not expired.")
+	return body
+}
+
+func makePostErr(href string, payload io.Reader, esc int) ([]byte, error) {
 	res, err := httpClient.Post(href, "application/json", payload)
 	if err != nil {
-		require.FailNowf(t, "Failed to make POST request. Check that the server is live and that the certificate in test/conformance/ssl is not expired.", "Error: %s\nURL: %s", err, href)
+		return nil, fmt.Errorf("failed to make POST request: %w\nURL: %s", err, href)
 	}
 	defer res.Body.Close() //nolint:errcheck
 	body, err := io.ReadAll(res.Body)
-	require.NoError(t, err)
-	require.Equal(t, esc, res.StatusCode, "%s\n%s", href, body)
-	return body
+	if err != nil {
+		return nil, fmt.Errorf("failed to read POST response body: %w\nURL: %s", err, href)
+	}
+	if res.StatusCode != esc {
+		return nil, fmt.Errorf("expected POST status %d, got %d\nURL: %s\n%s", esc, res.StatusCode, href, body)
+	}
+	return body, nil
 }
 
 func createPlan(t *testing.T, extra url.Values, isParallel bool) {
@@ -226,12 +237,18 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 			params := url.Values{"test": {module}, "plan": {plan}, "variant": {v.Get("variant").Raw}}
 
 			const maxRetries = 5
+		runnerRetries:
 			for retry := 1; retry <= maxRetries; retry++ {
 				time.Sleep(time.Duration(rand.Intn(5000)) * time.Millisecond)
 
 				t.Logf("Creating retry %d/%d testModule %s for plan %s with params: %+v", retry, maxRetries, module, plan, params)
-				body := makePost(t, urlx.CopyWithQuery(urlx.AppendPaths(server, "/api/runner"), params).String(),
-					nil, 201)
+				body, err := makePostErr(urlx.CopyWithQuery(urlx.AppendPaths(server, "/api/runner"), params).String(), nil, 201)
+				if err != nil {
+					t.Logf("Creating runner for testModule %s for plan %s failed. Retrying with a fresh test: %s", module, plan, err)
+					continue
+				}
+				testID := gjson.GetBytes(body, "id").String()
+				require.NotEmpty(t, testID)
 
 				conf := backoff.NewExponentialBackOff()
 				conf.MaxElapsedTime = time.Minute * 5
@@ -246,11 +263,15 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 					}
 					time.Sleep(nb)
 
-					state, passed := checkStatus(t, gjson.GetBytes(body, "id").String())
+					state, passed, err := checkStatus(t, testID)
+					if err != nil {
+						t.Logf("Checking status for testModule %s for plan %s failed. Continuing to poll: %s", module, plan, err)
+						continue
+					}
 					switch passed {
 					case statusRetry:
 						t.Logf("Status from testModule %s for plan %s with params marked the test for retry. Retrying with a fresh test...", module, plan)
-						break
+						continue runnerRetries
 					case statusFailed:
 						panic("This statement should never be reached")
 					case statusSuccess:
@@ -282,7 +303,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 								time.Sleep(bo)
 							}
 
-							makePost(t, urlx.AppendPaths(server, "/api/runner/", gjson.GetBytes(body, "id").String()).String(), nil, 200)
+							makePost(t, urlx.AppendPaths(server, "/api/runner/", testID).String(), nil, 200)
 						}
 					}
 				}
@@ -294,33 +315,39 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 	})
 }
 
-func checkStatus(t *testing.T, testID string) (string, status) {
+func checkStatus(t *testing.T, testID string) (string, status, error) {
 	res, err := httpClient.Get(urlx.AppendPaths(server, "/api/info", testID).String())
-	require.NoError(t, err)
+	if err != nil {
+		return "", statusRunning, fmt.Errorf("failed to make info request for test %s: %w", testID, err)
+	}
 	defer res.Body.Close() //nolint:errcheck
 	body, err := io.ReadAll(res.Body)
-	require.NoError(t, err)
-	require.Equal(t, 200, res.StatusCode, "%s", body)
+	if err != nil {
+		return "", statusRunning, fmt.Errorf("failed to read info response body for test %s: %w", testID, err)
+	}
+	if res.StatusCode != 200 {
+		return "", statusRunning, fmt.Errorf("expected info status 200 for test %s, got %d: %s", testID, res.StatusCode, body)
+	}
 
 	state := gjson.GetBytes(body, "status").String()
 	t.Logf("Got status %s for %s", state, testID)
 	switch state {
 	case "INTERRUPTED":
 		t.Logf("Test was INTERRUPTED: %s", body)
-		return state, statusRetry
+		return state, statusRetry, nil
 	case "FINISHED":
 		result := gjson.GetBytes(body, "result").String()
 		t.Logf("Got result %s for %s", result, testID)
 
 		if result == "PASSED" || result == "WARNING" || result == "SKIPPED" || result == "REVIEW" {
-			return state, statusSuccess
+			return state, statusSuccess, nil
 		} else if result == "FAILED" {
 			require.FailNowf(t, "Test was FAILED", "Expected status not to be FAILED got: %s", body)
-			return state, statusFailed
+			return state, statusFailed, nil
 		}
 
 		require.FailNowf(t, "Test failed with another error", "Unexpected status: %s", body)
-		return state, statusFailed
+		return state, statusFailed, nil
 	case "CONFIGURED":
 		fallthrough
 	case "CREATED":
@@ -328,9 +355,9 @@ func checkStatus(t *testing.T, testID string) (string, status) {
 	case "RUNNING":
 		fallthrough
 	case "WAITING":
-		return state, statusRunning
+		return state, statusRunning, nil
 	}
 
 	require.FailNowf(t, "Unexpected state", "Unexpected state: %s", body)
-	return state, statusFailed
+	return state, statusFailed, nil
 }

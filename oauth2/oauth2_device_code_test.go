@@ -5,7 +5,9 @@ package oauth2_test
 
 import (
 	"context"
+	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -458,6 +460,56 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		assert.Empty(t, token.Extra("id_token"))
 		assert.Empty(t, token.RefreshToken)
 	})
+	t.Run("case=polling client receives access_denied when consent is denied", func(t *testing.T) {
+		c, conf := newDeviceClient(t, reg)
+		conf.Scopes = []string{"hydra"}
+
+		rejectConsentHandler := func(w http.ResponseWriter, r *http.Request) {
+			vr, _, err := adminClient.OAuth2API.RejectOAuth2ConsentRequest(context.Background()).
+				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+				RejectOAuth2Request(hydra.RejectOAuth2Request{
+					Error:            new(fosite.ErrAccessDenied.ErrorField),
+					ErrorDescription: new("user denied the device authorization request"),
+					StatusCode:       new(int64(fosite.ErrAccessDenied.CodeField)),
+				}).
+				Execute()
+			require.NoError(t, err)
+			require.NotEmpty(t, vr.RedirectTo)
+			http.Redirect(w, r, vr.RedirectTo, http.StatusFound)
+		}
+
+		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+			acceptDeviceHandler(t, c),
+			acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+			rejectConsentHandler,
+		)
+
+		resp, err := getDeviceCode(t, conf, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, resp.DeviceCode)
+		require.NotEmpty(t, resp.UserCode)
+
+		// Drive the browser through device accept -> login -> consent denial.
+		// The user agent ends at an error page rather than the device-done URL.
+		hc := testhelpers.NewEmptyJarClient(t)
+		browserResp, err := hc.Get(resp.VerificationURIComplete)
+		require.NoError(t, err)
+		require.NoError(t, browserResp.Body.Close())
+
+		// The polling client must now receive access_denied on its next poll,
+		// instead of continuing to receive authorization_pending until the
+		// device code expires.
+		tokenResp := pollDeviceToken(t, conf, resp.DeviceCode)
+		body, err := io.ReadAll(tokenResp.Body)
+		require.NoError(t, err)
+		require.NoError(t, tokenResp.Body.Close())
+
+		// The key assertion: the polling client receives the access_denied error
+		// code (RFC 8628 section 3.5) rather than authorization_pending. fosite
+		// serialises ErrAccessDenied with HTTP 403.
+		assert.Equal(t, http.StatusForbidden, tokenResp.StatusCode, "body: %s", body)
+		assert.Equal(t, "access_denied", gjson.GetBytes(body, "error").String(), "body: %s", body)
+	})
 	t.Run("case=perform device flow with ID token", func(t *testing.T) {
 		c, conf := newDeviceClient(t, reg)
 		conf.Scopes = []string{"openid", "hydra"}
@@ -879,4 +931,24 @@ func newDeviceClient(
 		},
 		Scopes: strings.Split(c.Scope, " "),
 	}
+}
+
+// pollDeviceToken performs a single device-code token poll (RFC 8628 section 3.4)
+// against the token endpoint and returns the raw response. It deliberately does
+// not loop on authorization_pending, so callers can assert on the exact response
+// to a single poll (e.g. access_denied after the user denied consent) without
+// risking a hang until the device code expires.
+func pollDeviceToken(t *testing.T, conf *oauth2.Config, deviceCode string) *http.Response {
+	form := url.Values{}
+	form.Set("grant_type", string(fosite.GrantTypeDeviceCode))
+	form.Set("device_code", deviceCode)
+	form.Set("client_id", conf.ClientID)
+
+	req, err := http.NewRequest(http.MethodPost, conf.Endpoint.TokenURL, strings.NewReader(form.Encode()))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	return resp
 }

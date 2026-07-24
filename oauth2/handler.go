@@ -765,6 +765,17 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	if errors.Is(err, consent.ErrUserRedirected) {
 		return
 	} else if err != nil {
+		// If the user denied the consent request, mark the associated
+		// device-code session as rejected so the polling client receives
+		// access_denied (RFC 8628 section 3.5) on its next poll instead of
+		// continuing to receive authorization_pending until the device code
+		// expires. f is non-nil here only when consent was denied (see
+		// DefaultStrategy.verifyConsent); other errors return a nil flow.
+		if f != nil && f.DeviceCodeRequestID.String() != "" && f.ConsentError.IsError() {
+			if rejectErr := h.markDeviceUserCodeRejected(ctx, f.DeviceCodeRequestID.String()); rejectErr != nil {
+				x.LogError(r, rejectErr, h.r.Logger())
+			}
+		}
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -813,6 +824,24 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 
 	redirectURL := urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"client_id": {f.Client.GetID()}}).String()
 	http.Redirect(w, r, redirectURL, http.StatusFound)
+}
+
+// markDeviceUserCodeRejected transitions the device-code session identified by
+// deviceCodeRequestID into the UserCodeRejected state. It is called when the
+// user denies the device authorization request during the verification flow so
+// that the device's token poll returns access_denied (RFC 8628 section 3.5)
+// rather than continuing to return authorization_pending until the device code
+// expires. This mirrors the UserCodeAccepted transition performed on the
+// accept path above.
+func (h *Handler) markDeviceUserCodeRejected(ctx context.Context, deviceCodeRequestID string) error {
+	req, signature, err := h.r.OAuth2Storage().GetDeviceCodeSessionByRequestID(ctx, deviceCodeRequestID, &Session{})
+	if err != nil {
+		return err
+	}
+
+	req.SetUserCodeState(fosite.UserCodeRejected)
+
+	return h.r.OAuth2Storage().UpdateDeviceCodeSessionBySignature(ctx, signature, req)
 }
 
 // OAuth2 Device Flow

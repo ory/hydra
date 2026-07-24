@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/gofrs/flock"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -30,7 +31,6 @@ import (
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
-	"github.com/ory/x/sqlxx"
 )
 
 const (
@@ -49,18 +49,31 @@ func (mb *MigrationBox) Up(ctx context.Context) error {
 	return errors.WithStack(err)
 }
 
-// goldenDatabasePath computes the path of the golden database for this
-// migration set. The path is deterministic: it is the SHA-256 hash of the
-// concatenated content of all migrations, hex-encoded, stored in the OS temp
-// directory. If the migration set changes, the hash changes and the old golden
-// database is ignored automatically.
-func (mb *MigrationBox) goldenDatabasePath() string {
+// sqliteTemplatePath computes the path of the SQLite template for this
+// migration set. The path is deterministic and content-addressed, so a changed
+// migration set cannot reuse an older template.
+func (mb *MigrationBox) sqliteTemplatePath() string {
 	mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name())
 	h := sha256.New()
 	for _, mi := range mfs {
-		h.Write([]byte(mi.Content))
+		for _, part := range []string{
+			mi.Version,
+			mi.Path,
+			mi.Name,
+			mi.Direction,
+			mi.Type,
+			mi.DBType,
+			mi.Content,
+		} {
+			_, _ = h.Write([]byte(part))
+			_, _ = h.Write([]byte{0})
+		}
 	}
-	return filepath.Join(os.TempDir(), hex.EncodeToString(h.Sum(nil)))
+	dir := mb.sqliteTemplateCacheDir
+	if dir == "" {
+		dir = os.TempDir()
+	}
+	return filepath.Join(dir, "ory-popx-sqlite-template-"+hex.EncodeToString(h.Sum(nil))+".sqlite")
 }
 
 // restoreSQLiteOnline streams the contents of srcPath into the database
@@ -76,7 +89,7 @@ func restoreSQLiteOnline(ctx context.Context, db *sql.DB, srcPath string) error 
 	if err != nil {
 		return errors.Wrap(err, "failed to acquire sql.Conn for restore")
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	return conn.Raw(func(driverConn any) error {
 		if w, ok := driverConn.(interface{ Raw() driver.Conn }); ok {
@@ -116,44 +129,55 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 
 	c := mb.c.WithContext(ctx)
 
-	rawDbFileName := sqlxx.StripQueryParamsFromDSN(mb.c.URL())
-	// Resolve the database file path: strip the leading "sqlite://" scheme so
-	// we get a plain absolute path like /tmp/.../db.sqlite. We only apply the
-	// golden-database optimisation to on-disk SQLite files (absolute paths); in-
-	// memory databases (DSNs that contain ":memory:" or are not absolute paths)
-	// are skipped because file operations do not apply to them.
-	newDbFileName := strings.TrimPrefix(rawDbFileName, "sqlite://")
+	newDbFileName, isOnDiskSQLite := sqliteFilePath(mb.c.URL())
 	isSQLite := mb.c.Dialect.Name() == "sqlite3"
-	isOnDiskSQLite := isSQLite && filepath.IsAbs(newDbFileName)
+	isOnDiskSQLite = isSQLite && isOnDiskSQLite
 
-	// For test SQLite databases, try to restore a pre-migrated golden database
+	// For test SQLite databases, try to restore a pre-migrated template
 	// using SQLite's online backup API. The restore streams pages directly into
 	// the open connection, so mb.c stays valid throughout and any holders of
 	// it (including WithContext copies) keep working.
 	if testing.Testing() && isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase {
-		goldenDbPath := mb.goldenDatabasePath()
-		if _, statErr := os.Stat(goldenDbPath); statErr == nil {
-			// Only restore onto a fresh (uninitialized) database. If the
-			// migration table already exists, migrations were previously
-			// applied — either directly or via an earlier golden-DB restore.
-			// Overwriting an already-migrated file with the golden DB would
-			// wipe data written since migration and cause SQLITE_BUSY errors
-			// when concurrent goroutines share the same file (e.g. racy tests
-			// that call NewRegistryDefaultWithDSN in parallel).
-			mtn := sanitizedMigrationTableName(mb.c)
-			var existingTableCount int
-			alreadyMigrated := mb.c.Store.SQLDB().QueryRow(
-				"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?", mtn,
-			).Scan(&existingTableCount) == nil && existingTableCount > 0
-			if !alreadyMigrated {
-				if restoreErr := restoreSQLiteOnline(ctx, mb.c.Store.SQLDB(), goldenDbPath); restoreErr != nil {
+		templatePath := mb.sqliteTemplatePath()
+		// Only restore onto a fresh (uninitialized) database. If the
+		// migration table already exists, migrations were previously applied
+		// — either directly or via an earlier template restore.
+		mtn := sanitizedMigrationTableName(mb.c)
+		var existingTableCount int
+		alreadyMigrated := mb.c.Store.SQLDB().QueryRow(
+			"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?", mtn,
+		).Scan(&existingTableCount) == nil && existingTableCount > 0
+		if !alreadyMigrated {
+			if mkdirErr := os.MkdirAll(filepath.Dir(templatePath), 0o750); mkdirErr != nil {
+				mb.l.Errorf("Failed to create SQLite template cache directory, applying migrations: path=%s err=%v", filepath.Dir(templatePath), mkdirErr)
+			} else {
+				// Test packages run as separate processes. Serialize the first
+				// template build so only one of them pays the migration cost;
+				// waiters restore the completed template after acquiring the
+				// lock. The template itself is still installed atomically.
+				lock := flock.New(templatePath + ".lock")
+				if lockErr := lock.Lock(); lockErr != nil {
+					mb.l.Errorf("Failed to lock SQLite template, applying migrations: path=%s err=%v", templatePath, lockErr)
+				} else {
+					defer func() {
+						if unlockErr := lock.Unlock(); unlockErr != nil {
+							mb.l.Errorf("Failed to unlock SQLite template: path=%s err=%v", templatePath, unlockErr)
+						}
+					}()
+				}
+			}
+
+			if _, statErr := os.Stat(templatePath); statErr == nil {
+				if restoreErr := restoreSQLiteOnline(ctx, mb.c.Store.SQLDB(), templatePath); restoreErr != nil {
 					// Restore failed; log and fall through to the normal migration path.
-					mb.l.Errorf("Failed to restore golden database, applying migrations: src=%s dst=%s err=%v", goldenDbPath, newDbFileName, restoreErr)
+					mb.l.Errorf("Failed to restore SQLite template, applying migrations: src=%s dst=%s err=%v", templatePath, newDbFileName, restoreErr)
 				} else {
 					mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name())
-					mb.l.Infof("Skipped applying %d migrations using golden database: path=%s", len(mfs), goldenDbPath)
+					mb.l.Infof("Skipped applying %d migrations using SQLite template: path=%s", len(mfs), templatePath)
 					return len(mfs), nil
 				}
+			} else if !errors.Is(statErr, os.ErrNotExist) {
+				mb.l.Errorf("Failed to inspect SQLite template, applying migrations: path=%s err=%v", templatePath, statErr)
 			}
 		}
 	}
@@ -244,38 +268,52 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 			mb.l.Infof("Successfully applied %d migrations.", applied)
 		}
 
-		// Save a golden database after applying all migrations (not for
+		// Save a SQLite template after applying all migrations (not for
 		// partial step runs) so future test runs can skip migrations.
 		//
 		// Only save when at least one migration was applied. Saving when
 		// applied == 0 either captures an empty DB or an already-migrated
 		// one that may contain test data inserted by an earlier registry
 		// (e.g. the Hydra janitor reuses the same DSN), which would
-		// pollute the shared golden file.
+		// pollute the shared template.
 		//
 		// Use VACUUM INTO to produce a clean, fully-checkpointed copy
 		// without a separate wal_checkpoint step. Write to a temp path
 		// unique to this test's database, then atomically rename to the
-		// shared golden path. This prevents concurrent saves from
-		// multiple parallel tests from corrupting the golden database:
+		// shared template path. This prevents concurrent saves from
+		// multiple parallel tests from corrupting the template:
 		// os.Rename is atomic on the same filesystem, so the last writer
 		// wins with valid content and no reader ever sees a partial file.
 		if isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase && applied > 0 {
-			goldenDbPath := mb.goldenDatabasePath()
-			// tmpPath is unique per test (derived from the per-test DB
-			// path) so concurrent saves never write to the same temp file.
-			tmpPath := newDbFileName + ".vacuum-tmp"
+			templatePath := mb.sqliteTemplatePath()
+			tmp, err := os.CreateTemp(filepath.Dir(templatePath), ".sqlite-template-*.sqlite")
+			if err != nil {
+				mb.l.Errorf("Failed to allocate SQLite template file: err=%v", err)
+				return nil
+			}
+			tmpPath := tmp.Name()
+			if closeErr := tmp.Close(); closeErr != nil {
+				_ = os.Remove(tmpPath)
+				mb.l.Errorf("Failed to close SQLite template file: err=%v", closeErr)
+				return nil
+			}
+			// VACUUM INTO requires that the destination does not exist.
+			if removeErr := os.Remove(tmpPath); removeErr != nil {
+				mb.l.Errorf("Failed to prepare SQLite template file: err=%v", removeErr)
+				return nil
+			}
+			defer func() { _ = os.Remove(tmpPath) }()
 			// #nosec G201 - tmpPath is under os.TempDir() with a
 			// hex-hash filename, never derived from user input.
-			vacuumSQL := fmt.Sprintf("VACUUM INTO '%s'", tmpPath)
+			vacuumSQL := fmt.Sprintf("VACUUM INTO '%s'", strings.ReplaceAll(tmpPath, "'", "''"))
 			if err := mb.c.RawQuery(vacuumSQL).Exec(); err != nil {
-				mb.l.Errorf("Failed to create golden database copy: err=%v", err)
-			} else if err := os.Rename(tmpPath, goldenDbPath); err != nil {
+				mb.l.Errorf("Failed to create SQLite template copy: err=%v", err)
+			} else if err := os.Rename(tmpPath, templatePath); err != nil {
 				_ = os.Remove(tmpPath)
-				mb.l.Errorf("Failed to install golden database: src=%s dst=%s err=%v", tmpPath, goldenDbPath, err)
+				mb.l.Errorf("Failed to install SQLite template: src=%s dst=%s err=%v", tmpPath, templatePath, err)
 			} else {
 				mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name())
-				mb.l.Infof("Golden database saved, subsequent test runs will skip %d migrations: path=%s", len(mfs), goldenDbPath)
+				mb.l.Infof("SQLite template saved, subsequent test runs will skip %d migrations: path=%s", len(mfs), templatePath)
 			}
 		}
 		return nil

@@ -215,7 +215,9 @@ func TestDeviceTokenRequest(t *testing.T) {
 			}
 
 			var token *oauth2.Token
-			token, err = oauthClient.DeviceAccessToken(context.Background(), &oauth2.DeviceAuthResponse{DeviceCode: code})
+			// Interval: 1 keeps the x/oauth2 poll loop at its 1s floor; a zero
+			// value makes the client fall back to its own 5s default.
+			token, err = oauthClient.DeviceAccessToken(context.Background(), &oauth2.DeviceAuthResponse{DeviceCode: code, Interval: 1})
 
 			if testCase.check != nil {
 				testCase.check(t, token, err)
@@ -237,6 +239,11 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		config.KeyRefreshTokenHook:    "",
 	})))
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
+	// waitForRefreshTokenExpiry sleeps a full refresh-token lifespan to prove a
+	// refresh token stops working once expired. The shared 20s default dominates
+	// this test's runtime; 5s is still ~100x the sub-second refresh flow it must
+	// outlive, so it keeps the expiry assertion valid while cutting the wait.
+	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, 5*time.Second)
 
 	publicClient := hydra.NewAPIClient(hydra.NewConfiguration())
 	publicClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: publicTS.URL}}

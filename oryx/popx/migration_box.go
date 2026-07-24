@@ -26,13 +26,14 @@ import (
 type (
 	// MigrationBox is a embed migration box.
 	MigrationBox struct {
-		c                     *pop.Connection
-		migrationsUp          Migrations
-		migrationsDown        Migrations
-		perMigrationTimeout   time.Duration
-		l                     *logrusx.Logger
-		migrationContent      MigrationContent
-		disableGoldenDatabase bool
+		c                      *pop.Connection
+		migrationsUp           Migrations
+		migrationsDown         Migrations
+		perMigrationTimeout    time.Duration
+		l                      *logrusx.Logger
+		migrationContent       MigrationContent
+		disableGoldenDatabase  bool
+		sqliteTemplateCacheDir string
 	}
 	MigrationContent   func(mf Migration, c *pop.Connection, r []byte, usingTemplate bool) (string, error)
 	MigrationBoxOption func(*MigrationBox)
@@ -83,6 +84,16 @@ func WithPerMigrationTimeout(timeout time.Duration) MigrationBoxOption {
 func WithoutGoldenDatabase() MigrationBoxOption {
 	return func(m *MigrationBox) {
 		m.disableGoldenDatabase = true
+	}
+}
+
+// WithSQLiteTemplateCacheDir stores pre-migrated SQLite test database
+// templates in dir. By default, templates are stored in os.TempDir.
+//
+// This option only affects on-disk SQLite databases while running tests.
+func WithSQLiteTemplateCacheDir(dir string) MigrationBoxOption {
+	return func(m *MigrationBox) {
+		m.sqliteTemplateCacheDir = dir
 	}
 }
 

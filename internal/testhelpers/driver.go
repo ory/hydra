@@ -41,6 +41,12 @@ var ConfigDefaults = []configx.OptionModifier{
 		config.KeyLogLevel:                       "trace",
 		config.KeyDevelopmentMode:                true,
 		"serve.public.host":                      "localhost",
+		// The x/oauth2 device-flow client blocks a full polling interval before
+		// its very first token request, so the 5s production default dominates
+		// device-flow integration test runtime. 1s is the effective floor: the
+		// handler truncates the interval to whole seconds, and 0 makes the
+		// client fall back to its own 5s default.
+		config.KeyDeviceAuthTokenPollingInterval: "1s",
 	}),
 	configx.WithValue("log.leak_sensitive_values", true),
 }

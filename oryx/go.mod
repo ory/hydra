@@ -22,6 +22,7 @@ require (
 	github.com/gobuffalo/httptest v1.5.2
 	github.com/gobwas/glob v0.2.3
 	github.com/goccy/go-yaml v1.18.0
+	github.com/gofrs/flock v0.12.1
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/go-jsonnet v0.21.0
@@ -134,7 +135,6 @@ require (
 	github.com/gobuffalo/tags/v3 v3.1.4 // indirect
 	github.com/gobuffalo/validate/v3 v3.3.3 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
-	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect

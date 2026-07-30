@@ -404,3 +404,85 @@ func TestValidateDynamicRegistration(t *testing.T) {
 		})
 	}
 }
+
+// TestValidateDynamicRegistrationAccessTokenStrategy covers the behaviour
+// matrix described in https://github.com/ory/hydra/issues/4060 for the
+// optional `oidc.dynamic_client_registration.strategies.access_token`
+// override.
+func TestValidateDynamicRegistrationAccessTokenStrategy(t *testing.T) {
+	ctx := t.Context()
+
+	baseConfig := func(extra map[string]any) map[string]any {
+		m := map[string]any{
+			config.KeySubjectTypesSupported: []string{"public"},
+			config.KeyDefaultClientScope:    []string{"openid"},
+		}
+		for k, v := range extra {
+			m[k] = v
+		}
+		return m
+	}
+
+	for _, tc := range []struct {
+		name           string
+		configValues   map[string]any
+		in             *Client
+		expectErr      bool
+		expectStrategy string
+	}{
+		{
+			name: "dcr-unset-global-opaque-client-inherits",
+			configValues: baseConfig(map[string]any{
+				config.KeyAccessTokenStrategy: "opaque",
+			}),
+			in:             &Client{RedirectURIs: []string{"https://foo/"}},
+			expectStrategy: "",
+		},
+		{
+			name: "dcr-unset-global-jwt-client-inherits",
+			configValues: baseConfig(map[string]any{
+				config.KeyAccessTokenStrategy: "jwt",
+			}),
+			in:             &Client{RedirectURIs: []string{"https://foo/"}},
+			expectStrategy: "",
+		},
+		{
+			name: "dcr-opaque-overrides-global-jwt",
+			configValues: baseConfig(map[string]any{
+				config.KeyAccessTokenStrategy:    "jwt",
+				config.KeyDCRAccessTokenStrategy: "opaque",
+			}),
+			in:             &Client{RedirectURIs: []string{"https://foo/"}},
+			expectStrategy: "opaque",
+		},
+		{
+			name: "dcr-jwt-overrides-global-opaque",
+			configValues: baseConfig(map[string]any{
+				config.KeyAccessTokenStrategy:    "opaque",
+				config.KeyDCRAccessTokenStrategy: "jwt",
+			}),
+			in:             &Client{RedirectURIs: []string{"https://foo/"}},
+			expectStrategy: "jwt",
+		},
+		{
+			name: "client-supplied-strategy-still-rejected-even-with-dcr-override",
+			configValues: baseConfig(map[string]any{
+				config.KeyDCRAccessTokenStrategy: "jwt",
+			}),
+			in:        &Client{RedirectURIs: []string{"https://foo/"}, AccessTokenStrategy: "jwt"},
+			expectErr: true,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(tc.configValues)))
+			v := NewValidator(reg)
+			err := v.ValidateDynamicRegistration(ctx, tc.in)
+			if tc.expectErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectStrategy, tc.in.AccessTokenStrategy)
+		})
+	}
+}

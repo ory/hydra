@@ -21,6 +21,7 @@ import (
 	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/pagination/tokenpagination"
+	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/urlx"
 )
@@ -905,14 +906,38 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 		r.URL.Query().Get("challenge"),
 	)
 
-	verifier, err := h.r.LogoutManager().AcceptLogoutRequest(r.Context(), challenge)
+	ctx := r.Context()
+
+	verifier, err := h.r.LogoutManager().AcceptLogoutRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
+	// Decode the challenge to extract the session ID so we can invalidate the
+	// session eagerly, before returning the redirect URL.
+	logoutRequest, err := h.r.LogoutManager().GetLogoutRequest(ctx, challenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	// Invalidate the session synchronously before returning the redirect URL.
+	// This closes the race window between AcceptLogoutRequest returning and
+	// the browser completing the logout_verifier round-trip, during which
+	// background API requests could trigger silent re-authentication (see #4070).
+	//
+	// When completeLogout later runs it will find the session already deleted
+	// and short-circuit with a safe redirect — no front/back-channel
+	// notifications are sent, which is acceptable because the session is gone.
+	if err := h.r.LoginManager().DeleteLoginSession(ctx, logoutRequest.SessionID); err != nil && !errors.Is(err, sqlcon.ErrNoRows()) {
+		h.r.Logger().WithError(err).WithField("sid", logoutRequest.SessionID).Error("Failed to delete login session during logout accept")
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.r.Config().PublicURL(ctx), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {verifier}}).String(),
 	})
 }
 

@@ -84,7 +84,7 @@ func BenchmarkAuthCode(b *testing.B) {
 		config.KeyLogLevel:                  "error",
 		config.KeyAccessTokenStrategy:       "opaque",
 		config.KeyRefreshTokenHook:          "",
-		"tracing.providers.otlp.server_url": "http://localhost:4318",
+		"tracing.providers.otlp.server_url": "localhost:4318",
 		"tracing.providers.otlp.insecure":   true,
 	})), driver.WithTracerWrapper(func(t *otelx.Tracer) *otelx.Tracer { return new(otelx.Tracer).WithOTLP(tracer) }))
 	oauth2Keys, err := jwk.GenerateJWK(jose.ES256, x.OAuth2JWTKeyName, "sig")

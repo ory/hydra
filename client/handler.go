@@ -446,6 +446,10 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 
 	oldSecret := client.Secret
 
+	// RegistrationAccessTokenSignature is lost when the client is marshalled to JSON
+	// Store it prior to the patch and re-add it later
+	oldRegistrationAccessTokenSig := client.RegistrationAccessTokenSignature
+
 	client, err = jsonx.ApplyJSONPatch(patchJSON, client, "/id", "/RotatedSecrets", "rotated_secrets")
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -461,6 +465,9 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	} else {
 		client.RotatedSecrets = []string{} // explicitly clear
 	}
+
+	// Re-add the registration access token signature before updating the client in DB
+	client.RegistrationAccessTokenSignature = oldRegistrationAccessTokenSig
 
 	if err := h.updateClient(r.Context(), client, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)

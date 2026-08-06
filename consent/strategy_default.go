@@ -939,7 +939,7 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	session, err := s.r.LoginManager().GetRememberedLoginSession(ctx, hintSid)
+	session, err := s.r.LoginManager().GetLoginSession(ctx, hintSid)
 	if errors.Is(err, x.ErrNotFound) {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.
@@ -1096,7 +1096,7 @@ func (s *defaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 }
 
 func (s *defaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.ResponseWriter, r *http.Request, sid string) error {
-	loginSession, lsErr := s.r.LoginManager().GetRememberedLoginSession(ctx, sid)
+	loginSession, lsErr := s.r.LoginManager().GetLoginSession(ctx, sid)
 
 	if errors.Is(lsErr, x.ErrNotFound) {
 		// This is ok (session probably already revoked), do nothing!

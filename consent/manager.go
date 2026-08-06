@@ -52,6 +52,7 @@ type (
 	}
 	LoginManager interface {
 		GetRememberedLoginSession(ctx context.Context, id string) (*flow.LoginSession, error)
+		GetLoginSession(ctx context.Context, id string) (*flow.LoginSession, error)
 		DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error)
 		RevokeSubjectLoginSession(ctx context.Context, subject string) error
 		ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) error

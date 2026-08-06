@@ -240,6 +240,20 @@ func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (_
 	return &s, nil
 }
 
+func (p *Persister) GetLoginSession(ctx context.Context, id string) (_ *flow.LoginSession, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginSession")
+	defer otelx.End(span, &err)
+
+	var s flow.LoginSession
+	if err := p.QueryWithNetwork(ctx).Find(&s, id); errors.Is(err, sql.ErrNoRows) {
+		return nil, errors.WithStack(x.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &s, nil
+}
+
 // ConfirmLoginSession creates or updates the login session. The NID will be set to the network ID of the context.
 func (p *Persister) ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ConfirmLoginSession")

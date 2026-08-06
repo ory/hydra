@@ -216,7 +216,10 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 
 func TestProviderValidates(t *testing.T) {
 	ctx := t.Context()
-	c := newProvider(t, configx.WithConfigFiles("../../internal/.hydra.yaml"))
+	c := newProvider(t,
+		configx.WithConfigFiles("../../internal/.hydra.yaml"),
+		configx.DisableFileWatching(),
+	)
 
 	// log
 	assert.Equal(t, "debug", c.Source(ctx).String(KeyLogLevel))

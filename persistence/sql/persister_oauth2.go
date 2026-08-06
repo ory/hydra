@@ -461,8 +461,27 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.SetClientAssertionJWT")
 	defer otelx.End(span, &err)
 
-	// delete expired; this cleanup spares us the need for a background worker
-	if err := p.QueryWithNetwork(ctx).Where("expires_at < CURRENT_TIMESTAMP").Delete(&oauth2.BlacklistedJTI{}); err != nil {
+	// delete expired; this cleanup spares us the need for a background worker.
+	// Use a bound UTC timestamp (CURRENT_TIMESTAMP is the DB-server-local time and
+	// would prune the replay blacklist against the wrong clock on non-UTC hosts,
+	// see #3740) and bound the delete with LIMIT + FOR UPDATE SKIP LOCKED so
+	// concurrent requests don't all contend for locks on the same expired rows
+	// (see #4113).
+	if err := p.Connection(ctx).RawQuery(
+		`DELETE FROM hydra_oauth2_jti_blacklist
+		 WHERE nid = ? AND expires_at < ?
+		   AND signature IN (
+		       SELECT signature FROM (
+		           SELECT signature FROM hydra_oauth2_jti_blacklist
+		           WHERE nid = ? AND expires_at < ?
+		           LIMIT 100 FOR UPDATE SKIP LOCKED
+		       ) AS sub
+		   )`,
+		p.NetworkID(ctx),
+		time.Now().UTC(),
+		p.NetworkID(ctx),
+		time.Now().UTC(),
+	).Exec(); err != nil {
 		return sqlcon.HandleError(err)
 	}
 

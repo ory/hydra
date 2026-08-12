@@ -622,7 +622,7 @@ func (s *defaultStrategy) forwardConsentRequest(
 	return errors.WithStack(ErrUserRedirected)
 }
 
-func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWriter, r *http.Request, verifier string) (_ *flow.Flow, err error) {
+func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (_ *flow.Flow, err error) {
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyConsent")
 	defer otelx.End(span, &err)
 
@@ -631,7 +631,7 @@ func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
-	} else if f.Client.GetID() != r.URL.Query().Get("client_id") {
+	} else if f.Client.GetID() != req.GetClient().GetID() {
 		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}
 
@@ -1164,7 +1164,7 @@ func (s *defaultStrategy) HandleOAuth2AuthorizationRequest(
 		return f, s.requestConsent(ctx, w, r, req, f)
 	}
 
-	f, err := s.verifyConsent(ctx, w, r, consentVerifier)
+	f, err := s.verifyConsent(ctx, w, r, req, consentVerifier)
 	if err != nil {
 		return nil, err
 	}
@@ -1241,7 +1241,7 @@ func (s *defaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 		return f, s.requestConsent(ctx, w, r, ar, f)
 	}
 
-	return s.verifyConsent(ctx, w, r, consentVerifier)
+	return s.verifyConsent(ctx, w, r, ar, consentVerifier)
 }
 
 func (s *defaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {

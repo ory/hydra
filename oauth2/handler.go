@@ -1391,11 +1391,15 @@ func (h *Handler) updateSessionWithRequest(
 	session *Session,
 ) (*Session, error) {
 	for _, scope := range flow.GrantedScope {
-		request.GrantScope(scope)
+		if h.r.Config().GetScopeStrategy(ctx)(request.GetClient().GetScopes(), scope) {
+			request.GrantScope(scope)
+		}
 	}
 
 	for _, audience := range flow.GrantedAudience {
-		request.GrantAudience(audience)
+		if fosite.DefaultAudienceMatchingStrategy(request.GetClient().GetAudience(), []string{audience}) == nil {
+			request.GrantAudience(audience)
+		}
 	}
 
 	openIDKeyID, err := h.r.OpenIDJWTSigner().GetPublicKeyID(ctx)

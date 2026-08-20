@@ -637,7 +637,10 @@ func (s *defaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 
 	if f.ConsentError.IsError() {
 		f.ConsentError.SetDefaults(flow.ConsentRequestDeniedErrorName)
-		return nil, errors.WithStack(f.ConsentError.ToRFCError())
+		// Return the flow alongside the error so device-flow callers can identify
+		// a denied consent and mark the device code session as rejected.
+		// The auth-code caller discards the flow on error, so this is safe.
+		return f, errors.WithStack(f.ConsentError.ToRFCError())
 	}
 
 	if err := s.r.ConsentManager().CreateConsentSession(ctx, f); errors.Is(err, sqlcon.ErrUniqueViolation()) {
@@ -1343,3 +1346,4 @@ func (s *defaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWrite
 func (s *defaultStrategy) getDeviceVerificationPath(ctx context.Context) *url.URL {
 	return urlx.AppendPaths(s.r.Config().PublicURL(ctx), deviceVerificationPath)
 }
+

@@ -766,6 +766,23 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		return
 	} else if err != nil {
 		x.LogError(r, err, h.r.Logger())
+
+		// If consent for a device authorization flow was denied, propagate the
+		// rejection to the device session so the polling token client receives
+		// access_denied (RFC 8628 §3.5) instead of authorization_pending until
+		// the device code expires. HandleOAuth2DeviceAuthorizationRequest returns
+		// the flow alongside the error when the denial came from verifyConsent.
+		if f != nil && f.DeviceCodeRequestID.Valid {
+			if rq, sig, err := h.r.OAuth2Storage().GetDeviceCodeSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), &Session{}); err == nil {
+				rq.SetUserCodeState(fosite.UserCodeRejected)
+				if err := h.r.OAuth2Storage().UpdateDeviceCodeSessionBySignature(ctx, sig, rq); err != nil {
+					x.LogError(r, err, h.r.Logger())
+				}
+			} else {
+				x.LogError(r, err, h.r.Logger())
+			}
+		}
+
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -1628,3 +1645,4 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 	response.Credential = rawToken
 	h.r.Writer().Write(w, r, &response)
 }
+

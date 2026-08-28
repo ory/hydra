@@ -1280,6 +1280,57 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 			}
 		})
 	})
+	t.Run("case=should require re-authentication when device verification query has prompt=login", func(t *testing.T) {
+		subject := "aeneas-rekkas"
+		c := createDefaultClient(t)
+		hc := testhelpers.NewEmptyJarClient(t)
+
+		run := func(t *testing.T, extra url.Values, expectSkip bool) {
+			testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+				acceptDeviceHandler(t),
+				checkAndAcceptLoginHandler(t, adminClient, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
+					require.NoError(t, err)
+					assert.Equal(t, expectSkip, res.Skip)
+					return hydra.AcceptOAuth2LoginRequest{
+						Remember: new(true),
+					}
+				}),
+				acceptConsentHandler(t, &hydra.AcceptOAuth2ConsentRequest{
+					Remember:   new(true),
+					GrantScope: []string{"openid"},
+				}))
+
+			res, resp := makeOAuth2DeviceAuthRequest(t, reg, hc, c, "openid")
+			assert.EqualValues(t, http.StatusOK, resp.StatusCode)
+
+			devResp := new(oauth2.DeviceAuthResponse)
+			require.NoError(t, json.Unmarshal([]byte(res.Raw), devResp))
+
+			verifyURL := devResp.VerificationURIComplete
+			if extra != nil {
+				u, err := url.Parse(verifyURL)
+				require.NoError(t, err)
+				q := u.Query()
+				for k, vs := range extra {
+					q[k] = vs
+				}
+				u.RawQuery = q.Encode()
+				verifyURL = u.String()
+			}
+
+			resp, err := hc.Get(verifyURL)
+			require.NoError(t, err)
+			require.Contains(t, reg.Config().DeviceDoneURL(ctx).String(), resp.Request.URL.Path, "did not end up in post device URL")
+		}
+
+		t.Run("perform first flow", func(t *testing.T) {
+			run(t, nil, false)
+		})
+
+		t.Run("perform second flow with prompt=login and max_age=0", func(t *testing.T) {
+			run(t, url.Values{"prompt": {"login"}, "max_age": {"0"}}, false)
+		})
+	})
 	t.Run("case=should fail because we are reusing the same verifier", func(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)

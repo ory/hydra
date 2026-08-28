@@ -1223,8 +1223,9 @@ func (s *defaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	}
 
 	// Fake an authorization request to instantiate the flow.
+	// Device verification is GET, so r.Form is empty unless ParseForm was called.
 	ar.Client = c
-	ar.Form = r.Form
+	ar.Form = r.URL.Query()
 
 	if loginVerifier == "" && consentVerifier == "" {
 		// Here we end up if the device has been verified, but login and verification are still missing.

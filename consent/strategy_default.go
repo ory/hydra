@@ -334,8 +334,17 @@ func (s *defaultStrategy) revokeAuthenticationSession(ctx context.Context, w htt
 		return nil
 	}
 
-	_, err = s.r.LoginManager().DeleteLoginSession(ctx, sid)
-	return err
+	if _, err := s.r.LoginManager().DeleteLoginSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows()) {
+		// The login session was already deleted, for example by a headless
+		// logout that ran before this revocation. There is nothing left to
+		// revoke, so we treat this as a successful no-op instead of failing
+		// the subsequent login flow.
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *defaultStrategy) revokeAuthenticationCookie(ctx context.Context, w http.ResponseWriter, r *http.Request, ss sessions.Store) (string, error) {

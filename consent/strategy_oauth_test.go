@@ -278,6 +278,29 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		makeRequestAndExpectCode(t, nil, c, url.Values{})
 	})
 
+	t.Run("case=should complete login when the browser presents a session cookie whose login session was already deleted", func(t *testing.T) {
+		// Regression test for https://github.com/ory/hydra/issues/3504:
+		// A headless logout can delete the login session while the browser
+		// still holds the "sid" authentication cookie. On the next login,
+		// revokeAuthenticationSession deletes the (already gone) session; that
+		// delete returns sqlcon.ErrNoRows, which used to be propagated and
+		// failed the subsequent login. It must be treated as a no-op instead.
+		subject := "aeneas-rekkas"
+		c := createDefaultClient(t)
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			acceptLoginHandler(t, subject, &hydra.AcceptOAuth2LoginRequest{Remember: new(false)}),
+			acceptConsentHandler(t, &hydra.AcceptOAuth2ConsentRequest{Remember: new(false)}))
+
+		// The cookie references a session id that has no corresponding row in
+		// the store, exactly as it would after a headless logout deleted it.
+		hc := &http.Client{
+			Jar:       newAuthCookieJar(t, reg, publicTS.URL, "session-already-deleted"),
+			Transport: testhelpers.NewTestTransport(t),
+		}
+
+		makeRequestAndExpectCode(t, hc, c, url.Values{})
+	})
+
 	t.Run("case=should pass if both login and consent are granted and check remember flows as well as various payloads", func(t *testing.T) {
 		// Covers old test cases:
 		// - This should pass because login and consent have been granted, this time we remember the decision

@@ -176,6 +176,7 @@ func exchangeForAccessToken(t *testing.T) {
 		{
 			description: "should pass",
 			check: func(t *testing.T, token *goauth.Token, cl *goauth.Config, err error) {
+				require.NoError(t, err)
 				assert.Equal(t, "bearer", token.TokenType)
 				assert.NotEmpty(t, token.AccessToken)
 				assert.NotEmpty(t, token.RefreshToken)

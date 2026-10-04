@@ -42,8 +42,8 @@ var RootCommand = &cobra.Command{
 func RegisterCommandRecursive(parent *cobra.Command) {
 	parent.AddCommand(RootCommand)
 
-	RootCommand.AddCommand(FormatCommand)
-	RootCommand.AddCommand(LintCommand)
+	RootCommand.AddCommand(NewFormatCommand())
+	RootCommand.AddCommand(NewLintCommand())
 }
 
 func NewRootCommand() *cobra.Command {

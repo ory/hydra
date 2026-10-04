@@ -25,10 +25,10 @@ func TestCustomClaimsInSession(t *testing.T) {
 	}}
 
 	for _, tc := range []struct {
-		name                                        string
-		extra, expectedClaims                       map[string]any
-		allowedTopLevelClaims, expectNotSet         []string
-		mirrorTopLevelClaims, excludeNotBeforeClaim bool
+		name                                                           string
+		extra, expectedClaims                                          map[string]any
+		allowedTopLevelClaims, expectNotSet                            []string
+		mirrorTopLevelClaims, excludeNotBeforeClaim, preserveExtClaims bool
 	}{{
 		name:  "no custom claims",
 		extra: map[string]any{},
@@ -109,6 +109,101 @@ func TestCustomClaimsInSession(t *testing.T) {
 		},
 		expectNotSet: []string{"ext"},
 	}, {
+		name: "disabled mirror drops unlisted claims by default",
+		extra: map[string]any{
+			"foo": "bar",
+			"baz": "qux",
+		},
+		allowedTopLevelClaims: []string{"foo"},
+		mirrorTopLevelClaims:  false,
+		preserveExtClaims:     false,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+			"foo": "bar",
+		},
+		expectNotSet: []string{"ext", "baz"},
+	}, {
+		name: "disabled mirror preserves unlisted claims when enabled",
+		extra: map[string]any{
+			"foo": "bar",
+			"baz": "qux",
+		},
+		allowedTopLevelClaims: []string{"foo"},
+		mirrorTopLevelClaims:  false,
+		preserveExtClaims:     true,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+			"foo": "bar",
+			"ext": map[string]any{"baz": "qux"},
+		},
+		expectNotSet: []string{"baz"},
+	}, {
+		name:                 "preserve ext with no allowed top level claims",
+		extra:                map[string]any{"foo": "bar", "baz": "qux"},
+		mirrorTopLevelClaims: false,
+		preserveExtClaims:    true,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+			"ext": map[string]any{"foo": "bar", "baz": "qux"},
+		},
+		expectNotSet: []string{"foo", "baz"},
+	}, {
+		name:                  "preserve ext with all extras promoted",
+		extra:                 map[string]any{"foo": "bar"},
+		allowedTopLevelClaims: []string{"foo"},
+		mirrorTopLevelClaims:  false,
+		preserveExtClaims:     true,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+			"foo": "bar",
+		},
+		expectNotSet: []string{"ext"},
+	}, {
+		name: "preserve ext with reserved claims in extras",
+		extra: map[string]any{
+			"foo": "bar",
+			"iss": "hydra.remote",
+			"sub": "another-alice",
+		},
+		allowedTopLevelClaims: []string{"foo", "iss", "sub"},
+		mirrorTopLevelClaims:  false,
+		preserveExtClaims:     true,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+			"foo": "bar",
+			"ext": map[string]any{
+				"iss": "hydra.remote",
+				"sub": "another-alice",
+			},
+		},
+	}, {
+		name:                  "mirror takes precedence over preserve ext",
+		extra:                 map[string]any{"foo": "bar", "baz": "qux"},
+		allowedTopLevelClaims: []string{"foo"},
+		mirrorTopLevelClaims:  true,
+		preserveExtClaims:     true,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+			"foo": "bar",
+			"ext": map[string]any{"foo": "bar", "baz": "qux"},
+		},
+	}, {
+		name:                 "preserve ext with empty extras",
+		extra:                map[string]any{},
+		mirrorTopLevelClaims: false,
+		preserveExtClaims:    true,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+		},
+		expectNotSet: []string{"ext"},
+	}, {
 		name:                  "exclude not before claim",
 		extra:                 map[string]any{},
 		excludeNotBeforeClaim: true,
@@ -124,6 +219,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 			sess.AllowedTopLevelClaims = tc.allowedTopLevelClaims
 			sess.MirrorTopLevelClaims = tc.mirrorTopLevelClaims
 			sess.ExcludeNotBeforeClaim = tc.excludeNotBeforeClaim
+			sess.PreserveExtClaims = tc.preserveExtClaims
 
 			claims := sess.GetJWTClaims().ToMapClaims()
 			assert.Subset(t, claims, tc.expectedClaims)

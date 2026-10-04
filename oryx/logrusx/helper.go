@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 
@@ -22,13 +23,21 @@ import (
 	"github.com/ory/x/errorsx"
 )
 
+// loggerConfig holds the mutable state that can change after construction via
+// UseConfig. It is accessed via a pointer so all shallow copies of Logger
+// (WithField, WithFields, WithContext, NewEntry) share and see the same config.
+type loggerConfig struct {
+	mu                        sync.RWMutex
+	leakSensitive             bool
+	redactionText             string
+	additionalRedactedHeaders map[string]struct{}
+}
+
 type (
 	Logger struct {
 		*logrus.Entry
-		leakSensitive             bool
-		redactionText             string
-		additionalRedactedHeaders map[string]struct{}
-		opts                      []Option
+		cfg  *loggerConfig
+		opts []Option
 	}
 	Provider interface {
 		Logger() *Logger
@@ -53,20 +62,28 @@ func (l *Logger) WithContext(ctx context.Context) *Logger {
 	return &ll
 }
 
-func (l *Logger) HTTPHeadersRedacted(h http.Header) map[string]interface{} {
-	headers := map[string]interface{}{}
+func (l *Logger) HTTPHeadersRedacted(h http.Header) map[string]any {
+	// Snapshot the mutable config fields once under the read lock so we neither
+	// hold the lock during iteration nor risk a concurrent map write via UseConfig.
+	l.cfg.mu.RLock()
+	leakSensitive := l.cfg.leakSensitive
+	redactionText := l.cfg.redactionText
+	additionalHeaders := l.cfg.additionalRedactedHeaders
+	l.cfg.mu.RUnlock()
+
+	headers := map[string]any{}
 
 	for key, value := range h {
 		switch keyLower := strings.ToLower(key); keyLower {
 		case "authorization", "cookie", "set-cookie", "x-session-token":
-			headers[keyLower] = l.maybeRedact(value)
+			headers[keyLower] = maybeRedactWith(value, leakSensitive, redactionText)
 		case "location":
 			locationURL, err := url.Parse(h.Get("Location"))
 			if err != nil {
-				headers[keyLower] = l.maybeRedact(value)
+				headers[keyLower] = maybeRedactWith(value, leakSensitive, redactionText)
 				continue
 			}
-			if l.leakSensitive {
+			if leakSensitive {
 				headers[keyLower] = locationURL.String()
 			} else {
 				locationURL.RawQuery = ""
@@ -74,8 +91,8 @@ func (l *Logger) HTTPHeadersRedacted(h http.Header) map[string]interface{} {
 				headers[keyLower] = locationURL.Redacted()
 			}
 		default:
-			if _, ok := l.additionalRedactedHeaders[keyLower]; ok {
-				headers[keyLower] = l.maybeRedact(value)
+			if _, ok := additionalHeaders[keyLower]; ok {
+				headers[keyLower] = maybeRedactWith(value, leakSensitive, redactionText)
 				continue
 			}
 			headers[keyLower] = h.Get(key)
@@ -96,7 +113,7 @@ func (l *Logger) WithRequest(r *http.Request) *Logger {
 		scheme = "http"
 	}
 
-	ll := l.WithField("http_request", map[string]interface{}{
+	ll := l.WithField("http_request", map[string]any{
 		"remote":  r.RemoteAddr,
 		"method":  r.Method,
 		"path":    r.URL.EscapedPath(),
@@ -139,8 +156,12 @@ func (l *Logger) WithSpanFromContext(ctx context.Context) *Logger {
 	return l.WithField("otel", traces)
 }
 
-func (l *Logger) Logf(level logrus.Level, format string, args ...interface{}) {
-	if !l.leakSensitive {
+func (l *Logger) Logf(level logrus.Level, format string, args ...any) {
+	l.cfg.mu.RLock()
+	leakSensitive := l.cfg.leakSensitive
+	l.cfg.mu.RUnlock()
+
+	if !leakSensitive {
 		for i, arg := range args {
 			switch urlArg := arg.(type) {
 			case url.URL:
@@ -157,32 +178,32 @@ func (l *Logger) Logf(level logrus.Level, format string, args ...interface{}) {
 	l.Entry.Logf(level, format, args...)
 }
 
-func (l *Logger) Tracef(format string, args ...interface{}) {
+func (l *Logger) Tracef(format string, args ...any) {
 	l.Logf(logrus.TraceLevel, format, args...)
 }
 
-func (l *Logger) Debugf(format string, args ...interface{}) {
+func (l *Logger) Debugf(format string, args ...any) {
 	l.Logf(logrus.DebugLevel, format, args...)
 }
 
-func (l *Logger) Infof(format string, args ...interface{}) {
+func (l *Logger) Infof(format string, args ...any) {
 	l.Logf(logrus.InfoLevel, format, args...)
 }
 
-func (l *Logger) Warnf(format string, args ...interface{}) {
+func (l *Logger) Warnf(format string, args ...any) {
 	l.Logf(logrus.WarnLevel, format, args...)
 }
 
-func (l *Logger) Errorf(format string, args ...interface{}) {
+func (l *Logger) Errorf(format string, args ...any) {
 	l.Logf(logrus.ErrorLevel, format, args...)
 }
 
-func (l *Logger) Fatalf(format string, args ...interface{}) {
+func (l *Logger) Fatalf(format string, args ...any) {
 	l.Logf(logrus.FatalLevel, format, args...)
 	l.Entry.Logger.Exit(1)
 }
 
-func (l *Logger) Panicf(format string, args ...interface{}) {
+func (l *Logger) Panicf(format string, args ...any) {
 	l.Logf(logrus.PanicLevel, format, args...)
 }
 
@@ -192,23 +213,33 @@ func (l *Logger) WithFields(f logrus.Fields) *Logger {
 	return &ll
 }
 
-func (l *Logger) WithField(key string, value interface{}) *Logger {
+func (l *Logger) WithField(key string, value any) *Logger {
 	ll := *l
 	ll.Entry = l.Entry.WithField(key, value)
 	return &ll
 }
 
-func (l *Logger) maybeRedact(value interface{}) interface{} {
+// maybeRedactWith is the lock-free redaction helper; callers must supply
+// pre-snapshotted values of leakSensitive and redactionText.
+func maybeRedactWith(value any, leakSensitive bool, redactionText string) any {
 	if fmt.Sprintf("%v", value) == "" || value == nil {
 		return nil
 	}
-	if !l.leakSensitive {
-		return l.redactionText
+	if !leakSensitive {
+		return redactionText
 	}
 	return value
 }
 
-func (l *Logger) WithSensitiveField(key string, value interface{}) *Logger {
+func (l *Logger) maybeRedact(value any) any {
+	l.cfg.mu.RLock()
+	leak := l.cfg.leakSensitive
+	text := l.cfg.redactionText
+	l.cfg.mu.RUnlock()
+	return maybeRedactWith(value, leak, text)
+}
+
+func (l *Logger) WithSensitiveField(key string, value any) *Logger {
 	return l.WithField(key, l.maybeRedact(value))
 }
 
@@ -217,7 +248,7 @@ func (l *Logger) WithError(err error) *Logger {
 		return l
 	}
 
-	ctx := map[string]interface{}{"message": err.Error()}
+	ctx := map[string]any{"message": err.Error()}
 	if l.Entry.Logger.IsLevelEnabled(logrus.DebugLevel) {
 		if e, ok := err.(errorsx.StackTracer); ok {
 			ctx["stack_trace"] = fmt.Sprintf("%+v", e.StackTrace())

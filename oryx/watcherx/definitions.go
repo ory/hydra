@@ -7,6 +7,8 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+
+	"github.com/pkg/errors"
 )
 
 type (
@@ -22,6 +24,7 @@ type (
 		DispatchNow() (<-chan int, error)
 	}
 	dispatcher struct {
+		ctx     context.Context
 		trigger chan struct{}
 		done    chan int
 	}
@@ -42,8 +45,9 @@ func (e *errSchemeUnknown) Error() string {
 	return fmt.Sprintf("unknown scheme '%s' to watch", e.scheme)
 }
 
-func newDispatcher() *dispatcher {
+func newDispatcher(ctx context.Context) *dispatcher {
 	return &dispatcher{
+		ctx:     ctx,
 		trigger: make(chan struct{}),
 		done:    make(chan int),
 	}
@@ -53,8 +57,15 @@ func (d *dispatcher) DispatchNow() (<-chan int, error) {
 	if d.trigger == nil {
 		return nil, ErrWatcherNotRunning
 	}
-	d.trigger <- struct{}{}
-	return d.done, nil
+	// The trigger send must respect cancellation. Once the watcher's context is
+	// done its receiver goroutine has returned, so a bare send would block
+	// forever and wedge the caller.
+	select {
+	case d.trigger <- struct{}{}:
+		return d.done, nil
+	case <-d.ctx.Done():
+		return nil, errors.WithStack(ErrWatcherNotRunning)
+	}
 }
 
 func Watch(ctx context.Context, u *url.URL, c EventChannel) (Watcher, error) {

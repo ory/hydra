@@ -52,6 +52,7 @@ func TestImportJWKS(t *testing.T) {
 			actual := gjson.Parse(cmdx.ExecNoErr(t, c, args...))
 			assert.Len(t, actual.Get("keys.0").Array(), 1, "%s", actual.Raw)
 			assert.NotEmpty(t, actual.Get("keys.0.kid").String(), "%s", actual.Raw)
+			assert.Equal(t, args[0], actual.Get("keys.0.set").String(), "%s", actual.Raw)
 			assert.NotEmpty(t, cmp.Or(actual.Get("keys.0.x").String(), actual.Get("keys.0.n").String()), "%s", actual.Raw)
 			assert.Equal(t, cmp.Or(tc[0], "RS256"), actual.Get("keys.0.alg").String(), "%s", actual.Raw)
 		})

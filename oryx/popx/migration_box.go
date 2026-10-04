@@ -20,19 +20,21 @@ import (
 
 	"github.com/ory/pop/v6"
 
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/logrusx"
 )
 
 type (
 	// MigrationBox is a embed migration box.
 	MigrationBox struct {
-		c                   *pop.Connection
-		migrationsUp        Migrations
-		migrationsDown      Migrations
-		perMigrationTimeout time.Duration
-		dumpMigrations      bool
-		l                   *logrusx.Logger
-		migrationContent    MigrationContent
+		c                      *pop.Connection
+		migrationsUp           Migrations
+		migrationsDown         Migrations
+		perMigrationTimeout    time.Duration
+		l                      *logrusx.Logger
+		migrationContent       MigrationContent
+		disableGoldenDatabase  bool
+		sqliteTemplateCacheDir string
 	}
 	MigrationContent   func(mf Migration, c *pop.Connection, r []byte, usingTemplate bool) (string, error)
 	MigrationBoxOption func(*MigrationBox)
@@ -77,19 +79,39 @@ func WithPerMigrationTimeout(timeout time.Duration) MigrationBoxOption {
 	}
 }
 
-func WithDumpMigrations() MigrationBoxOption {
+// WithoutGoldenDatabase disables the golden database optimisation for SQLite
+// test databases. Use this when the caller asserts on migration execution
+// side-effects (e.g. exact timing, call counts, or intermediate schema state).
+func WithoutGoldenDatabase() MigrationBoxOption {
 	return func(m *MigrationBox) {
-		m.dumpMigrations = true
+		m.disableGoldenDatabase = true
 	}
 }
 
+// WithSQLiteTemplateCacheDir stores pre-migrated SQLite test database
+// templates in dir. By default, templates are stored in os.TempDir.
+//
+// This option only affects on-disk SQLite databases while running tests.
+func WithSQLiteTemplateCacheDir(dir string) MigrationBoxOption {
+	return func(m *MigrationBox) {
+		m.sqliteTemplateCacheDir = dir
+	}
+}
+
+var testdataPattern = regexp.MustCompile(`^(\d+)_testdata(|\.[a-zA-Z0-9]+).sql$`)
+
 // WithTestdata adds testdata to the migration box.
 func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
-	testdataPattern := regexp.MustCompile(`^(\d+)_testdata(|\.[a-zA-Z0-9]+).sql$`)
 	return func(m *MigrationBox) {
+		// Testdata may not change the golden-database hash,
+		// so it should not share or create a golden database.
+		m.disableGoldenDatabase = true
 		require.NoError(t, fs.WalkDir(testdata, ".", func(path string, info fs.DirEntry, err error) error {
 			if err != nil {
 				return errors.WithStack(err)
+			}
+			if info.Name() == "." {
+				return nil
 			}
 			if !info.Type().IsRegular() {
 				t.Logf("skipping testdata entry that is not a file: %s", path)
@@ -108,7 +130,7 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 				flavor = pop.CanonicalDialect(strings.TrimPrefix(match[2], "."))
 			}
 
-			//t.Logf("Found test migration \"%s\" (%s, %+v): %s", flavor, match, err, info.Name())
+			// t.Logf("Found test migration \"%s\" (%s, %+v): %s", flavor, match, err, info.Name())
 
 			m.migrationsUp = append(m.migrationsUp, Migration{
 				Version:   version + "9", // run testdata after version
@@ -201,6 +223,50 @@ func NewMigrationBox(dir fs.FS, c *pop.Connection, l *logrusx.Logger, opts ...Mi
 	return mb, nil
 }
 
+// migrationFallbacks returns the ordered dialects migration selection falls
+// back to before the generic ("all") file (.yugabyte. → .postgres. → generic
+// for YugabyteDB, no fallbacks otherwise).
+func (mb *MigrationBox) migrationFallbacks() []string {
+	if mb.c.Dialect.Name() == dbal.DriverYugabyteDB {
+		return []string{dbal.DriverPostgreSQL}
+	}
+	return nil
+}
+
+// SelectedMigrations returns a copy of the migrations selected for the
+// connection's dialect and direction. It uses the same exact-match and fallback
+// ranking as Up, Down, and Status so callers can audit the effective migration
+// set without duplicating filename-selection logic.
+func (mb *MigrationBox) SelectedMigrations(direction string) (Migrations, error) {
+	dialect := mb.c.Dialect.Name()
+	fallbacks := mb.migrationFallbacks()
+	switch direction {
+	case "up":
+		return slices.Clone(mb.migrationsUp.sortAndFilter(dialect, fallbacks...)), nil
+	case "down":
+		return slices.Clone(mb.migrationsDown.sortAndFilter(dialect, fallbacks...)), nil
+	default:
+		return nil, errors.Errorf("unknown migration direction %q", direction)
+	}
+}
+
+// noTxDDL reports whether the dialect cannot run DDL inside a transaction, so
+// both migrations and the migration-status table setup must run in autocommit
+// mode. CockroachDB and MySQL auto-commit each DDL statement; YugabyteDB
+// restricts DDL inside transactions. Because there is no surrounding
+// transaction to roll back a partial failure, new YugabyteDB migrations must
+// contain one idempotent statement per file. YugabyteDB also inherits older
+// PostgreSQL migration files that predate this rule; service-level guard tests
+// track that replay risk, and a dedicated .yugabyte. override is required when
+// a new unsafe inherited migration appears.
+func (mb *MigrationBox) noTxDDL() bool {
+	switch mb.c.Dialect.Name() {
+	case dbal.DriverCockroachDB, dbal.DriverMySQL, dbal.DriverYugabyteDB:
+		return true
+	}
+	return false
+}
+
 func (mb *MigrationBox) findMigrations(
 	dir fs.FS,
 	runner func([]byte) func(m Migration, c *pop.Connection) error,
@@ -222,8 +288,8 @@ func (mb *MigrationBox) findMigrations(
 
 		details, err := parseMigrationFilename(info.Name())
 		if err != nil {
-			if strings.HasPrefix(err.Error(), "unsupported dialect") {
-				mb.l.Tracef("This is usually ok - ignoring migration file %s because dialect is not supported: %s", info.Name(), err.Error())
+			if errors.Is(err, errUnsupportedMigrationDialect) {
+				mb.l.Debugf("Ignoring migration file %s because its dialect is not supported: %s", info.Name(), err.Error())
 				return nil
 			}
 			return errors.WithStack(err)

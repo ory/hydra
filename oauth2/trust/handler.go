@@ -105,6 +105,9 @@ type trustOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  201: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	var grantRequest createGrantRequest
 
@@ -176,12 +179,15 @@ type getTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) getTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	rawID := r.PathValue("id")
 	id, err := uuid.FromString(rawID)
 	if err != nil {
 		h.registry.Writer().WriteError(w, r,
-			errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse parameter id: %v", err)))
+			errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to parse parameter id: %v", err)))
 		return
 	}
 
@@ -227,12 +233,15 @@ type deleteTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	rawID := r.PathValue("id")
 	id, err := uuid.FromString(rawID)
 	if err != nil {
 		h.registry.Writer().WriteError(w, r,
-			errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse parameter id: %v", err)))
+			errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to parse parameter id: %v", err)))
 		return
 	}
 
@@ -276,6 +285,9 @@ type listTrustedOAuth2JwtGrantIssuers struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuers
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request) {
 	optionalIssuer := r.URL.Query().Get("issuer")
 
@@ -283,7 +295,7 @@ func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r
 	pageOpts, err := keysetpagination.ParseQueryParams(pageKeys, r.URL.Query())
 	if err != nil {
 		h.registry.Writer().WriteError(w, r,
-			errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse pagination parameters: %v", err)))
+			errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to parse pagination parameters: %v", err)))
 		return
 	}
 

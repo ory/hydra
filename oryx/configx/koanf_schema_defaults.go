@@ -43,5 +43,11 @@ func (k *KoanfSchemaDefaults) Read() (map[string]interface{}, error) {
 		}
 	}
 
-	return maps.Unflatten(values, "."), nil
+	// Deep-copy: getSchemaPaths caches Path entries by schema hash, so
+	// key.Default may be a map/slice shared across all callers. koanf.Merge
+	// retains references when merging, and recursively writes into shared
+	// sub-maps when a later provider overlaps the default's path —
+	// without this copy, concurrent configx.New calls race on the shared
+	// default value.
+	return maps.Unflatten(maps.Copy(values), "."), nil
 }

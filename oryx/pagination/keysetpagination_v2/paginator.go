@@ -8,7 +8,13 @@ import (
 	"reflect"
 
 	"github.com/jmoiron/sqlx/reflectx"
+
+	"github.com/ory/herodot"
 )
+
+func ErrInvalidPaginationToken() *herodot.DefaultError {
+	return herodot.ErrBadRequest().WithError("invalid pagination token")
+}
 
 type (
 	Paginator struct {
@@ -103,9 +109,11 @@ func ResultFunc[I any](items []I, p *Paginator, extractor func(last I, colName s
 	newCols := make([]Column, len(currentCols))
 	for i, col := range currentCols {
 		newCols[i] = Column{
-			Name:  col.Name,
-			Order: col.Order,
-			Value: extractor(lastItem, col.Name),
+			Name:          col.Name,
+			Order:         col.Order,
+			Nullable:      col.Nullable,
+			HasConstraint: col.HasConstraint,
+			Value:         extractor(lastItem, col.Name),
 		}
 	}
 
@@ -121,23 +129,28 @@ func ResultFunc[I any](items []I, p *Paginator, extractor func(last I, colName s
 func WithSize(size int) Option {
 	return func(p *Paginator) { p.size = size }
 }
+
 func WithDefaultSize(size int) Option {
 	return func(p *Paginator) { p.defaultSize = size }
 }
+
 func WithMaxSize(size int) Option {
 	return func(p *Paginator) { p.maxSize = size }
 }
+
 func WithToken(t PageToken) Option {
 	return func(p *Paginator) { p.token = t }
 }
+
 func WithDefaultToken(t PageToken) Option {
 	return func(p *Paginator) { p.defaultToken = t }
 }
+
 func withIsLast(isLast bool) Option {
 	return func(p *Paginator) { p.isLast = isLast }
 }
 
-func NewPaginator(modifiers ...Option) *Paginator {
+func NewPaginator(modifiers ...Option) (*Paginator, error) {
 	p := &Paginator{
 		// these can still be overridden by the modifiers, but they should never be unset
 		maxSize:     DefaultMaxSize,
@@ -146,5 +159,34 @@ func NewPaginator(modifiers ...Option) *Paginator {
 	for _, f := range modifiers {
 		f(p)
 	}
-	return p
+	if err := p.validatePageToken(); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// validatePageToken ensures the page token columns strictly match DefaultToken's schema in order.
+func (p *Paginator) validatePageToken() error {
+	tokenCols := p.PageToken().Columns()
+	if len(tokenCols) == 0 {
+		return nil
+	}
+
+	if columnsMatch(tokenCols, p.defaultToken.Columns()) {
+		return nil
+	}
+	return ErrInvalidPaginationToken()
+}
+
+func columnsMatch(tokenCols, templateCols []Column) bool {
+	if len(templateCols) == 0 || len(tokenCols) != len(templateCols) {
+		return false
+	}
+	for i, col := range tokenCols {
+		def := templateCols[i]
+		if def.Name != col.Name || def.Order != col.Order || def.Nullable != col.Nullable {
+			return false
+		}
+	}
+	return true
 }

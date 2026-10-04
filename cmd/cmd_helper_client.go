@@ -13,9 +13,7 @@ import (
 	"github.com/spf13/pflag"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/v2/cmd/cli"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/pointerx"
 )
 
 func clientFromFlags(cmd *cobra.Command) (hydra.OAuth2Client, error) {
@@ -37,43 +35,94 @@ func clientFromFlags(cmd *cobra.Command) (hydra.OAuth2Client, error) {
 	}
 
 	return hydra.OAuth2Client{
-		AccessTokenStrategy:               pointerx.Ptr(flagx.MustGetString(cmd, flagClientAccessTokenStrategy)),
+		AccessTokenStrategy:               new(flagx.MustGetString(cmd, flagClientAccessTokenStrategy)),
 		AllowedCorsOrigins:                flagx.MustGetStringSlice(cmd, flagClientAllowedCORSOrigin),
 		Audience:                          flagx.MustGetStringSlice(cmd, flagClientAudience),
-		BackchannelLogoutSessionRequired:  pointerx.Ptr(flagx.MustGetBool(cmd, flagClientBackChannelLogoutSessionRequired)),
-		BackchannelLogoutUri:              pointerx.Ptr(flagx.MustGetString(cmd, flagClientBackchannelLogoutCallback)),
-		ClientName:                        pointerx.Ptr(flagx.MustGetString(cmd, flagClientName)),
-		ClientSecret:                      pointerx.Ptr(flagx.MustGetString(cmd, flagClientSecret)),
-		ClientUri:                         pointerx.Ptr(flagx.MustGetString(cmd, flagClientClientURI)),
+		BackchannelLogoutSessionRequired:  new(flagx.MustGetBool(cmd, flagClientBackChannelLogoutSessionRequired)),
+		BackchannelLogoutUri:              new(flagx.MustGetString(cmd, flagClientBackchannelLogoutCallback)),
+		ClientName:                        new(flagx.MustGetString(cmd, flagClientName)),
+		ClientSecret:                      new(flagx.MustGetString(cmd, flagClientSecret)),
+		ClientUri:                         new(flagx.MustGetString(cmd, flagClientClientURI)),
 		Contacts:                          flagx.MustGetStringSlice(cmd, flagClientContact),
-		FrontchannelLogoutSessionRequired: pointerx.Ptr(flagx.MustGetBool(cmd, flagClientFrontChannelLogoutSessionRequired)),
-		FrontchannelLogoutUri:             pointerx.Ptr(flagx.MustGetString(cmd, flagClientFrontChannelLogoutCallback)),
+		FrontchannelLogoutSessionRequired: new(flagx.MustGetBool(cmd, flagClientFrontChannelLogoutSessionRequired)),
+		FrontchannelLogoutUri:             new(flagx.MustGetString(cmd, flagClientFrontChannelLogoutCallback)),
 		GrantTypes:                        flagx.MustGetStringSlice(cmd, flagClientGrantType),
-		JwksUri:                           pointerx.Ptr(flagx.MustGetString(cmd, flagClientJWKSURI)),
-		LogoUri:                           pointerx.Ptr(flagx.MustGetString(cmd, flagClientLogoURI)),
+		JwksUri:                           new(flagx.MustGetString(cmd, flagClientJWKSURI)),
+		LogoUri:                           new(flagx.MustGetString(cmd, flagClientLogoURI)),
 		Metadata:                          json.RawMessage(flagx.MustGetString(cmd, flagClientMetadata)),
-		Owner:                             pointerx.Ptr(flagx.MustGetString(cmd, flagClientOwner)),
-		PolicyUri:                         pointerx.Ptr(flagx.MustGetString(cmd, flagClientPolicyURI)),
+		Owner:                             new(flagx.MustGetString(cmd, flagClientOwner)),
+		PolicyUri:                         new(flagx.MustGetString(cmd, flagClientPolicyURI)),
 		PostLogoutRedirectUris:            flagx.MustGetStringSlice(cmd, flagClientPostLogoutCallback),
 		RedirectUris:                      flagx.MustGetStringSlice(cmd, flagClientRedirectURI),
-		RequestObjectSigningAlg:           pointerx.Ptr(flagx.MustGetString(cmd, flagClientRequestObjectSigningAlg)),
+		RequestObjectSigningAlg:           new(flagx.MustGetString(cmd, flagClientRequestObjectSigningAlg)),
 		RequestUris:                       flagx.MustGetStringSlice(cmd, flagClientRequestURI),
 		ResponseTypes:                     flagx.MustGetStringSlice(cmd, flagClientResponseType),
-		Scope:                             pointerx.Ptr(strings.Join(flagx.MustGetStringSlice(cmd, flagClientScope), " ")),
-		SkipConsent:                       pointerx.Ptr(flagx.MustGetBool(cmd, flagClientSkipConsent)),
-		SkipLogoutConsent:                 pointerx.Ptr(flagx.MustGetBool(cmd, flagClientLogoutSkipConsent)),
-		SectorIdentifierUri:               pointerx.Ptr(flagx.MustGetString(cmd, flagClientSectorIdentifierURI)),
-		SubjectType:                       pointerx.Ptr(flagx.MustGetString(cmd, flagClientSubjectType)),
-		TokenEndpointAuthMethod:           pointerx.Ptr(flagx.MustGetString(cmd, flagClientTokenEndpointAuthMethod)),
-		TosUri:                            pointerx.Ptr(flagx.MustGetString(cmd, flagClientTOSURI)),
+		Scope:                             new(strings.Join(flagx.MustGetStringSlice(cmd, flagClientScope), " ")),
+		SkipConsent:                       new(flagx.MustGetBool(cmd, flagClientSkipConsent)),
+		SkipLogoutConsent:                 new(flagx.MustGetBool(cmd, flagClientLogoutSkipConsent)),
+		SectorIdentifierUri:               new(flagx.MustGetString(cmd, flagClientSectorIdentifierURI)),
+		SubjectType:                       new(flagx.MustGetString(cmd, flagClientSubjectType)),
+		TokenEndpointAuthMethod:           new(flagx.MustGetString(cmd, flagClientTokenEndpointAuthMethod)),
+		TosUri:                            new(flagx.MustGetString(cmd, flagClientTOSURI)),
 	}, nil
+}
+
+// clientPatchFromFlags returns a JSON Patch document covering exactly those
+// client flags that were set on the command line, so that an update changes
+// only the provided fields and leaves the rest of the client untouched.
+func clientPatchFromFlags(cmd *cobra.Command) []hydra.JsonPatch {
+	str := func(flag string) any { return flagx.MustGetString(cmd, flag) }
+	strSlice := func(flag string) any { return flagx.MustGetStringSlice(cmd, flag) }
+	boolean := func(flag string) any { return flagx.MustGetBool(cmd, flag) }
+
+	patch := []hydra.JsonPatch{}
+	for _, f := range []struct {
+		flag  string
+		path  string
+		value func(flag string) any
+	}{
+		{flagClientAccessTokenStrategy, "/access_token_strategy", str},
+		{flagClientAllowedCORSOrigin, "/allowed_cors_origins", strSlice},
+		{flagClientAudience, "/audience", strSlice},
+		{flagClientBackChannelLogoutSessionRequired, "/backchannel_logout_session_required", boolean},
+		{flagClientBackchannelLogoutCallback, "/backchannel_logout_uri", str},
+		{flagClientName, "/client_name", str},
+		{flagClientSecret, "/client_secret", str},
+		{flagClientClientURI, "/client_uri", str},
+		{flagClientContact, "/contacts", strSlice},
+		{flagClientFrontChannelLogoutSessionRequired, "/frontchannel_logout_session_required", boolean},
+		{flagClientFrontChannelLogoutCallback, "/frontchannel_logout_uri", str},
+		{flagClientGrantType, "/grant_types", strSlice},
+		{flagClientJWKSURI, "/jwks_uri", str},
+		{flagClientLogoURI, "/logo_uri", str},
+		{flagClientMetadata, "/metadata", func(flag string) any { return json.RawMessage(flagx.MustGetString(cmd, flag)) }},
+		{flagClientOwner, "/owner", str},
+		{flagClientPolicyURI, "/policy_uri", str},
+		{flagClientPostLogoutCallback, "/post_logout_redirect_uris", strSlice},
+		{flagClientRedirectURI, "/redirect_uris", strSlice},
+		{flagClientRequestObjectSigningAlg, "/request_object_signing_alg", str},
+		{flagClientRequestURI, "/request_uris", strSlice},
+		{flagClientResponseType, "/response_types", strSlice},
+		{flagClientScope, "/scope", func(flag string) any { return strings.Join(flagx.MustGetStringSlice(cmd, flag), " ") }},
+		{flagClientSectorIdentifierURI, "/sector_identifier_uri", str},
+		{flagClientSkipConsent, "/skip_consent", boolean},
+		{flagClientLogoutSkipConsent, "/skip_logout_consent", boolean},
+		{flagClientSubjectType, "/subject_type", str},
+		{flagClientTokenEndpointAuthMethod, "/token_endpoint_auth_method", str},
+		{flagClientTOSURI, "/tos_uri", str},
+	} {
+		if cmd.Flags().Changed(f.flag) {
+			patch = append(patch, hydra.JsonPatch{Op: "replace", Path: f.path, Value: f.value(f.flag)})
+		}
+	}
+	return patch
 }
 
 func registerEncryptFlags(flags *pflag.FlagSet) {
 	// encrypt client secret options
-	flags.String(cli.FlagEncryptionPGPKey, "", "Base64 encoded PGP encryption key for encrypting client secret.")
-	flags.String(cli.FlagEncryptionPGPKeyURL, "", "PGP encryption key URL for encrypting client secret.")
-	flags.String(cli.FlagEncryptionKeybase, "", "Keybase username for encrypting client secret.")
+	flags.String(FlagEncryptionPGPKey, "", "Base64 encoded PGP encryption key for encrypting client secret.")
+	flags.String(FlagEncryptionPGPKeyURL, "", "PGP encryption key URL for encrypting client secret.")
+	flags.String(FlagEncryptionKeybase, "", "Keybase username for encrypting client secret.")
 }
 
 func registerClientFlags(flags *pflag.FlagSet) {

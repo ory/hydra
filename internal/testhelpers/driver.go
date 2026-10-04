@@ -25,6 +25,7 @@ import (
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/sqlcon/dockertest"
@@ -41,6 +42,12 @@ var ConfigDefaults = []configx.OptionModifier{
 		config.KeyLogLevel:                       "trace",
 		config.KeyDevelopmentMode:                true,
 		"serve.public.host":                      "localhost",
+		// The x/oauth2 device-flow client blocks a full polling interval before
+		// its very first token request, so the 5s production default dominates
+		// device-flow integration test runtime. 1s is the effective floor: the
+		// handler truncates the interval to whole seconds, and 0 makes the
+		// client fall back to its own 5s default.
+		config.KeyDeviceAuthTokenPollingInterval: "1s",
 	}),
 	configx.WithValue("log.leak_sensitive_values", true),
 }
@@ -61,6 +68,10 @@ func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate, initNetwork bool, 
 		driver.SkipNetworkInit(),
 		driver.WithConfigOptions(configOpts...),
 		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(contextx.NewTestConfigProvider(spec.ConfigValidationSchema, configOpts...))),
+		driver.WithHTTPClientOptions(
+			httpx.ResilientClientWithMinRetryWait(time.Millisecond),
+			httpx.ResilientClientWithMaxRetryWait(time.Millisecond),
+		),
 	}, opts...)
 
 	reg, err := driver.New(t.Context(), regOpts...)
@@ -84,7 +95,7 @@ func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate, initNetwork bool, 
 func ConnectToMySQL(t testing.TB) string { return dockertest.RunTestMySQLWithVersion(t, "8.0") }
 func ConnectToPG(t testing.TB) string    { return dockertest.RunTestPostgreSQLWithVersion(t, "16") }
 func ConnectToCRDB(t testing.TB) string {
-	return dockertest.RunTestCockroachDBWithVersion(t, "latest-v24.1")
+	return dockertest.RunTestCockroachDBWithVersion(t, "latest-v25.4")
 }
 
 func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {

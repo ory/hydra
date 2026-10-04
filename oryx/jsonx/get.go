@@ -30,14 +30,14 @@ func jsonKey(f reflect.StructField) *string {
 func AllValidJSONKeys(s interface{}) (keys []string) {
 	t := reflect.TypeOf(s)
 	v := reflect.ValueOf(s)
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		t = t.Elem()
 		v = v.Elem()
 	}
 	for i := range t.NumField() {
 		f := t.Field(i)
 		jKey := jsonKey(f)
-		if k := f.Type.Kind(); k == reflect.Struct || k == reflect.Ptr {
+		if k := f.Type.Kind(); k == reflect.Struct || k == reflect.Pointer {
 			subKeys := AllValidJSONKeys(v.Field(i).Interface())
 			for _, subKey := range subKeys {
 				if jKey != nil {

@@ -1,0 +1,1 @@
+DROP INDEX hydra_oauth2_refresh_subject_nid_idx ON hydra_oauth2_refresh;

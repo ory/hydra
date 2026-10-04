@@ -42,7 +42,7 @@ That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
 won't clash with Ory Fosite's direction. A great way to do this is via
 [Ory Fosite Discussions](https://github.com/orgs/ory/discussions) or the
-[Ory Chat](https://www.ory.sh/chat).
+[Ory Chat](https://slack.ory.com).
 
 ## FAQ
 
@@ -64,7 +64,7 @@ won't clash with Ory Fosite's direction. A great way to do this is via
   [a Contributors License Agreement?](https://cla-assistant.io/ory/fosite)
 
 - I would like updates about new versions of Ory Fosite.
-  [How are new releases announced?](https://www.ory.sh/l/sign-up-newsletter)
+  [How are new releases announced?](https://www.ory.com/l/sign-up-newsletter)
 
 ## How can I contribute?
 
@@ -106,7 +106,7 @@ to help out:
 
 ## Communication
 
-We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
+We use [Slack](https://slack.ory.com). You are welcome to drop in and ask
 questions, discuss bugs and feature requests, talk to other users of Ory, etc.
 
 Check out [Ory Fosite Discussions](https://github.com/orgs/ory/discussions).
@@ -115,7 +115,7 @@ and similar data.
 
 You can also join our community calls if you want to speak to the Ory team
 directly or ask some questions. You can find more info and participate in
-[Slack](https://www.ory.sh/chat) in the #community-call channel.
+[Slack](https://slack.ory.com) in the #community-call channel.
 
 If you want to receive regular notifications about updates to Ory Fosite,
 consider joining the mailing list. We will _only_ send you vital information on
@@ -137,9 +137,9 @@ to add your example or Ory-related project to the awesome-ory README.
 ## Contribute code
 
 Unless you are fixing a known bug, we **strongly** recommend discussing it with
-the core team via a GitHub issue or [in our chat](https://www.ory.sh/chat)
-before getting started to ensure your work is consistent with Ory Fosite's
-roadmap and architecture.
+the core team via a GitHub issue or [in our chat](https://slack.ory.com) before
+getting started to ensure your work is consistent with Ory Fosite's roadmap and
+architecture.
 
 All contributions are made via pull requests. To make a pull request, you will
 need a GitHub account; if you are unclear on this process, see GitHub's
@@ -151,8 +151,8 @@ request, go through this checklist:
 1. Create a feature branch off of `master` so that changes do not get mixed up.
 1. [Rebase](http://git-scm.com/book/en/Git-Branching-Rebasing) your local
    changes against the `master` branch.
-1. Run the full project test suite with the `go test -tags sqlite ./...` (or
-   equivalent) command and confirm that it passes.
+1. Run the full project test suite with the `go test ./...` (or equivalent)
+   command and confirm that it passes.
 1. Run `make format`
 1. Add a descriptive prefix to commits. This ensures a uniform commit history
    and helps structure the changelog. Please refer to this
@@ -248,4 +248,4 @@ community a safe place for you and we've got your back.
 
 We welcome discussion about creating a welcoming, safe, and productive
 environment for the community. If you have any questions, feedback, or concerns
-[please let us know](https://www.ory.sh/chat).
+[please let us know](https://slack.ory.com).

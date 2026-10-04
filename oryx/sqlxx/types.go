@@ -43,6 +43,7 @@ func (ns *Duration) UnmarshalJSON(data []byte) error {
 }
 
 // StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.
+// swagger:type array
 type StringSliceJSONFormat []string
 
 // Scan implements the Scanner interface.
@@ -279,7 +280,7 @@ func (ns *NullTime) Scan(value interface{}) error {
 	if err := (&v).Scan(value); err != nil {
 		return err
 	}
-	*ns = NullTime(v.Time)
+	*ns = NullTime(v.Time.UTC())
 	return nil
 }
 
@@ -305,7 +306,22 @@ func (ns *NullTime) UnmarshalJSON(data []byte) error {
 
 // Value implements the driver Valuer interface.
 func (ns NullTime) Value() (driver.Value, error) {
-	return sql.NullTime{Valid: !time.Time(ns).IsZero(), Time: time.Time(ns)}.Value()
+	return sql.NullTime{Valid: !time.Time(ns).IsZero(), Time: time.Time(ns).UTC()}.Value()
+}
+
+// DeepCopy implements github.com/mohae/deepcopy.Interface.
+//
+// NullTime wraps time.Time, whose fields are unexported. The default
+// reflection-based deep copy in mohae/deepcopy skips unexported fields, which
+// would zero out the timestamp. Returning a pointer to a copy preserves the
+// value. The method uses a pointer receiver so that mohae/deepcopy returns
+// the matching *NullTime type when it finds one as a struct field.
+func (ns *NullTime) DeepCopy() any {
+	if ns == nil {
+		return (*NullTime)(nil)
+	}
+	cpy := *ns
+	return &cpy
 }
 
 // MapStringInterface represents a map[string]interface that works well with JSON, SQL, and Swagger.
@@ -442,6 +458,33 @@ func (m *NullJSONRawMessage) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// NullJSONObject represents a nullable JSON object (always key-value pairs).
+// Use this for fields that are always objects (e.g., HTTP headers).
+// For arbitrary JSON that can be strings, arrays, or objects, use NullJSONRawMessage.
+//
+// swagger:type object
+type NullJSONObject json.RawMessage
+
+// Scan implements the Scanner interface.
+func (m *NullJSONObject) Scan(value any) error {
+	return (*NullJSONRawMessage)(m).Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (m NullJSONObject) Value() (driver.Value, error) {
+	return NullJSONRawMessage(m).Value()
+}
+
+// MarshalJSON returns m as the JSON encoding of m.
+func (m NullJSONObject) MarshalJSON() ([]byte, error) {
+	return NullJSONRawMessage(m).MarshalJSON()
+}
+
+// UnmarshalJSON sets *m to a copy of data.
+func (m *NullJSONObject) UnmarshalJSON(data []byte) error {
+	return (*NullJSONRawMessage)(m).UnmarshalJSON(data)
+}
+
 // JSONScan is a generic helper for retrieving a SQL JSON-encoded value.
 func JSONScan(dst, value any) error {
 	// Note: raw is a string (not []byte) because the MySQL driver reuses byte slices across scans.
@@ -464,6 +507,7 @@ func JSONScan(dst, value any) error {
 }
 
 // NullInt64 represents an int64 that may be null.
+// swagger:type int64
 // swagger:model nullInt64
 type NullInt64 struct {
 	Int   int64

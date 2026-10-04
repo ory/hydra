@@ -17,6 +17,7 @@ import (
 	"github.com/ory/hydra/v2/hsm"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/popx"
@@ -41,6 +42,7 @@ type (
 		kratos             kratos.Client
 		fop                fosite.OAuth2Provider
 		dbOptsModifier     []func(details *pop.ConnectionDetails)
+		httpClientOpts     []httpx.ResilientOptions
 	}
 	OptionsModifier func(*options)
 
@@ -65,6 +67,14 @@ func WithConfigOptions(opts ...configx.OptionModifier) OptionsModifier {
 func WithDBOptionsModifier(f ...func(details *pop.ConnectionDetails)) OptionsModifier {
 	return func(o *options) {
 		o.dbOptsModifier = append(o.dbOptsModifier, f...)
+	}
+}
+
+// WithHTTPClientOptions configures the resilient HTTP clients created by the registry.
+// The options override the registry's production defaults, but not its configured SSRF policy.
+func WithHTTPClientOptions(opts ...httpx.ResilientOptions) OptionsModifier {
+	return func(o *options) {
+		o.httpClientOpts = append(o.httpClientOpts, opts...)
 	}
 }
 
@@ -187,6 +197,7 @@ func New(ctx context.Context, opts ...OptionsModifier) (*RegistrySQL, error) {
 	r.kratos = o.kratos
 	r.fop = o.fop
 	r.dbOptsModifier = o.dbOptsModifier
+	r.httpClientOpts = o.httpClientOpts
 
 	if err = r.Init(ctx, o.skipNetworkInit, o.autoMigrate, o.extraMigrations, o.goMigrations); err != nil {
 		l.WithError(err).Error("Unable to initialize service registry.")

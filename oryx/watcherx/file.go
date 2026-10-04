@@ -5,7 +5,6 @@ package watcherx
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -40,7 +39,7 @@ func WatchFile(ctx context.Context, file string, c EventChannel) (Watcher, error
 			return nil, errors.WithStack(err)
 		}
 	}
-	d := newDispatcher()
+	d := newDispatcher(ctx)
 	go streamFileEvents(ctx, watcher, c, d.trigger, d.done, file, resolvedFile)
 	return d, nil
 }
@@ -108,8 +107,6 @@ func streamFileEvents(ctx context.Context, watcher *fsnotify.Watcher, c EventCha
 			if !ok {
 				return
 			}
-			list := watcher.WatchList()
-			fmt.Println(list)
 			// filter events to only watch watchedFile
 			// e.Name contains the name of the watchedFile (regardless whether it is a symlink), not the resolved file name
 			if filepath.Clean(e.Name) == watchedFile {

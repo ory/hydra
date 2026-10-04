@@ -21,7 +21,7 @@ var _ MappedNullable = &OAuth2LogoutRequest{}
 
 // OAuth2LogoutRequest struct for OAuth2LogoutRequest
 type OAuth2LogoutRequest struct {
-	// Challenge is the identifier of the logout authentication request.
+	// Challenge is used to retrieve/accept/deny the logout request.
 	Challenge *string       `json:"challenge,omitempty"`
 	Client    *OAuth2Client `json:"client,omitempty"`
 	ExpiresAt *time.Time    `json:"expires_at,omitempty"`
@@ -32,7 +32,7 @@ type OAuth2LogoutRequest struct {
 	RpInitiated *bool `json:"rp_initiated,omitempty"`
 	// SessionID is the login session ID that was requested to log out.
 	Sid *string `json:"sid,omitempty"`
-	// Subject is the user for whom the logout was request.
+	// Subject is the user for whom the logout was requested.
 	Subject *string `json:"subject,omitempty"`
 }
 

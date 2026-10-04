@@ -11,6 +11,7 @@ Method | HTTP request | Description
 [**CreateOAuth2Client**](OAuth2API.md#CreateOAuth2Client) | **Post** /admin/clients | Create OAuth 2.0 Client
 [**DeleteOAuth2Client**](OAuth2API.md#DeleteOAuth2Client) | **Delete** /admin/clients/{id} | Delete OAuth 2.0 Client
 [**DeleteOAuth2Token**](OAuth2API.md#DeleteOAuth2Token) | **Delete** /admin/oauth2/tokens | Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
+[**DeleteRotatedOAuth2ClientSecrets**](OAuth2API.md#DeleteRotatedOAuth2ClientSecrets) | **Delete** /admin/clients/{id}/secrets/rotate | Delete Rotated OAuth 2.0 Client Secrets
 [**DeleteTrustedOAuth2JwtGrantIssuer**](OAuth2API.md#DeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
 [**GetOAuth2Client**](OAuth2API.md#GetOAuth2Client) | **Get** /admin/clients/{id} | Get an OAuth 2.0 Client
 [**GetOAuth2ConsentRequest**](OAuth2API.md#GetOAuth2ConsentRequest) | **Get** /admin/oauth2/auth/requests/consent | Get OAuth 2.0 Consent Request
@@ -32,6 +33,7 @@ Method | HTTP request | Description
 [**RevokeOAuth2ConsentSessions**](OAuth2API.md#RevokeOAuth2ConsentSessions) | **Delete** /admin/oauth2/auth/sessions/consent | Revoke OAuth 2.0 Consent Sessions of a Subject
 [**RevokeOAuth2LoginSessions**](OAuth2API.md#RevokeOAuth2LoginSessions) | **Delete** /admin/oauth2/auth/sessions/login | Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
 [**RevokeOAuth2Token**](OAuth2API.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth 2.0 Access or Refresh Token
+[**RotateOAuth2ClientSecret**](OAuth2API.md#RotateOAuth2ClientSecret) | **Post** /admin/clients/{id}/secrets/rotate | Rotate OAuth 2.0 Client Secret
 [**SetOAuth2Client**](OAuth2API.md#SetOAuth2Client) | **Put** /admin/clients/{id} | Set OAuth 2.0 Client
 [**SetOAuth2ClientLifespans**](OAuth2API.md#SetOAuth2ClientLifespans) | **Put** /admin/clients/{id}/lifespans | Set OAuth2 Client Token Lifespans
 [**TrustOAuth2JwtGrantIssuer**](OAuth2API.md#TrustOAuth2JwtGrantIssuer) | **Post** /admin/trust/grants/jwt-bearer/issuers | Trust OAuth2 JWT Bearer Grant Type Issuer
@@ -491,6 +493,76 @@ Name | Type | Description  | Notes
 ### Return type
 
  (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## DeleteRotatedOAuth2ClientSecrets
+
+> OAuth2Client DeleteRotatedOAuth2ClientSecrets(ctx, id).Execute()
+
+Delete Rotated OAuth 2.0 Client Secrets
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
+)
+
+func main() {
+	id := "id_example" // string | OAuth 2.0 Client ID
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2API.DeleteRotatedOAuth2ClientSecrets(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.DeleteRotatedOAuth2ClientSecrets``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `DeleteRotatedOAuth2ClientSecrets`: OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.DeleteRotatedOAuth2ClientSecrets`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | OAuth 2.0 Client ID | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiDeleteRotatedOAuth2ClientSecretsRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**OAuth2Client**](OAuth2Client.md)
 
 ### Authorization
 
@@ -1001,8 +1073,8 @@ import (
 )
 
 func main() {
-	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
-	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional)
+	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). (optional) (default to 250)
+	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). (optional)
 	clientName := "clientName_example" // string | The name of the clients to filter by. (optional)
 	owner := "owner_example" // string | The owner of the clients to filter by. (optional)
 
@@ -1029,8 +1101,8 @@ Other parameters are passed through a pointer to a apiListOAuth2ClientsRequest s
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
- **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | 
+ **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). | [default to 250]
+ **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). | 
  **clientName** | **string** | The name of the clients to filter by. | 
  **owner** | **string** | The owner of the clients to filter by. | 
 
@@ -1074,8 +1146,8 @@ import (
 
 func main() {
 	subject := "subject_example" // string | The subject to list the consent sessions for.
-	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
-	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to "1")
+	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). (optional) (default to 250)
+	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). (optional)
 	loginSessionId := "loginSessionId_example" // string | The login session id to list the consent sessions for. (optional)
 
 	configuration := openapiclient.NewConfiguration()
@@ -1102,8 +1174,8 @@ Other parameters are passed through a pointer to a apiListOAuth2ConsentSessionsR
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **subject** | **string** | The subject to list the consent sessions for. | 
- **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
- **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to &quot;1&quot;]
+ **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). | [default to 250]
+ **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). | 
  **loginSessionId** | **string** | The login session id to list the consent sessions for. | 
 
 ### Return type
@@ -1145,8 +1217,8 @@ import (
 )
 
 func main() {
-	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
-	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional)
+	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). (optional) (default to 250)
+	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). (optional)
 	issuer := "issuer_example" // string | If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned. (optional)
 
 	configuration := openapiclient.NewConfiguration()
@@ -1172,8 +1244,8 @@ Other parameters are passed through a pointer to a apiListTrustedOAuth2JwtGrantI
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
- **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | 
+ **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). | [default to 250]
+ **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination). | 
  **issuer** | **string** | If optional \&quot;issuer\&quot; is supplied, only jwt-bearer grants with this issuer will be returned. | 
 
 ### Return type
@@ -1920,6 +1992,76 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
 - **Content-Type**: application/x-www-form-urlencoded
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## RotateOAuth2ClientSecret
+
+> OAuth2Client RotateOAuth2ClientSecret(ctx, id).Execute()
+
+Rotate OAuth 2.0 Client Secret
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
+)
+
+func main() {
+	id := "id_example" // string | OAuth 2.0 Client ID
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2API.RotateOAuth2ClientSecret(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RotateOAuth2ClientSecret``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `RotateOAuth2ClientSecret`: OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.RotateOAuth2ClientSecret`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | OAuth 2.0 Client ID | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiRotateOAuth2ClientSecretRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**OAuth2Client**](OAuth2Client.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

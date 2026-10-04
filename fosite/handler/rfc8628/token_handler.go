@@ -24,6 +24,7 @@ var _ fosite.TokenEndpointHandler = (*DeviceCodeTokenEndpointHandler)(nil)
 // - the Device Authorization Grant as defined in https://www.rfc-editor.org/rfc/rfc8628
 type DeviceCodeTokenEndpointHandler struct {
 	Storage interface {
+		fosite.Transactional
 		DeviceAuthStorageProvider
 		oauth2.AccessTokenStorageProvider
 		oauth2.RefreshTokenStorageProvider
@@ -60,18 +61,17 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 		return errorsx.WithStack(fosite.ErrUnknownRequest)
 	}
 
-	var code, signature string
-	var err error
-	if code, signature, err = c.deviceCode(ctx, requester); err != nil {
+	code, signature, err := c.deviceCode(ctx, requester)
+	if err != nil {
 		return err
 	}
 
-	var ar fosite.DeviceRequester
-	if ar, err = c.session(ctx, requester, signature); err != nil {
+	ar, err := c.session(ctx, requester, signature)
+	if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
-	if err = c.Strategy.DeviceCodeStrategy().ValidateDeviceCode(ctx, ar, code); err != nil {
+	if err := c.Strategy.DeviceCodeStrategy().ValidateDeviceCode(ctx, ar, code); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -83,44 +83,35 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 		requester.GrantAudience(audience)
 	}
 
-	var accessToken, accessTokenSignature string
-	accessToken, accessTokenSignature, err = c.Strategy.AccessTokenStrategy().GenerateAccessToken(ctx, requester)
+	accessToken, accessTokenSignature, err := c.Strategy.AccessTokenStrategy().GenerateAccessToken(ctx, requester)
 	if err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
+		return errors.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	var refreshToken, refreshTokenSignature string
 	if c.canIssueRefreshToken(ctx, requester) {
 		refreshToken, refreshTokenSignature, err = c.Strategy.RefreshTokenStrategy().GenerateRefreshToken(ctx, requester)
 		if err != nil {
-			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
+			return errors.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 		}
 	}
 
-	ctx, err = fosite.MaybeBeginTx(ctx, c.Storage)
-	if err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	}
-	defer func() {
-		if err != nil {
-			if rollBackTxnErr := fosite.MaybeRollbackTx(ctx, c.Storage); rollBackTxnErr != nil {
-				err = errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebugf("error: %s; rollback error: %s", err, rollBackTxnErr))
+	err = c.Storage.Transaction(ctx, func(ctx context.Context) error {
+		if err := c.Storage.DeviceAuthStorage().InvalidateDeviceCodeSession(ctx, signature); err != nil {
+			return err
+		}
+		if err := c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
+			return err
+		}
+		if refreshTokenSignature != "" {
+			if err := c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshTokenSignature, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
+				return err
 			}
 		}
-	}()
-
-	if err = c.Storage.DeviceAuthStorage().InvalidateDeviceCodeSession(ctx, signature); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	}
-
-	if err = c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	}
-
-	if refreshTokenSignature != "" {
-		if err = c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshTokenSignature, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
-			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-		}
+		return nil
+	})
+	if err != nil {
+		return errors.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	lifeSpan := fosite.GetEffectiveLifespan(requester.GetClient(), c.getGrantType(requester), fosite.AccessToken, c.Config.GetAccessTokenLifespan(ctx))
@@ -130,10 +121,6 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 	responder.SetScopes(requester.GetGrantedScopes())
 	if refreshToken != "" {
 		responder.SetExtra("refresh_token", refreshToken)
-	}
-
-	if err = fosite.MaybeCommitTx(ctx, c.Storage); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	return nil

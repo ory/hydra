@@ -357,6 +357,18 @@ func (p *Provider) Set(key string, value interface{}) error {
 	return nil
 }
 
+// ConfigFiles returns all config file paths configured on this provider,
+// including paths set via WithConfigFiles and via the --config flag.
+func (p *Provider) ConfigFiles() []string {
+	paths := make([]string, len(p.files))
+	copy(paths, p.files)
+	if p.flags != nil {
+		flagPaths, _ := p.flags.GetStringSlice(FlagConfig)
+		paths = append(paths, flagPaths...)
+	}
+	return paths
+}
+
 func (p *Provider) BoolF(key string, fallback bool) bool {
 	p.l.RLock()
 	defer p.l.RUnlock()
@@ -471,7 +483,7 @@ func (p *Provider) TracingConfig(serviceName string) *otelx.Config {
 			Jaeger: otelx.JaegerConfig{
 				Sampling: otelx.JaegerSampling{
 					ServerURL:    p.String("tracing.providers.jaeger.sampling.server_url"),
-					TraceIdRatio: p.Float64F("tracing.providers.jaeger.sampling.trace_id_ratio", 1),
+					TraceIDRatio: p.Float64F("tracing.providers.jaeger.sampling.trace_id_ratio", 1),
 				},
 				LocalAgentAddress: p.String("tracing.providers.jaeger.local_agent_address"),
 			},

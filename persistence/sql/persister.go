@@ -5,11 +5,9 @@ package sql
 
 import (
 	"context"
-	"database/sql"
 	"reflect"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
@@ -29,17 +27,10 @@ import (
 
 var (
 	_ persistence.Persister     = (*Persister)(nil)
-	_ fosite.Transactional      = (*Persister)(nil)
 	_ fosite.ClientManager      = (*Persister)(nil)
 	_ oauth2.AssertionJWTReader = (*Persister)(nil)
 	_ x.FositeStorer            = (*Persister)(nil)
 )
-
-var ErrNoTransactionOpen = errors.New("There is no Transaction in this context.")
-
-type skipCommitContextKey int
-
-const skipCommitKey skipCommitContextKey = 0
 
 type (
 	Persister struct {
@@ -53,8 +44,8 @@ type (
 		FlowCipher() *aead.XChaCha20Poly1305
 		Kratos() kratos.Client
 		contextx.Provider
-		x.RegistryLogger
-		x.TracingProvider
+		logrusx.Provider
+		otelx.Provider
 		config.Provider
 	}
 	BasePersister struct {
@@ -63,8 +54,8 @@ type (
 		d           baseDependencies
 	}
 	baseDependencies interface {
-		x.RegistryLogger
-		x.TracingProvider
+		logrusx.Provider
+		otelx.Provider
 		contextx.Provider
 		config.Provider
 		jwk.ManagerProvider
@@ -130,7 +121,7 @@ func (p *BasePersister) Ping(ctx context.Context) error { return p.c.Store.SQLDB
 func (p *BasePersister) mustSetNetwork(ctx context.Context, v interface{}) {
 	rv := reflect.ValueOf(v)
 
-	if rv.Kind() != reflect.Ptr || (rv.Kind() == reflect.Ptr && rv.Elem().Kind() != reflect.Struct) {
+	if rv.Kind() != reflect.Pointer || (rv.Kind() == reflect.Pointer && rv.Elem().Kind() != reflect.Struct) {
 		panic("v must be a pointer to a struct")
 	}
 	nf := rv.Elem().FieldByName("NID")
@@ -142,63 +133,4 @@ func (p *BasePersister) mustSetNetwork(ctx context.Context, v interface{}) {
 
 func (p *BasePersister) Transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
 	return popx.Transaction(ctx, p.c, f)
-}
-
-// BeginTX implements Transactional.
-func (p *BasePersister) BeginTX(ctx context.Context) (_ context.Context, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
-	defer otelx.End(span, &err)
-
-	fallback := &pop.Connection{TX: &pop.Tx{}}
-	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
-		return context.WithValue(ctx, skipCommitKey, true), nil // no-op
-	}
-
-	tx, err := p.c.Store.TransactionContextOptions(ctx, &sql.TxOptions{
-		Isolation: sql.LevelRepeatableRead,
-		ReadOnly:  false,
-	})
-	c := &pop.Connection{
-		TX:      tx,
-		Store:   tx,
-		ID:      uuid.Must(uuid.NewV4()).String(),
-		Dialect: p.c.Dialect,
-	}
-	return popx.WithTransaction(ctx, c), err
-}
-
-// Commit implements Transactional.
-func (p *BasePersister) Commit(ctx context.Context) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
-	defer otelx.End(span, &err)
-
-	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
-		return nil // we skipped BeginTX, so we also skip Commit
-	}
-
-	fallback := &pop.Connection{TX: &pop.Tx{}}
-	tx := popx.GetConnection(ctx, fallback)
-	if tx.TX == fallback.TX || tx.TX == nil {
-		return errors.WithStack(ErrNoTransactionOpen)
-	}
-
-	return errors.WithStack(tx.TX.Commit())
-}
-
-// Rollback implements Transactional.
-func (p *BasePersister) Rollback(ctx context.Context) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
-	defer otelx.End(span, &err)
-
-	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
-		return nil // we skipped BeginTX, so we also skip Rollback
-	}
-
-	fallback := &pop.Connection{TX: &pop.Tx{}}
-	tx := popx.GetConnection(ctx, fallback)
-	if tx.TX == fallback.TX || tx.TX == nil {
-		return errors.WithStack(ErrNoTransactionOpen)
-	}
-
-	return errors.WithStack(tx.TX.Rollback())
 }

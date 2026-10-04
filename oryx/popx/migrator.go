@@ -5,21 +5,30 @@ package popx
 
 import (
 	"context"
+	"crypto/sha256"
+	"database/sql"
+	"database/sql/driver"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/gofrs/flock"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	moderncsqlite "modernc.org/sqlite"
 
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/cmdx"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
@@ -32,13 +41,85 @@ const (
 )
 
 func (mb *MigrationBox) shouldNotUseTransaction(m Migration) bool {
-	return m.Autocommit || mb.c.Dialect.Name() == "cockroach" || mb.c.Dialect.Name() == "mysql"
+	return m.Autocommit || mb.noTxDDL()
 }
 
 // Up runs pending "up" migrations and applies them to the database.
 func (mb *MigrationBox) Up(ctx context.Context) error {
 	_, err := mb.UpTo(ctx, 0)
 	return errors.WithStack(err)
+}
+
+// sqliteTemplatePath computes the path of the SQLite template for this
+// migration set. The path is deterministic and content-addressed, so a changed
+// migration set cannot reuse an older template.
+func (mb *MigrationBox) sqliteTemplatePath() string {
+	mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name(), mb.migrationFallbacks()...)
+	h := sha256.New()
+	for _, mi := range mfs {
+		for _, part := range []string{
+			mi.Version,
+			mi.Path,
+			mi.Name,
+			mi.Direction,
+			mi.Type,
+			mi.DBType,
+			mi.Content,
+		} {
+			_, _ = h.Write([]byte(part))
+			_, _ = h.Write([]byte{0})
+		}
+	}
+	dir := mb.sqliteTemplateCacheDir
+	if dir == "" {
+		dir = os.TempDir()
+	}
+	return filepath.Join(dir, "ory-popx-sqlite-template-"+hex.EncodeToString(h.Sum(nil))+".sqlite")
+}
+
+// restoreSQLiteOnline streams the contents of srcPath into the database
+// represented by db using SQLite's online backup API. The destination
+// connection stays open throughout, so the *sql.DB and any pop.Connection
+// holding it remain valid.
+//
+// pop wraps the modernc.org/sqlite driver with otelsql for tracing; we
+// unwrap via the otelsql Raw() accessor before reaching the driver-specific
+// NewRestore method on the underlying *sqlite.conn.
+func restoreSQLiteOnline(ctx context.Context, db *sql.DB, srcPath string) error {
+	conn, err := db.Conn(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to acquire sql.Conn for restore")
+	}
+	defer func() { _ = conn.Close() }()
+
+	return conn.Raw(func(driverConn any) error {
+		if w, ok := driverConn.(interface{ Raw() driver.Conn }); ok {
+			driverConn = w.Raw()
+		}
+		restorer, ok := driverConn.(interface {
+			NewRestore(srcUri string) (*moderncsqlite.Backup, error)
+		})
+		if !ok {
+			return errors.Errorf("driver %T does not support online restore", driverConn)
+		}
+		// See: https://sqlite.org/backup.html .
+		backup, err := restorer.NewRestore(srcPath)
+		if err != nil {
+			return errors.Wrap(err, "NewRestore failed")
+		}
+		// Step(-1) copies all remaining pages in one call.
+		for {
+			more, stepErr := backup.Step(-1)
+			if stepErr != nil {
+				_ = backup.Finish()
+				return errors.Wrap(stepErr, "backup.Step failed")
+			}
+			if !more {
+				break
+			}
+		}
+		return errors.Wrap(backup.Finish(), "backup.Finish failed")
+	})
 }
 
 // UpTo runs up to step "up" migrations and applies them to the database.
@@ -48,9 +129,66 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 	defer otelx.End(span, &err)
 
 	c := mb.c.WithContext(ctx)
+
+	newDbFileName, isOnDiskSQLite := sqliteFilePath(mb.c.URL())
+	isSQLite := mb.c.Dialect.Name() == "sqlite3"
+	isOnDiskSQLite = isSQLite && isOnDiskSQLite
+
+	// For test SQLite databases, try to restore a pre-migrated template
+	// using SQLite's online backup API. The restore streams pages directly into
+	// the open connection, so mb.c stays valid throughout and any holders of
+	// it (including WithContext copies) keep working.
+	if testing.Testing() && isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase {
+		templatePath := mb.sqliteTemplatePath()
+		// Only restore onto a fresh (uninitialized) database. If the
+		// migration table already exists, migrations were previously applied
+		// — either directly or via an earlier template restore.
+		mtn := sanitizedMigrationTableName(mb.c)
+		var existingTableCount int
+		alreadyMigrated := mb.c.Store.SQLDB().QueryRow(
+			"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?", mtn,
+		).Scan(&existingTableCount) == nil && existingTableCount > 0
+		if !alreadyMigrated {
+			if mkdirErr := os.MkdirAll(filepath.Dir(templatePath), 0o750); mkdirErr != nil {
+				mb.l.Errorf("Failed to create SQLite template cache directory, applying migrations: path=%s err=%v", filepath.Dir(templatePath), mkdirErr)
+			} else {
+				// Test packages run as separate processes. Serialize the first
+				// template build so only one of them pays the migration cost;
+				// waiters restore the completed template after acquiring the
+				// lock. The template itself is still installed atomically.
+				lock := flock.New(templatePath + ".lock")
+				if lockErr := lock.Lock(); lockErr != nil {
+					mb.l.Errorf("Failed to lock SQLite template, applying migrations: path=%s err=%v", templatePath, lockErr)
+				} else {
+					defer func() {
+						if unlockErr := lock.Unlock(); unlockErr != nil {
+							mb.l.Errorf("Failed to unlock SQLite template: path=%s err=%v", templatePath, unlockErr)
+						}
+					}()
+				}
+			}
+
+			if _, statErr := os.Stat(templatePath); statErr == nil {
+				if restoreErr := restoreSQLiteOnline(ctx, mb.c.Store.SQLDB(), templatePath); restoreErr != nil {
+					// Restore failed; log and fall through to the normal migration path.
+					mb.l.Errorf("Failed to restore SQLite template, applying migrations: src=%s dst=%s err=%v", templatePath, newDbFileName, restoreErr)
+				} else {
+					mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name(), mb.migrationFallbacks()...)
+					mb.l.Infof("Skipped applying %d migrations using SQLite template: path=%s", len(mfs), templatePath)
+					return len(mfs), nil
+				}
+			} else if !errors.Is(statErr, os.ErrNotExist) {
+				mb.l.Errorf("Failed to inspect SQLite template, applying migrations: path=%s err=%v", templatePath, statErr)
+			}
+		}
+	}
+
+	// Keep applied across whole-run retry attempts. Every migration counted here
+	// has already committed its schema_migration row, so it remains part of this
+	// UpTo call's step budget even when a later migration retries.
 	err = mb.exec(ctx, func() error {
 		mtn := sanitizedMigrationTableName(c)
-		mfs := mb.migrationsUp.sortAndFilter(c.Dialect.Name())
+		mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name(), mb.migrationFallbacks()...)
 		for _, mi := range mfs {
 			l := mb.l.WithField("version", mi.Version).WithField("migration_name", mi.Name).WithField("migration_file", mi.Path)
 
@@ -133,6 +271,55 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 		} else {
 			mb.l.Infof("Successfully applied %d migrations.", applied)
 		}
+
+		// Save a SQLite template after applying all migrations (not for
+		// partial step runs) so future test runs can skip migrations.
+		//
+		// Only save when at least one migration was applied. Saving when
+		// applied == 0 either captures an empty DB or an already-migrated
+		// one that may contain test data inserted by an earlier registry
+		// (e.g. the Hydra janitor reuses the same DSN), which would
+		// pollute the shared template.
+		//
+		// Use VACUUM INTO to produce a clean, fully-checkpointed copy
+		// without a separate wal_checkpoint step. Write to a temp path
+		// unique to this test's database, then atomically rename to the
+		// shared template path. This prevents concurrent saves from
+		// multiple parallel tests from corrupting the template:
+		// os.Rename is atomic on the same filesystem, so the last writer
+		// wins with valid content and no reader ever sees a partial file.
+		if isOnDiskSQLite && step <= 0 && !mb.disableGoldenDatabase && applied > 0 {
+			templatePath := mb.sqliteTemplatePath()
+			tmp, err := os.CreateTemp(filepath.Dir(templatePath), ".sqlite-template-*.sqlite")
+			if err != nil {
+				mb.l.Errorf("Failed to allocate SQLite template file: err=%v", err)
+				return nil
+			}
+			tmpPath := tmp.Name()
+			if closeErr := tmp.Close(); closeErr != nil {
+				_ = os.Remove(tmpPath)
+				mb.l.Errorf("Failed to close SQLite template file: err=%v", closeErr)
+				return nil
+			}
+			// VACUUM INTO requires that the destination does not exist.
+			if removeErr := os.Remove(tmpPath); removeErr != nil {
+				mb.l.Errorf("Failed to prepare SQLite template file: err=%v", removeErr)
+				return nil
+			}
+			defer func() { _ = os.Remove(tmpPath) }()
+			// #nosec G201 - tmpPath is under os.TempDir() with a
+			// hex-hash filename, never derived from user input.
+			vacuumSQL := fmt.Sprintf("VACUUM INTO '%s'", strings.ReplaceAll(tmpPath, "'", "''"))
+			if err := mb.c.RawQuery(vacuumSQL).Exec(); err != nil {
+				mb.l.Errorf("Failed to create SQLite template copy: err=%v", err)
+			} else if err := os.Rename(tmpPath, templatePath); err != nil {
+				_ = os.Remove(tmpPath)
+				mb.l.Errorf("Failed to install SQLite template: src=%s dst=%s err=%v", tmpPath, templatePath, err)
+			} else {
+				mfs := mb.migrationsUp.sortAndFilter(mb.c.Dialect.Name(), mb.migrationFallbacks()...)
+				mb.l.Infof("SQLite template saved, subsequent test runs will skip %d migrations: path=%s", len(mfs), templatePath)
+			}
+		}
 		return nil
 	})
 	return applied, errors.WithStack(err)
@@ -148,6 +335,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 	if steps <= 0 {
 		steps = math.MaxInt
 	}
+	remainingSteps := steps
 
 	c := mb.c.WithContext(ctx)
 	return errors.WithStack(mb.exec(ctx, func() (err error) {
@@ -156,9 +344,9 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 		if err != nil {
 			return errors.Wrap(err, "migration down: unable count existing migration")
 		}
-		steps = min(steps, count)
+		attemptSteps := min(remainingSteps, count)
 
-		mfs := mb.migrationsDown.sortAndFilter(c.Dialect.Name())
+		mfs := mb.migrationsDown.sortAndFilter(mb.c.Dialect.Name(), mb.migrationFallbacks()...)
 		slices.Reverse(mfs)
 		if len(mfs) > count {
 			// skip all migrations that were not yet applied
@@ -167,14 +355,14 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 
 		reverted := 0
 		defer func() {
-			migrationsToRevertCount := min(steps, len(mfs))
+			migrationsToRevertCount := min(attemptSteps, len(mfs))
 			mb.l.Debugf("Successfully reverted %d/%d migrations.", reverted, migrationsToRevertCount)
 			if err != nil {
 				mb.l.WithError(err).Error("Problem reverting migrations.")
 			}
 		}()
 		for i, mi := range mfs {
-			if i >= steps {
+			if i >= attemptSteps {
 				break
 			}
 			l := mb.l.WithField("version", mi.Version).WithField("migration_name", mi.Name).WithField("migration_file", mi.Path)
@@ -232,6 +420,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 
 			l.Infof("%s applied successfully", mi.Name)
 			reverted++
+			remainingSteps--
 		}
 		return nil
 	}))
@@ -293,7 +482,7 @@ func (mb *MigrationBox) isolatedTransaction(ctx context.Context, direction strin
 
 	if mb.perMigrationTimeout > 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, mb.perMigrationTimeout)
+		ctx, cancel = context.WithTimeoutCause(ctx, mb.perMigrationTimeout, errors.Errorf("failed to run all SQL migrations: direction=%s timeout=%s", direction, mb.perMigrationTimeout))
 		defer cancel()
 	}
 
@@ -305,8 +494,9 @@ func (mb *MigrationBox) isolatedTransaction(ctx context.Context, direction strin
 func (mb *MigrationBox) createMigrationStatusTableTransaction(ctx context.Context, transactions ...[]string) error {
 	for _, statements := range transactions {
 		// CockroachDB does not support transactional schema changes, so we have to run
-		// the statements outside of a transaction.
-		if mb.c.Dialect.Name() == "cockroach" || mb.c.Dialect.Name() == "mysql" {
+		// the statements outside of a transaction. The same applies to any dialect
+		// that opts into autocommit DDL (see noTxDDL).
+		if mb.noTxDDL() {
 			for _, statement := range statements {
 				if err := mb.c.WithContext(ctx).RawQuery(statement).Exec(); err != nil {
 					return errors.Wrapf(err, "unable to execute statement: %s", statement)
@@ -423,10 +613,12 @@ func (mb *MigrationBox) Status(ctx context.Context) (MigrationStatuses, error) {
 
 	con := mb.c.WithContext(ctx)
 
-	migrationsUp := mb.migrationsUp.sortAndFilter(con.Dialect.Name())
+	dialect := mb.c.Dialect.Name()
+	fallbacks := mb.migrationFallbacks()
+	migrationsUp := mb.migrationsUp.sortAndFilter(dialect, fallbacks...)
 
 	if len(migrationsUp) == 0 {
-		return nil, errors.Errorf("unable to find any migrations for dialect: %s", con.Dialect.Name())
+		return nil, errors.Errorf("unable to find any migrations for dialect: %s", dialect)
 	}
 
 	alreadyApplied := make([]string, 0, len(migrationsUp))
@@ -445,7 +637,7 @@ func (mb *MigrationBox) Status(ctx context.Context) (MigrationStatuses, error) {
 	statuses := make(MigrationStatuses, len(migrationsUp))
 	for k, mf := range migrationsUp {
 		downContent := "-- error: no down migration defined for this migration"
-		if mDown := mb.migrationsDown.find(mf.Version, con.Dialect.Name()); mDown != nil {
+		if mDown := mb.migrationsDown.find(mf.Version, dialect, fallbacks...); mDown != nil {
 			downContent = mDown.Content
 		}
 		statuses[k] = MigrationStatus{
@@ -471,7 +663,7 @@ func (mb *MigrationBox) Status(ctx context.Context) (MigrationStatuses, error) {
 func (mb *MigrationBox) DumpMigrationSchema(ctx context.Context) error {
 	c := mb.c.WithContext(ctx)
 	schema := "schema.sql"
-	f, err := os.Create(schema) //#nosec:G304) //#nosec:G304
+	f, err := os.Create(schema) //#nosec:G304
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -485,15 +677,6 @@ func (mb *MigrationBox) DumpMigrationSchema(ctx context.Context) error {
 
 func (mb *MigrationBox) exec(ctx context.Context, fn func() error) error {
 	now := time.Now()
-	defer func() {
-		if !mb.dumpMigrations {
-			return
-		}
-		err := mb.DumpMigrationSchema(ctx)
-		if err != nil {
-			mb.l.WithError(err).Error("Migrator: unable to dump schema")
-		}
-	}()
 	defer mb.printTimer(now)
 
 	err := mb.CreateSchemaMigrations(ctx)
@@ -507,9 +690,13 @@ func (mb *MigrationBox) exec(ctx context.Context, fn func() error) error {
 		}
 	}
 
-	if mb.c.Dialect.Name() == "cockroach" {
+	switch mb.c.Dialect.Name() {
+	case dbal.DriverCockroachDB, dbal.DriverYugabyteDB:
 		outer := fn
 		fn = func() error {
+			// CreateSchemaMigrations runs before this wrapper. YugabyteDB uses
+			// autocommit DDL, but its pgwire errors expose the same retryable
+			// SQLSTATEs that crdb.Execute classifies for whole-run retries.
 			return errors.WithStack(crdb.Execute(outer))
 		}
 	}

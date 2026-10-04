@@ -15,9 +15,10 @@ jobs:
           fetch-depth: 2
           repository: ory/hydra
           ref: master
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v6
         with:
-          go-version: "1.21"
+          check-latest: true
+          go-version-file: go.mod
       - name: Update fosite
         run: |
           go mod edit -replace github.com/ory/fosite=github.com/ory/fosite@${{ github.sha }}

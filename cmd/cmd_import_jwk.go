@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/cobra"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/v2/cmd/cli"
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
@@ -71,7 +70,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not decode key from `%s` to public nor private keys: %s; %s", src, privErr, pubErr)
 				}
 
-				key = cli.ToSDKFriendlyJSONWebKey(key, "", "")
+				key = ToSDKFriendlyJSONWebKey(key, "", "")
 
 				type jwk hydra.JsonWebKey // opt out of OpenAPI-generated UnmarshalJSON
 				var (
@@ -127,7 +126,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 				}
 			}
 
-			cmdx.PrintTable(cmd, &outputJSONWebKeyCollection{Set: set, Keys: imported})
+			cmdx.PrintTable(cmd, &outputJSONWebKeyCollection{Set: set, Keys: newOutputJsonWebKeys(set, imported)})
 			if len(failed) != 0 {
 				cmdx.PrintErrors(cmd, failed)
 				return cmdx.FailSilently(cmd)

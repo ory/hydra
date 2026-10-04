@@ -7,19 +7,19 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/gobwas/glob"
 	"github.com/rs/cors"
 
+	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/x/corsx"
+	"github.com/ory/x/logrusx"
 )
 
 func Middleware(
 	reg interface {
-		x.RegistryLogger
+		logrusx.Provider
 		oauth2.Registry
 		client.Registry
 	}) func(h http.Handler) http.Handler {
@@ -34,6 +34,8 @@ func Middleware(
 				return
 			}
 
+			legacyAllowInsecureOrigin := reg.Config().LegacyAllowInsecureOrigins(ctx)
+
 			alwaysAllow := len(opts.AllowedOrigins) == 0
 			patterns := make([]glob.Glob, 0, len(opts.AllowedOrigins))
 			for _, o := range opts.AllowedOrigins {
@@ -45,6 +47,12 @@ func Middleware(
 				// This way g := glob.Compile("http://**") g.Match("http://google.com") returns true.
 				if scheme, rest, found := strings.Cut(o, "://"); found && rest == "*" {
 					o = scheme + "://**"
+				} else if corsx.ClassifyOrigin(o).IsUnsafeWildcard() && !legacyAllowInsecureOrigin {
+					// Reject unbounded wildcards such as "https://*foo.com"; their
+					// "*" crosses the DNS-label boundary and would match an
+					// attacker-registrable host like "https://evilfoo.com".
+					reg.Logger().WithField("pattern", o).Warn("Ignoring CORS origin with an unbounded wildcard; use the labelled form \"https://*.example.com\".")
+					continue
 				}
 				g, err := glob.Compile(strings.ToLower(o), '.')
 				if err != nil {
@@ -123,6 +131,10 @@ func Middleware(
 						// This way g := glob.Compile("http://**") g.Match("http://google.com") returns true.
 						if scheme, rest, found := strings.Cut(o, "://"); found && rest == "*" {
 							o = scheme + "://**"
+						} else if corsx.ClassifyOrigin(o).IsUnsafeWildcard() && !legacyAllowInsecureOrigin {
+							// Skip unbounded wildcards such as "http://*foo.com",
+							// which would otherwise match "http://evilfoo.com".
+							continue
 						}
 
 						g, err := glob.Compile(strings.ToLower(o), '.')

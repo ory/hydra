@@ -26,7 +26,7 @@ We encourage all contributions. Before opening a pull request, read the
 
 ## Prerequisites
 
-You need Go 1.13+ with `GO111MODULE=on` and, for the test suites:
+You need Go 1.26+. For the test suites:
 
 - Docker and Docker Compose
 - Makefile
@@ -58,24 +58,24 @@ There are three types of tests:
 Short tests run fairly quickly and use SQLite in-memory.
 
 All tests run against a sqlite in-memory database, thus it is required to use
-the `-tags sqlite` build tag.
+the `` build tag.
 
 Run all short tests:
 
 ```shell
-go test -v -failfast -short -tags sqlite ./...
+go test -v -failfast -short  ./...
 ```
 
 Run short tests in a specific module:
 
 ```shell
-go test -v -failfast -short -tags sqlite ./client
+go test -v -failfast -short  ./client
 ```
 
 Run a specific test:
 
 ```shell
-go test -v -failfast -short -tags sqlite -run ^TestName$ ./...
+go test -v -failfast -short  -run ^TestName$ ./...
 ```
 
 ### Regular tests

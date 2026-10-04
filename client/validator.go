@@ -15,9 +15,10 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/httpx"
+
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/ipx"
 )
 
@@ -38,7 +39,7 @@ func isSupportedAuthTokenSigningAlg(alg string) bool {
 }
 
 type validatorRegistry interface {
-	x.HTTPClientProvider
+	httpx.ClientProvider
 	config.Provider
 }
 
@@ -75,16 +76,24 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if v.r.Config().ClientHTTPNoPrivateIPRanges() {
-		values := map[string]string{
-			"jwks_uri":               c.JSONWebKeysURI,
-			"backchannel_logout_uri": c.BackChannelLogoutURI,
+		values := map[string]string{}
+		if c.JSONWebKeysURI != "" {
+			values["jwks_uri"] = c.JSONWebKeysURI
+		}
+		if c.BackChannelLogoutURI != "" {
+			values["backchannel_logout_uri"] = c.BackChannelLogoutURI
+		}
+		if c.SectorIdentifierURI != "" {
+			values["sector_identifier_uri"] = c.SectorIdentifierURI
 		}
 
 		for k, v := range c.RequestURIs {
-			values[fmt.Sprintf("request_uris.%d", k)] = v
+			if v != "" {
+				values[fmt.Sprintf("request_uris.%d", k)] = v
+			}
 		}
 
-		if err := ipx.AreAllAssociatedIPsAllowed(values); err != nil {
+		if err := ipx.AreAllAssociatedIPsAllowed(ctx, values); err != nil {
 			return errors.WithStack(ErrInvalidClientMetadata.WithHintf("Client IP address is not allowed: %s", err))
 		}
 	}
@@ -220,7 +229,7 @@ func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) 
 		return errors.WithStack(ErrInvalidClientMetadata.WithHint(`"metadata" cannot be set for dynamic client registration`))
 	}
 	if c.AccessTokenStrategy != "" {
-		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own access token strategy."))
+		return errors.WithStack(herodot.ErrBadRequest().WithReasonf("It is not allowed to choose your own access token strategy."))
 	}
 	if c.SkipConsent {
 		return errors.WithStack(ErrInvalidRequest.WithDescription(`"skip_consent" cannot be set for dynamic client registration`))

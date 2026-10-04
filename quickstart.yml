@@ -3,7 +3,7 @@
 ###########################################################################
 #                                                                         #
 # If you have not yet read the tutorial, do so now:                       #
-#  https://www.ory.sh/docs/hydra/5min-tutorial                            #
+#  https://www.ory.com/docs/hydra/5min-tutorial                            #
 #                                                                         #
 # This set up is only for demonstration purposes. The login               #
 # endpoint can only be used if you follow the steps in the tutorial.      #
@@ -16,7 +16,7 @@ services:
       - hydra-sqlite:/mnt/sqlite
     command: "chmod -R 777 /mnt/sqlite"
   hydra:
-    image: oryd/hydra:v25.4.0
+    # image: oryd/hydra:v25.4.0
     build:
       context: .
       dockerfile: .docker/Dockerfile-local-build
@@ -35,12 +35,13 @@ services:
       - DSN=sqlite:///mnt/sqlite/db.sqlite?_fk=true&mode=rwc
     restart: unless-stopped
     depends_on:
-      - hydra-migrate
-      - sqlite
+      hydra-migrate:
+        condition: service_completed_successfully
     networks:
       - intranet
+    image: oryd/hydra:v26.2.0
   hydra-migrate:
-    image: oryd/hydra:v25.4.0
+    # image: oryd/hydra:v25.4.0
     build:
       context: .
       dockerfile: .docker/Dockerfile-local-build
@@ -57,11 +58,13 @@ services:
     networks:
       - intranet
     depends_on:
-      - sqlite
+      sqlite:
+        condition: service_completed_successfully
+    image: oryd/hydra:v26.2.0
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v25.4.0
+    image: oryd/hydra-login-consent-node:v26.2.0
     ports:
       - "3000:3000"
     restart: unless-stopped

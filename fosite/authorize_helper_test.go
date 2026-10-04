@@ -191,13 +191,13 @@ func TestDoesClientWhiteListRedirect(t *testing.T) {
 			isError: true,
 		},
 		{
-			client:  &fosite.DefaultClient{RedirectURIs: []string{"https://www.ory.sh/cb"}},
+			client:  &fosite.DefaultClient{RedirectURIs: []string{"https://www.ory.com/cb"}},
 			url:     "http://127.0.0.1:8080/cb",
 			isError: true,
 		},
 		{
 			client:  &fosite.DefaultClient{RedirectURIs: []string{"http://127.0.0.1:8080/cb"}},
-			url:     "https://www.ory.sh/cb",
+			url:     "https://www.ory.com/cb",
 			isError: true,
 		},
 		{

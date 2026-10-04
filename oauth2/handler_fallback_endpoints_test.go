@@ -17,7 +17,6 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/httprouterx"
-	"github.com/ory/x/prometheusx"
 )
 
 func TestHandlerConsent(t *testing.T) {
@@ -26,16 +25,15 @@ func TestHandlerConsent(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")))
 
 	h := oauth2.NewHandler(reg)
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	r := httprouterx.NewRouterAdminWithPrefix(metrics)
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	res, err := http.Get(ts.URL + oauth2.DefaultConsentPath)
+	res, err := testhelpers.NewTestClient(t).Get(ts.URL + oauth2.DefaultConsentPath)
 	assert.Nil(t, err)
-	defer res.Body.Close() //nolint:errcheck
+	defer func() { _ = res.Body.Close() }()
 
 	body, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)

@@ -35,9 +35,3 @@
   value:
     type: integer
     nullable: true
-- op: replace
-  path: "#/components/schemas/nullDuration"
-  value:
-    type: string
-    nullable: true
-    pattern: ^[0-9]+(ns|us|ms|s|m|h)$

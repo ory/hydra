@@ -36,18 +36,18 @@ type (
 	}
 	Nil struct{}
 
-	format string
+	Format string
 )
 
 const (
-	FormatQuiet       format = "quiet"
-	FormatTable       format = "table"
-	FormatJSON        format = "json"
-	FormatJSONPath    format = "jsonpath"
-	FormatJSONPointer format = "jsonpointer"
-	FormatJSONPretty  format = "json-pretty"
-	FormatYAML        format = "yaml"
-	FormatDefault     format = "default"
+	FormatQuiet       Format = "quiet"
+	FormatTable       Format = "table"
+	FormatJSON        Format = "json"
+	FormatJSONPath    Format = "jsonpath"
+	FormatJSONPointer Format = "jsonpointer"
+	FormatJSONPretty  Format = "json-pretty"
+	FormatYAML        Format = "yaml"
+	FormatDefault     Format = "default"
 
 	FlagFormat = "format"
 
@@ -62,6 +62,18 @@ func (Nil) Interface() interface{} {
 	return nil
 }
 
+type printOptions struct {
+	format string
+}
+
+type PrintOption func(*printOptions)
+
+func WithFormat(v string) PrintOption {
+	return func(o *printOptions) {
+		o.format = v
+	}
+}
+
 func PrintErrors(cmd *cobra.Command, errs map[string]error) {
 	for src, err := range errs {
 		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "%s: %s\n", src, err.Error())
@@ -69,27 +81,34 @@ func PrintErrors(cmd *cobra.Command, errs map[string]error) {
 }
 
 func PrintRow(cmd *cobra.Command, row TableRow) {
-	f := getFormat(cmd)
+	PrintRowf(cmd.OutOrStdout(), row, WithFormat(getFormatValue(cmd)))
+}
 
-	switch f {
+func PrintRowf(w io.Writer, row TableRow, opts ...PrintOption) {
+	o := &printOptions{}
+	for _, fn := range opts {
+		fn(o)
+	}
+
+	switch parseFormat(o.format) {
 	case FormatQuiet:
 		if idAble, ok := row.(interface{ ID() string }); ok {
-			_, _ = fmt.Fprintln(cmd.OutOrStdout(), idAble.ID())
+			_, _ = fmt.Fprintln(w, idAble.ID())
 			break
 		}
-		_, _ = fmt.Fprintln(cmd.OutOrStdout(), row.Columns()[0])
+		_, _ = fmt.Fprintln(w, row.Columns()[0])
 	case FormatJSON:
-		printJSON(cmd.OutOrStdout(), row.Interface(), false, "")
+		printJSON(w, row.Interface(), false, "")
 	case FormatYAML:
-		printYAML(cmd.OutOrStdout(), row.Interface())
+		printYAML(w, row.Interface())
 	case FormatJSONPretty:
-		printJSON(cmd.OutOrStdout(), row.Interface(), true, "")
+		printJSON(w, row.Interface(), true, "")
 	case FormatJSONPath:
-		printJSON(cmd.OutOrStdout(), row.Interface(), true, getPath(cmd))
+		printJSON(w, row.Interface(), true, getPath(o.format))
 	case FormatJSONPointer:
-		printJSON(cmd.OutOrStdout(), filterJSONPointer(cmd, row.Interface()), true, "")
+		printJSON(w, filterJSONPointer(o.format, row.Interface()), true, "")
 	case FormatTable, FormatDefault:
-		w := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 1, '\t', 0)
+		w := tabwriter.NewWriter(w, 0, 8, 1, '\t', 0)
 
 		fields := row.Columns()
 		for i, h := range row.Header() {
@@ -100,10 +119,7 @@ func PrintRow(cmd *cobra.Command, row TableRow) {
 	}
 }
 
-func filterJSONPointer(cmd *cobra.Command, data any) any {
-	f, err := cmd.Flags().GetString(FlagFormat)
-	// unexpected error
-	Must(err, "flag access error: %s", err)
+func filterJSONPointer(f string, data any) any {
 	_, jsonptr, found := strings.Cut(f, "=")
 	if !found {
 		_, _ = fmt.Fprintf(os.Stderr,
@@ -121,36 +137,43 @@ func filterJSONPointer(cmd *cobra.Command, data any) any {
 }
 
 func PrintTable(cmd *cobra.Command, table Table) {
-	f := getFormat(cmd)
+	PrintTablef(cmd.OutOrStdout(), table, WithFormat(getFormatValue(cmd)))
+}
 
-	switch f {
+func PrintTablef(w io.Writer, table Table, opts ...PrintOption) {
+	o := &printOptions{}
+	for _, fn := range opts {
+		fn(o)
+	}
+
+	switch parseFormat(o.format) {
 	case FormatQuiet:
 		if table.Len() == 0 {
-			fmt.Fprintln(cmd.OutOrStdout())
+			fmt.Fprintln(w)
 		}
 
 		if idAble, ok := table.(interface{ IDs() []string }); ok {
 			for _, row := range idAble.IDs() {
-				fmt.Fprintln(cmd.OutOrStdout(), row)
+				fmt.Fprintln(w, row)
 			}
 			break
 		}
 
 		for _, row := range table.Table() {
-			fmt.Fprintln(cmd.OutOrStdout(), row[0])
+			fmt.Fprintln(w, row[0])
 		}
 	case FormatJSON:
-		printJSON(cmd.OutOrStdout(), table.Interface(), false, "")
+		printJSON(w, table.Interface(), false, "")
 	case FormatJSONPretty:
-		printJSON(cmd.OutOrStdout(), table.Interface(), true, "")
+		printJSON(w, table.Interface(), true, "")
 	case FormatJSONPath:
-		printJSON(cmd.OutOrStdout(), table.Interface(), true, getPath(cmd))
+		printJSON(w, table.Interface(), true, getPath(o.format))
 	case FormatJSONPointer:
-		printJSON(cmd.OutOrStdout(), filterJSONPointer(cmd, table.Interface()), true, "")
+		printJSON(w, filterJSONPointer(o.format, table.Interface()), true, "")
 	case FormatYAML:
-		printYAML(cmd.OutOrStdout(), table.Interface())
+		printYAML(w, table.Interface())
 	default:
-		w := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 1, '\t', 0)
+		w := tabwriter.NewWriter(w, 0, 8, 1, '\t', 0)
 
 		for _, h := range table.Header() {
 			fmt.Fprintf(w, "%s\t", h)
@@ -168,40 +191,50 @@ func PrintTable(cmd *cobra.Command, table Table) {
 type interfacer interface{ Interface() interface{} }
 
 func PrintJSONAble(cmd *cobra.Command, d interface{ String() string }) {
-	var path string
+	PrintJSONAblef(cmd.OutOrStdout(), d, WithFormat(getFormatValue(cmd)))
+}
+
+func PrintJSONAblef(w io.Writer, d interface{ String() string }, opts ...PrintOption) {
 	if d == nil {
 		d = Nil{}
 	}
-	switch getFormat(cmd) {
+
+	o := &printOptions{}
+	for _, fn := range opts {
+		fn(o)
+	}
+
+	var path string
+	switch parseFormat(o.format) {
 	default:
-		_, _ = fmt.Fprint(cmd.OutOrStdout(), d.String())
+		_, _ = fmt.Fprint(w, d.String())
 	case FormatJSON:
 		var v interface{} = d
 		if i, ok := d.(interfacer); ok {
 			v = i
 		}
-		printJSON(cmd.OutOrStdout(), v, false, "")
+		printJSON(w, v, false, "")
 	case FormatJSONPath:
-		path = getPath(cmd)
+		path = getPath(o.format)
 		fallthrough
 	case FormatJSONPretty:
 		var v interface{} = d
 		if i, ok := d.(interfacer); ok {
 			v = i
 		}
-		printJSON(cmd.OutOrStdout(), v, true, path)
+		printJSON(w, v, true, path)
 	case FormatJSONPointer:
 		var v interface{} = d
 		if i, ok := d.(interfacer); ok {
 			v = i
 		}
-		printJSON(cmd.OutOrStdout(), filterJSONPointer(cmd, v), true, "")
+		printJSON(w, filterJSONPointer(o.format, v), true, "")
 	case FormatYAML:
 		var v interface{} = d
 		if i, ok := d.(interfacer); ok {
 			v = i
 		}
-		printYAML(cmd.OutOrStdout(), v)
+		printYAML(w, v)
 	}
 }
 
@@ -211,15 +244,19 @@ func getQuiet(cmd *cobra.Command) bool {
 	return q
 }
 
-func getFormat(cmd *cobra.Command) format {
+func getFormatValue(cmd *cobra.Command) string {
 	if getQuiet(cmd) {
-		return FormatQuiet
+		return string(FormatQuiet)
 	}
 
-	// ignore the error here as we use this function also when the flag might not be registered
 	f, _ := cmd.Flags().GetString(FlagFormat)
+	return f
+}
 
+func parseFormat(f string) Format {
 	switch {
+	case f == string(FormatQuiet):
+		return FormatQuiet
 	case f == string(FormatTable):
 		return FormatTable
 	case f == string(FormatJSON):
@@ -237,10 +274,7 @@ func getFormat(cmd *cobra.Command) format {
 	}
 }
 
-func getPath(cmd *cobra.Command) string {
-	f, err := cmd.Flags().GetString(FlagFormat)
-	// unexpected error
-	Must(err, "flag access error: %s", err)
+func getPath(f string) string {
 	_, path, found := strings.Cut(f, "=")
 	if !found {
 		_, _ = fmt.Fprintf(os.Stderr,
@@ -282,7 +316,7 @@ func RegisterJSONFormatFlags(flags *pflag.FlagSet) {
 
 func RegisterFormatFlags(flags *pflag.FlagSet) {
 	RegisterNoiseFlags(flags)
-	flags.String(FlagFormat, string(FormatDefault), fmt.Sprintf("Set the output format. One of %s, %s, %s, %s, %s and %s.", FormatTable, FormatJSON, FormatYAML, FormatJSONPretty, FormatJSONPath, FormatJSONPointer))
+	flags.String(FlagFormat, string(FormatTable), fmt.Sprintf("Set the output format. One of %s, %s, %s, %s, %s and %s.", FormatTable, FormatJSON, FormatYAML, FormatJSONPretty, FormatJSONPath, FormatJSONPointer))
 }
 
 func PrintOpenAPIError(cmd *cobra.Command, err error) error {

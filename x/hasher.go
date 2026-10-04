@@ -17,7 +17,7 @@ var _ fosite.Hasher = (*Hasher)(nil)
 
 // Hasher implements fosite.Hasher.
 type Hasher struct {
-	t      TracingProvider
+	t      otelx.Provider
 	c      config
 	bcrypt *hasherx.Bcrypt
 	pbkdf2 *hasherx.PBKDF2
@@ -30,7 +30,7 @@ type config interface {
 }
 
 // NewHasher returns a new BCrypt instance.
-func NewHasher(t TracingProvider, c config) *Hasher {
+func NewHasher(t otelx.Provider, c config) *Hasher {
 	return &Hasher{
 		t:      t,
 		c:      c,

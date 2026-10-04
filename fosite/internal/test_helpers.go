@@ -20,23 +20,19 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
-func ptr(d time.Duration) *time.Duration {
-	return &d
-}
-
 var TestLifespans fosite.ClientLifespanConfig = fosite.ClientLifespanConfig{
-	AuthorizationCodeGrantAccessTokenLifespan:  ptr(31 * time.Hour),
-	AuthorizationCodeGrantIDTokenLifespan:      ptr(32 * time.Hour),
-	AuthorizationCodeGrantRefreshTokenLifespan: ptr(33 * time.Hour),
-	ClientCredentialsGrantAccessTokenLifespan:  ptr(34 * time.Hour),
-	ImplicitGrantAccessTokenLifespan:           ptr(35 * time.Hour),
-	ImplicitGrantIDTokenLifespan:               ptr(36 * time.Hour),
-	JwtBearerGrantAccessTokenLifespan:          ptr(37 * time.Hour),
-	PasswordGrantAccessTokenLifespan:           ptr(38 * time.Hour),
-	PasswordGrantRefreshTokenLifespan:          ptr(39 * time.Hour),
-	RefreshTokenGrantIDTokenLifespan:           ptr(40 * time.Hour),
-	RefreshTokenGrantAccessTokenLifespan:       ptr(41 * time.Hour),
-	RefreshTokenGrantRefreshTokenLifespan:      ptr(42 * time.Hour),
+	AuthorizationCodeGrantAccessTokenLifespan:  new(31 * time.Hour),
+	AuthorizationCodeGrantIDTokenLifespan:      new(32 * time.Hour),
+	AuthorizationCodeGrantRefreshTokenLifespan: new(33 * time.Hour),
+	ClientCredentialsGrantAccessTokenLifespan:  new(34 * time.Hour),
+	ImplicitGrantAccessTokenLifespan:           new(35 * time.Hour),
+	ImplicitGrantIDTokenLifespan:               new(36 * time.Hour),
+	JwtBearerGrantAccessTokenLifespan:          new(37 * time.Hour),
+	PasswordGrantAccessTokenLifespan:           new(38 * time.Hour),
+	PasswordGrantRefreshTokenLifespan:          new(39 * time.Hour),
+	RefreshTokenGrantIDTokenLifespan:           new(40 * time.Hour),
+	RefreshTokenGrantAccessTokenLifespan:       new(41 * time.Hour),
+	RefreshTokenGrantRefreshTokenLifespan:      new(42 * time.Hour),
 }
 
 func RequireEqualDuration(t *testing.T, expected time.Duration, actual time.Duration, precision time.Duration) {
@@ -78,7 +74,7 @@ func ParseFormPostResponse(t *testing.T, redirectURL string, resp io.Reader) (au
 	doc, err := html.Parse(resp)
 	require.NoError(t, err)
 
-	//doc>html>body
+	// doc>html>body
 	body := findBody(doc.FirstChild.FirstChild)
 	require.Equal(t, "body", body.Data)
 

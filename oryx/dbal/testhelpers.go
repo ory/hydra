@@ -1,3 +1,6 @@
+// Copyright © 2026 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package dbal
 
 import (
@@ -10,12 +13,12 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/fsx"
+	"github.com/ory/x/sqlcon/dockertest"
 )
 
 var hashDumpRegex = regexp.MustCompile(`-- migrations hash: ([^\n]+)\n`)

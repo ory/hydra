@@ -6,12 +6,16 @@ package fosite
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"time"
 
 	"github.com/dgraph-io/ristretto/v2"
 	"github.com/hashicorp/go-retryablehttp"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/otelx"
 
 	"github.com/go-jose/go-jose/v3"
 )
@@ -94,11 +98,21 @@ func JWKSFetcherWithHTTPClientSource(clientSourceFunc func(ctx context.Context) 
 // Resolve returns the JSON Web Key Set, or an error if something went wrong. The forceRefresh, if true, forces
 // the strategy to fetch the key from the remote. If forceRefresh is false, the strategy may use a caching strategy
 // to fetch the key.
-func (s *DefaultJWKSFetcherStrategy) Resolve(ctx context.Context, location string, ignoreCache bool) (*jose.JSONWebKeySet, error) {
+func (s *DefaultJWKSFetcherStrategy) Resolve(ctx context.Context, location string, ignoreCache bool) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/hydra/v2/fosite").Start(ctx, "DefaultJWKSFetcherStrategy.Resolve",
+		trace.WithAttributes(
+			attribute.String("location", location),
+			attribute.Bool("cache.ignore", ignoreCache),
+		))
+	defer otelx.End(span, &err)
+
 	cacheKey := defaultJWKSFetcherStrategyCachePrefix + location
 	key, ok := s.cache.Get(cacheKey)
+
+	span.SetAttributes(attribute.Bool("cache.hit", ok))
+
 	if !ok || ignoreCache {
-		req, err := retryablehttp.NewRequest("GET", location, nil)
+		req, err := retryablehttp.NewRequestWithContext(ctx, "GET", location, nil)
 		if err != nil {
 			return nil, errorsx.WithStack(ErrServerError.WithHintf("Unable to create HTTP 'GET' request to fetch  JSON Web Keys from location '%s'.", location).WithWrap(err).WithDebug(err.Error()))
 		}
@@ -108,13 +122,12 @@ func (s *DefaultJWKSFetcherStrategy) Resolve(ctx context.Context, location strin
 			hc = s.clientSourceFunc(ctx)
 		}
 
-		response, err := hc.Do(req.WithContext(ctx))
+		response, err := hc.Do(req)
 		if err != nil {
 			return nil, errorsx.WithStack(ErrServerError.WithHintf("Unable to fetch JSON Web Keys from location '%s'. Check for typos or other network issues.", location).WithWrap(err).WithDebug(err.Error()))
 		}
-		defer func() {
-			_ = response.Body.Close()
-		}()
+		defer func(Body io.Closer) { _ = Body.Close() }(response.Body)
+		response.Body = io.NopCloser(io.LimitReader(response.Body, 10*1024*1024)) // limit to 10MiB
 
 		if response.StatusCode < 200 || response.StatusCode >= 400 {
 			return nil, errorsx.WithStack(ErrServerError.WithHintf("Expected successful status code in range of 200 - 399 from location '%s' but received code %d.", location, response.StatusCode))

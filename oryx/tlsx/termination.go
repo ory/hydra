@@ -11,15 +11,15 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/negroni"
 
-	"github.com/ory/herodot"
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/prometheusx"
 )
 
 type dependencies interface {
 	logrusx.Provider
-	Writer() herodot.Writer
+	httpx.WriterProvider
 }
 
 // EnforceTLSRequests creates a middleware that enforces TLS for incoming HTTP requests.

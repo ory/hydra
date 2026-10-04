@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // hostCache caches DNS lookup results for hostnames to avoid repeated lookups.
@@ -106,7 +108,7 @@ func isPublicHostname(hostname string) bool {
 		return false
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeoutCause(context.Background(), 2*time.Second, errors.Errorf("failed to resolve DNS for %s within 2s", hostname))
 	defer cancel()
 
 	ips, err := net.DefaultResolver.LookupIPAddr(ctx, hostname)

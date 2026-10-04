@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -44,11 +45,11 @@ func (p *ConsentPersister) RevokeSubjectConsentSession(ctx context.Context, user
 	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ?", user))
 }
 
-func (p *ConsentPersister) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectClientConsentSession", trace.WithAttributes(attribute.String("client", client)))
+func (p *ConsentPersister) RevokeSubjectClientConsentSession(ctx context.Context, user, clientID string) (err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectClientConsentSession", trace.WithAttributes(attribute.String("client.id", clientID)))
 	defer otelx.End(span, &err)
 
-	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
+	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, clientID))
 }
 
 func (p *ConsentPersister) RevokeConsentSessionByID(ctx context.Context, consentRequestID string) (err error) {
@@ -112,21 +113,60 @@ func (p *ConsentPersister) revokeConsentSession(whereStmt string, whereArgs ...i
 	}
 }
 
+// RevokeSubjectLoginSessionBatchSize bounds how many login sessions a single
+// RevokeSubjectLoginSession DELETE removes per statement, so the ON DELETE SET
+// NULL cascade into hydra_oauth2_flow stays well under CockroachDB's
+// per-transaction intent budget (kv.transaction.max_intents_bytes). It is a var
+// (not a const) only so tests can lower it to exercise multi-batch behavior.
+var RevokeSubjectLoginSessionBatchSize = 100
+
 func (p *Persister) RevokeSubjectLoginSession(ctx context.Context, subject string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectLoginSession")
 	defer otelx.End(span, &err)
 
-	err = p.QueryWithNetwork(ctx).Where("subject = ?", subject).Delete(&flow.LoginSession{})
-	if err != nil {
-		return sqlcon.HandleError(err)
+	nid := p.NetworkID(ctx)
+	total := 0
+	batches := 0
+	for {
+		// Honor the caller's deadline/cancellation between batches. Already
+		// committed batches stay deleted; the caller can retry to finish.
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return errors.WithStack(ctxErr)
+		}
+
+		// The nested SELECT is required because our MySQL version does not
+		// support LIMIT in an IN/ANY subquery. This form is portable across all
+		// supported dialects; the inner SELECT is served by the (subject, nid)
+		// index. The outer DELETE repeats the nid filter as defense in depth so
+		// the network boundary is enforced on the delete target itself, matching
+		// QueryWithNetwork.
+		var deleted int
+		/* #nosec G201 - RevokeSubjectLoginSessionBatchSize is a package-level integer variable, not user input. */
+		deleted, err = p.Connection(ctx).RawQuery(
+			fmt.Sprintf(`DELETE FROM hydra_oauth2_authentication_session WHERE nid = ? AND id IN (
+				SELECT id FROM (
+					SELECT id FROM hydra_oauth2_authentication_session WHERE nid = ? AND subject = ? LIMIT %d
+				) AS s
+			)`, RevokeSubjectLoginSessionBatchSize),
+			nid, nid, subject,
+		).ExecWithCount()
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		total += deleted
+		batches++
+		p.l.Debugf("Revoking subject login sessions: %d deleted so far", total)
+
+		if deleted < RevokeSubjectLoginSessionBatchSize {
+			break // Last partial batch -> the subject is fully drained.
+		}
 	}
 
-	// This confuses people, see https://github.com/ory/hydra/issues/1168
-	//
-	// count, _ := rows.RowsAffected()
-	// if count == 0 {
-	// 	 return errors.WithStack(x.ErrNotFound)
-	// }
+	span.SetAttributes(
+		attribute.Int("rows_deleted", total),
+		attribute.Int("batches", batches),
+	)
 
 	return nil
 }
@@ -156,15 +196,15 @@ func (p *Persister) CreateForcedObfuscatedLoginSession(ctx context.Context, sess
 	})
 }
 
-func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (_ *consent.ForcedObfuscatedLoginSession, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetForcedObfuscatedLoginSession", trace.WithAttributes(attribute.String("client", client)))
+func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, clientID, obfuscated string) (_ *consent.ForcedObfuscatedLoginSession, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetForcedObfuscatedLoginSession", trace.WithAttributes(attribute.String("client.id", clientID)))
 	defer otelx.End(span, &err)
 
 	var s consent.ForcedObfuscatedLoginSession
 
 	if err := p.Connection(ctx).Where(
 		"client_id = ? AND subject_obfuscated = ? AND nid = ?",
-		client,
+		clientID,
 		obfuscated,
 		p.NetworkID(ctx),
 	).First(&s); errors.Is(err, sql.ErrNoRows) {
@@ -181,7 +221,7 @@ func (p *ConsentPersister) CreateConsentSession(ctx context.Context, f *flow.Flo
 	defer otelx.End(span, &err)
 
 	if f.NID != p.NetworkID(ctx) {
-		return errors.WithStack(sqlcon.ErrNoRows)
+		return errors.WithStack(sqlcon.ErrNoRows())
 	}
 	return sqlcon.HandleError(p.Connection(ctx).Create(f))
 }
@@ -272,10 +312,22 @@ func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (_ *
 			return err
 		}
 
-		return tx.RawQuery(
+		count, err := tx.RawQuery(
 			`DELETE FROM hydra_oauth2_authentication_session WHERE id = ? AND nid = ?`,
 			id, p.NetworkID(ctx),
-		).Exec()
+		).ExecWithCount()
+		if err != nil {
+			return err
+		}
+		if count == 0 {
+			// A concurrent transaction deleted the session between our
+			// consistent read above and this delete. Surface ErrNoRows so
+			// callers relying on the delete as an at-most-once gate (e.g.
+			// back-channel logout execution) treat this call as the loser,
+			// matching the DELETE ... RETURNING behavior on other dialects.
+			return sql.ErrNoRows
+		}
+		return nil
 	}); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -339,6 +391,8 @@ func applyTableNameWithIndexHint(conn *pop.Connection, table string, index strin
 	case "mysql":
 		return table + " USE INDEX(" + index + ")"
 	default:
+		// PostgreSQL and YugabyteDB do not accept these dialect-specific index
+		// hint syntaxes.
 		return table
 	}
 }
@@ -347,9 +401,12 @@ func (p *ConsentPersister) FindSubjectsGrantedConsentRequests(ctx context.Contex
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests")
 	defer otelx.End(span, &err)
 
-	paginator := keysetpagination.NewPaginator(append(pageOpts,
+	paginator, err := keysetpagination.NewPaginator(append(pageOpts,
 		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "login_challenge", Value: ""})),
 	)...)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var fs []flow.Flow
 	err = p.QueryWithNetwork(ctx).
@@ -374,9 +431,12 @@ func (p *ConsentPersister) FindSubjectsSessionGrantedConsentRequests(ctx context
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests", trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
-	paginator := keysetpagination.NewPaginator(append(pageOpts,
+	paginator, err := keysetpagination.NewPaginator(append(pageOpts,
 		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "login_challenge", Value: ""})),
 	)...)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var fs []flow.Flow
 	err = p.QueryWithNetwork(ctx).
@@ -398,128 +458,229 @@ func (p *ConsentPersister) FindSubjectsSessionGrantedConsentRequests(ctx context
 	return fs, nextPage, nil
 }
 
-func (p *ConsentPersister) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithFrontChannelLogout")
-	defer otelx.End(span, &err)
-
-	return p.listUserAuthenticatedClients(ctx, subject, sid, "front")
-}
-
-func (p *ConsentPersister) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithBackChannelLogout")
-	defer otelx.End(span, &err)
-
-	return p.listUserAuthenticatedClients(ctx, subject, sid, "back")
-}
-
-func (p *ConsentPersister) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) (cs []client.Client, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.listUserAuthenticatedClients",
+func (p *ConsentPersister) ListClientsWithLogoutURLsForSubjectAndSID(ctx context.Context, subject, sid string) (withFrontChannelURL, withBackChannelURL []client.Client, err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListClientsWithLogoutURLsForSubjectAndSID",
 		trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
-	conn := p.Connection(ctx)
-	columns := popx.DBColumns[client.Client](&popx.AliasQuoter{Alias: "c", Quoter: conn.Dialect})
+	defer func() {
+		span.SetAttributes(
+			attribute.Int("withFrontChannelURL", len(withFrontChannelURL)),
+			attribute.Int("withBackChannelURL", len(withBackChannelURL)))
+	}()
 
-	if err := conn.RawQuery(
-		/* #nosec G201 - channel can either be "front" or "back" */
-		fmt.Sprintf(`
-SELECT DISTINCT %s FROM hydra_client as c
-JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
-WHERE
-	f.subject = ? AND
-	c.%schannel_logout_uri != '' AND
-	c.%schannel_logout_uri IS NOT NULL AND
-	f.login_session_id = ? AND
-	f.nid = ? AND
-	c.nid = ?`,
-			columns,
-			channel,
-			channel,
-		),
-		subject,
-		sid,
-		p.NetworkID(ctx),
-		p.NetworkID(ctx),
-	).All(&cs); err != nil {
-		return nil, sqlcon.HandleError(err)
+	var (
+		cols                   = pop.NewModel(new(client.Client), ctx).Columns().Readable()
+		clientTable, flowTable = clientFlowTableNamesWithQueryHint(p.Connection(ctx).Dialect.Name())
+
+		q = fmt.Sprintf(`
+		SELECT %s FROM %s c
+		WHERE id IN (
+			SELECT client_id
+			FROM %s f
+			WHERE
+				f.nid = ?
+				AND f.login_session_id = ?
+				AND f.subject = ?
+		)
+		AND	c.nid = ?
+		AND (
+			c.frontchannel_logout_uri != '' OR c.backchannel_logout_uri != ''
+		)`,
+			cols.QuotedString(p.Connection(ctx).Dialect),
+			clientTable,
+			flowTable)
+
+		nid = p.NetworkID(ctx)
+		cs  []client.Client
+	)
+
+	err = p.Connection(ctx).RawQuery(q, nid, sid, subject, nid).All(&cs)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil, nil
+	}
+	if err != nil {
+		return nil, nil, sqlcon.HandleError(err)
 	}
 
-	return cs, nil
+	for _, c := range cs {
+		if c.FrontChannelLogoutURI != "" {
+			withFrontChannelURL = append(withFrontChannelURL, c)
+		}
+		if c.BackChannelLogoutURI != "" {
+			withBackChannelURL = append(withBackChannelURL, c)
+		}
+	}
+
+	return withFrontChannelURL, withBackChannelURL, nil
 }
 
-func (p *Persister) CreateLogoutRequest(ctx context.Context, request *flow.LogoutRequest) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLogoutRequest")
+func clientFlowTableNamesWithQueryHint(dialect string) (clientTable, flowTable string) {
+	switch dialect {
+	case "cockroach":
+		return "hydra_client@primary", "hydra_oauth2_flow@hydra_oauth2_flow_login_session_subject_idx"
+	default:
+		// PostgreSQL and YugabyteDB do not accept CockroachDB's @index syntax.
+		return "hydra_client", "hydra_oauth2_flow"
+	}
+}
+
+// logoutPayload is the wire format used when AEAD-encoding logout challenges
+// and verifiers. It carries internal fields that must not appear in the public
+// oAuth2LogoutRequest HTTP response (PostLogoutRedirectURI) and the network ID
+// used to enforce tenant isolation across the encrypted blob.
+type logoutPayload struct {
+	*flow.LogoutRequest
+	PostLogoutRedirectURI string    `json:"redir_url,omitempty"`
+	NID                   uuid.UUID `json:"nid"`
+}
+
+func newLogoutPayload(req *flow.LogoutRequest, nid uuid.UUID) *logoutPayload {
+	return &logoutPayload{
+		LogoutRequest:         req,
+		PostLogoutRedirectURI: req.PostLogoutRedirectURI,
+		NID:                   nid,
+	}
+}
+
+// ToLogoutRequest validates the payload's NID against currentNID and returns
+// the embedded LogoutRequest with PostLogoutRedirectURI restored. Returns
+// x.ErrNotFound if the NID does not match, mirroring how flow.decodeFlow
+// rejects cross-tenant challenges for login, consent, and device flows, and
+// ErrorLogoutFlowExpired if the embedded expiry has passed. Stateless blobs
+// cannot be revoked, so the expiry is their only time bound and every decode
+// path must enforce it.
+func (payload *logoutPayload) ToLogoutRequest(currentNID uuid.UUID) (*flow.LogoutRequest, error) {
+	if payload.NID != currentNID {
+		return nil, errors.WithStack(x.ErrNotFound.WithDescription("Network IDs are not matching."))
+	}
+	if payload.LogoutRequest == nil {
+		payload.LogoutRequest = &flow.LogoutRequest{}
+	}
+	if payload.ExpiresAt == nil || payload.ExpiresAt.Before(time.Now()) {
+		return nil, errors.WithStack(flow.ErrorLogoutFlowExpired)
+	}
+	payload.LogoutRequest.PostLogoutRedirectURI = payload.PostLogoutRedirectURI
+	return payload.LogoutRequest, nil
+}
+
+// looksLikeLegacyUUID reports whether s parses as a UUID. Before the
+// stateless logout flow shipped, logout challenges and verifiers were
+// generated via uuid.New() and stored in the hydra_oauth2_logout_request
+// table. During the rollout window — until any such legacy
+// challenge/verifier has aged past the configured logout request TTL — we
+// surface UUID-shaped inputs as "expired" so clients retry through their
+// normal logout-flow restart path, rather than as a generic decryption
+// failure.
+func looksLikeLegacyUUID(s string) bool {
+	_, err := uuid.FromString(s)
+	return err == nil
+}
+
+func (p *Persister) CreateLogoutChallenge(ctx context.Context, request *flow.LogoutRequest) (challenge string, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLogoutChallenge")
 	defer otelx.End(span, &err)
 
-	return errors.WithStack(p.CreateWithNetwork(ctx, request))
+	// The challenge IS the AEAD blob we're about to produce, so encoding it
+	// into the payload would be self-referential and bloat the size. Blank it
+	// before encoding; GetLogoutRequest will populate it again on decode.
+	request.Challenge = ""
+	challenge, err = flow.Encode(ctx, p.r.FlowCipher(), newLogoutPayload(request, p.NetworkID(ctx)), flow.AsLogoutChallenge)
+	if err != nil {
+		return "", errors.WithStack(fosite.ErrServerError.WithWrap(err).WithHintf("Failed to encrypt the logout challenge."))
+	}
+	return challenge, nil
 }
 
-func (p *Persister) AcceptLogoutRequest(ctx context.Context, challenge string) (_ *flow.LogoutRequest, err error) {
+func (p *Persister) AcceptLogoutRequest(ctx context.Context, challenge string) (verifier string, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AcceptLogoutRequest")
 	defer otelx.End(span, &err)
 
-	if err := p.Connection(ctx).RawQuery("UPDATE hydra_oauth2_logout_request SET accepted=true, rejected=false WHERE challenge=? AND nid = ?", challenge, p.NetworkID(ctx)).Exec(); err != nil {
-		return nil, sqlcon.HandleError(err)
+	payload, err := flow.Decode[logoutPayload](ctx, p.r.FlowCipher(), challenge, flow.AsLogoutChallenge)
+	if err != nil {
+		if looksLikeLegacyUUID(challenge) {
+			return "", errors.WithStack(flow.ErrorLogoutFlowExpired)
+		}
+		return "", errors.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout challenge."))
+	}
+	nid := p.NetworkID(ctx)
+	req, err := payload.ToLogoutRequest(nid)
+	if err != nil {
+		return "", err
+	}
+	// The verifier IS the AEAD blob we're about to produce. Avoid embedding the
+	// caller-provided challenge inside the verifier payload (self-referential
+	// and bloats size).
+	req.Challenge = ""
+	// The verifier is consumed machine-to-machine by the logout completion
+	// handler, which only needs the subject, session ID, RP flag, expiry, and
+	// post-logout redirect URI. Drop the client metadata and the original
+	// request URL (which can embed a full id_token_hint JWT) to keep the
+	// verifier — and thus the redirect URL it travels in — short.
+	req.Client = nil
+	req.RequestURL = ""
+
+	verifier, err = flow.Encode(ctx, p.r.FlowCipher(), newLogoutPayload(req, nid), flow.AsLogoutVerifier)
+	if err != nil {
+		return "", errors.WithStack(fosite.ErrServerError.WithWrap(err).WithHintf("Failed to encrypt the logout verifier."))
 	}
 
-	return p.GetLogoutRequest(ctx, challenge)
+	return verifier, nil
 }
 
 func (p *Persister) RejectLogoutRequest(ctx context.Context, challenge string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RejectLogoutRequest")
 	defer otelx.End(span, &err)
 
-	count, err := p.Connection(ctx).
-		RawQuery("UPDATE hydra_oauth2_logout_request SET rejected=true, accepted=false WHERE challenge=? AND nid = ?", challenge, p.NetworkID(ctx)).
-		ExecWithCount()
-	if count == 0 {
-		return errors.WithStack(x.ErrNotFound)
-	} else {
-		return errors.WithStack(err)
+	payload, err := flow.Decode[logoutPayload](ctx, p.r.FlowCipher(), challenge, flow.AsLogoutChallenge)
+	if err != nil {
+		if looksLikeLegacyUUID(challenge) {
+			return errors.WithStack(flow.ErrorLogoutFlowExpired)
+		}
+		return errors.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout challenge."))
 	}
+	if _, err := payload.ToLogoutRequest(p.NetworkID(ctx)); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Persister) GetLogoutRequest(ctx context.Context, challenge string) (_ *flow.LogoutRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLogoutRequest")
 	defer otelx.End(span, &err)
 
-	var lr flow.LogoutRequest
-	return &lr, sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("challenge = ? AND rejected = FALSE", challenge).First(&lr))
+	payload, err := flow.Decode[logoutPayload](ctx, p.r.FlowCipher(), challenge, flow.AsLogoutChallenge)
+	if err != nil {
+		if looksLikeLegacyUUID(challenge) {
+			return nil, errors.WithStack(flow.ErrorLogoutFlowExpired)
+		}
+		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout challenge."))
+	}
+	req, err := payload.ToLogoutRequest(p.NetworkID(ctx))
+	if err != nil {
+		return nil, err
+	}
+	req.Challenge = challenge
+	return req, nil
 }
 
 func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (_ *flow.LogoutRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLogoutRequest")
 	defer otelx.End(span, &err)
 
-	var lr flow.LogoutRequest
-	if count, err := p.Connection(ctx).RawQuery(`
-UPDATE hydra_oauth2_logout_request
-  SET was_used = TRUE
-WHERE nid = ?
-  AND verifier = ?
-  AND accepted = TRUE
-  AND rejected = FALSE`,
-		p.NetworkID(ctx),
-		verifier,
-	).ExecWithCount(); count == 0 && err == nil {
-		return nil, errors.WithStack(x.ErrNotFound)
-	} else if err != nil {
-		return nil, sqlcon.HandleError(err)
+	payload, err := flow.Decode[logoutPayload](ctx, p.r.FlowCipher(), verifier, flow.AsLogoutVerifier)
+	if err != nil {
+		if looksLikeLegacyUUID(verifier) {
+			return nil, errors.WithStack(flow.ErrorLogoutFlowExpired)
+		}
+		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout verifier."))
 	}
-
-	err = sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("verifier = ?", verifier).First(&lr))
+	lr, err := payload.ToLogoutRequest(p.NetworkID(ctx))
 	if err != nil {
 		return nil, err
 	}
 
-	if expiry := time.Time(lr.ExpiresAt);
-	// If the expiry is unset, we are in a legacy use case (allow logout).
-	// TODO: Remove this in the future.
-	!expiry.IsZero() && expiry.Before(time.Now().UTC()) {
-		return nil, errors.WithStack(flow.ErrorLogoutFlowExpired)
-	}
-
-	return &lr, nil
+	return lr, nil
 }
 
 func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit, batchSize int) (err error) {
@@ -583,7 +744,7 @@ func (p *Persister) mySQLConfirmLoginSession(ctx context.Context, session *flow.
 			return nil
 		}
 
-		if !errors.Is(err, sqlcon.ErrUniqueViolation) {
+		if !errors.Is(err, sqlcon.ErrUniqueViolation()) {
 			return err
 		}
 

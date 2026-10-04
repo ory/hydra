@@ -53,10 +53,10 @@ func TestClientCredentials_HandleTokenEndpointRequest(t *testing.T) {
 			mock: func() {
 				areq.EXPECT().GetGrantTypes().Return(fosite.Arguments{"client_credentials"})
 				areq.EXPECT().GetRequestedScopes().Return([]string{})
-				areq.EXPECT().GetRequestedAudience().Return([]string{"https://www.ory.sh/not-api"})
+				areq.EXPECT().GetRequestedAudience().Return([]string{"https://www.ory.com/not-api"})
 				areq.EXPECT().GetClient().Return(&fosite.DefaultClient{
 					GrantTypes: fosite.Arguments{"client_credentials"},
-					Audience:   []string{"https://www.ory.sh/api"},
+					Audience:   []string{"https://www.ory.com/api"},
 				})
 			},
 		},

@@ -17,7 +17,7 @@ import (
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/x/pointerx"
+
 	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/sqlxx"
 )
@@ -78,7 +78,7 @@ func TestEncoding(t *testing.T) {
 		GrantedScope:       []string{"scope1", "scope2"},
 		GrantedAudience:    []string{"https://api.example.org/v1", "https://api.example.org/v2"},
 		ConsentRemember:    true,
-		ConsentRememberFor: pointerx.Int(3600),
+		ConsentRememberFor: new(3600),
 		ConsentHandledAt:   sqlxx.NullTime(time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)),
 		SessionIDToken: sqlxx.MapStringInterface{
 			"session-id-token-key1": "val1",
@@ -134,6 +134,8 @@ func TestEncoding(t *testing.T) {
 			{"consent verifier decoded as consent challenge", flow.AsConsentVerifier, flow.AsConsentChallenge},
 			{"login challenge decoded as consent challenge", flow.AsLoginChallenge, flow.AsConsentChallenge},
 			{"consent challenge decoded as login challenge", flow.AsConsentChallenge, flow.AsLoginChallenge},
+			{"authorization code decoded as login challenge", flow.AsAuthorizeCode, flow.AsLoginChallenge},
+			{"login challenge decoded as authorization code", flow.AsLoginChallenge, flow.AsAuthorizeCode},
 		}
 
 		for _, tc := range testCases {

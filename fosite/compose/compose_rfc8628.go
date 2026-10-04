@@ -41,6 +41,7 @@ func RFC8628DeviceAuthorizationTokenFactory(config fosite.Configurator, storage 
 			oauth2.RefreshTokenStrategyProvider
 		}),
 		Storage: storage.(interface {
+			fosite.Transactional
 			rfc8628.DeviceAuthStorageProvider
 			oauth2.AccessTokenStorageProvider
 			oauth2.RefreshTokenStorageProvider

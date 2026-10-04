@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.TOKEN_PRIVILEGED }}
       - name: Milestone Documentation Generator
@@ -24,7 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           outputFile: docs/docs/milestones.md
       - name: Commit Milestone Documentation
-        uses: EndBug/add-and-commit@v9.1.4
+        uses: EndBug/add-and-commit@v10.0.0
         with:
           message: "autogen(docs): update milestone document"
           author_name: aeneasr

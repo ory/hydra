@@ -9,11 +9,11 @@ import (
 
 	"github.com/ory/x/clidoc"
 
-	"github.com/ory/hydra/v2/cmd"
+	"github.com/ory/hydra/v2/cmd/servercmd"
 )
 
 func main() {
-	if err := clidoc.Generate(cmd.NewRootCmd(), os.Args[1:]); err != nil {
+	if err := clidoc.Generate(servercmd.NewRootCmd(), os.Args[1:]); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%+v", err)
 		os.Exit(1)
 	}

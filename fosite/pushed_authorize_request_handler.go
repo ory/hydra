@@ -8,6 +8,7 @@ import (
 	"errors"
 	"net/http"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/hydra/v2/fosite/i18n"
@@ -24,7 +25,8 @@ const (
 
 // NewPushedAuthorizeRequest validates the request and produces an AuthorizeRequester object that can be stored
 func (f *Fosite) NewPushedAuthorizeRequest(ctx context.Context, r *http.Request) (_ AuthorizeRequester, err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/hydra/v2/fosite").Start(ctx, "Fosite.NewPushedAuthorizeRequest")
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/hydra/v2/fosite").Start(ctx, "Fosite.NewPushedAuthorizeRequest",
+		trace.WithAttributes(attribute.Bool("is_par_request", true)))
 	defer otelx.End(span, &err)
 
 	request := NewAuthorizeRequest()

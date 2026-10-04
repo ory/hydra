@@ -1,9 +1,12 @@
 export PATH 					:= .bin:${PATH}
 
+PRETTIER_VERSION=$(shell cat package.json | jq -r '.devDependencies["prettier"] // .dependencies["prettier"]')
+
 format: .bin/goimports .bin/ory node_modules  # formats the source code
 	.bin/ory dev headers copyright --type=open-source
 	.bin/goimports -w .
-	npm exec -- prettier --write .
+	@echo "Prettier Version: $(PRETTIER_VERSION)"
+	npx --package=prettier@$(PRETTIER_VERSION)  prettier . --write
 
 help:
 	@cat Makefile | grep '^[^ ]*:' | grep -v '^\.bin/' | grep -v '.SILENT:' | grep -v '^node_modules:' | grep -v help | sed 's/:.*#/#/' | column -s "#" -t

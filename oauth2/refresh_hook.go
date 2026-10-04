@@ -9,7 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/otelx"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fosite"
@@ -50,9 +51,14 @@ type RefreshTokenHookRequest struct {
 // RefreshTokenHook is an AccessRequestHook called for `refresh_token` grant type.
 func RefreshTokenHook(reg interface {
 	config.Provider
-	x.HTTPClientProvider
-}) AccessRequestHook {
-	return func(ctx context.Context, requester fosite.AccessRequester) error {
+	httpx.ClientProvider
+	otelx.Provider
+},
+) AccessRequestHook {
+	return func(ctx context.Context, requester fosite.AccessRequester) (err error) {
+		ctx, span := reg.Tracer(ctx).Tracer().Start(ctx, "oauth2.RefreshTokenHook")
+		defer otelx.End(span, &err)
+
 		hookConfig := reg.Config().TokenRefreshHookConfig(ctx)
 		if hookConfig == nil {
 			return nil

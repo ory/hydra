@@ -5,6 +5,7 @@ package popx
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ory/pop/v6"
 )
@@ -19,6 +20,7 @@ func IndexHint(conn *pop.Connection, table string, index string) string {
 	if conn.Dialect.Name() == "cockroach" {
 		return table + "@" + index
 	}
+	// PostgreSQL and YugabyteDB do not accept CockroachDB's @index syntax.
 	return table
 }
 
@@ -42,4 +44,17 @@ type (
 
 func (pq *AliasQuoter) Quote(key string) string {
 	return fmt.Sprintf("%s.%s", pq.Quoter.Quote(pq.Alias), pq.Quoter.Quote(key))
+}
+
+// Placeholders returns `num` placeholders ?, e.g. "?, ?, ?".
+// Placeholders(0) returns "".
+func Placeholders(num int) string {
+	switch num {
+	case 0:
+		return ""
+	case 1:
+		return "?"
+	default:
+		return strings.Repeat("?, ", num-1) + "?"
+	}
 }

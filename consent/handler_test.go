@@ -17,16 +17,14 @@ import (
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	. "github.com/ory/hydra/v2/consent"
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/ioutilx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/sqlxx"
-	"github.com/ory/x/uuidx"
 )
 
 func TestGetLogoutRequest(t *testing.T) {
@@ -35,10 +33,10 @@ func TestGetLogoutRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
-	defer ts.Close()
+	t.Cleanup(ts.Close)
 
 	cl := &client.Client{
 		ID:   "test client id",
@@ -47,17 +45,17 @@ func TestGetLogoutRequest(t *testing.T) {
 	require.NoError(t, reg.ClientManager().CreateClient(t.Context(), cl))
 
 	requestURL := "http://192.0.2.1"
+	expiresAt := time.Now().UTC().Add(time.Hour).Round(time.Second)
 
-	t.Run("unhandled logout request", func(t *testing.T) {
-		challenge := "test-challenge-unhandled"
-		require.NoError(t, reg.LogoutManager().CreateLogoutRequest(t.Context(), &flow.LogoutRequest{
+	t.Run("returns the logout request", func(t *testing.T) {
+		challenge, err := reg.LogoutManager().CreateLogoutChallenge(t.Context(), &flow.LogoutRequest{
 			Client:     cl,
-			ID:         challenge,
 			RequestURL: requestURL,
-			Verifier:   uuidx.NewV4().String(),
 			SessionID:  "test-session-id",
 			Subject:    "test-subject",
-		}))
+			ExpiresAt:  &expiresAt,
+		})
+		require.NoError(t, err)
 
 		resp, err := ts.Client().Get(ts.URL + "/admin" + LogoutPath + "?challenge=" + challenge)
 		require.NoError(t, err)
@@ -65,33 +63,52 @@ func TestGetLogoutRequest(t *testing.T) {
 
 		var result flow.LogoutRequest
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		assert.Equal(t, challenge, result.ID)
+		assert.Equal(t, challenge, result.Challenge)
 		assert.Equal(t, requestURL, result.RequestURL)
-	})
-
-	t.Run("handled logout request", func(t *testing.T) {
-		challenge := "test-challenge-handled"
-		require.NoError(t, reg.LogoutManager().CreateLogoutRequest(t.Context(), &flow.LogoutRequest{
-			Client:     cl,
-			ID:         challenge,
-			RequestURL: requestURL,
-			Verifier:   uuidx.NewV4().String(),
-			WasHandled: true,
-		}))
-
-		resp, err := ts.Client().Get(ts.URL + "/admin" + LogoutPath + "?challenge=" + challenge)
-		require.NoError(t, err)
-		require.EqualValues(t, http.StatusGone, resp.StatusCode)
-
-		var result flow.OAuth2RedirectTo
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		assert.Equal(t, requestURL, result.RedirectTo)
 	})
 
 	t.Run("unknown challenge", func(t *testing.T) {
 		resp, err := ts.Client().Get(ts.URL + "/admin" + LogoutPath + "?challenge=unknown-challenge")
 		require.NoError(t, err)
 		assert.EqualValuesf(t, http.StatusNotFound, resp.StatusCode, "%s", ioutilx.MustReadAll(resp.Body))
+	})
+
+	t.Run("challenge stays decodable after accept", func(t *testing.T) {
+		// In the stateless logout flow, single-use is enforced at the
+		// session-deletion layer in completeLogout, not at the handler. The
+		// logout challenge remains decodable after AcceptLogoutRequest is
+		// called, so a repeated GET on the admin endpoint still returns 200
+		// with the same payload.
+		challenge, err := reg.LogoutManager().CreateLogoutChallenge(t.Context(), &flow.LogoutRequest{
+			Client:     cl,
+			RequestURL: requestURL,
+			SessionID:  "test-session-id-reuse",
+			Subject:    "test-subject-reuse",
+			ExpiresAt:  &expiresAt,
+		})
+		require.NoError(t, err)
+
+		first, err := ts.Client().Get(ts.URL + "/admin" + LogoutPath + "?challenge=" + challenge)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusOK, first.StatusCode)
+
+		var firstResult flow.LogoutRequest
+		require.NoError(t, json.NewDecoder(first.Body).Decode(&firstResult))
+
+		// Accept the challenge and discard the verifier.
+		_, err = reg.LogoutManager().AcceptLogoutRequest(t.Context(), challenge)
+		require.NoError(t, err)
+
+		second, err := ts.Client().Get(ts.URL + "/admin" + LogoutPath + "?challenge=" + challenge)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusOK, second.StatusCode)
+
+		var secondResult flow.LogoutRequest
+		require.NoError(t, json.NewDecoder(second.Body).Decode(&secondResult))
+		assert.Equal(t, firstResult.Challenge, secondResult.Challenge)
+		assert.Equal(t, firstResult.Subject, secondResult.Subject)
+		assert.Equal(t, firstResult.SessionID, secondResult.SessionID)
+		assert.Equal(t, firstResult.RequestURL, secondResult.RequestURL)
 	})
 }
 
@@ -101,7 +118,7 @@ func TestGetLoginRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -168,7 +185,7 @@ func TestGetConsentRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -245,7 +262,7 @@ func TestAcceptLoginRequestDouble(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -286,7 +303,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewRouterAdminWithPrefix()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	t.Cleanup(ts.Close)

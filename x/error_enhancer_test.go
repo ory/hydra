@@ -24,11 +24,11 @@ func TestErrorEnhancer(t *testing.T) {
 		out string
 	}{
 		{
-			in:  sqlcon.ErrNoRows,
+			in:  sqlcon.ErrNoRows(),
 			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\"}",
 		},
 		{
-			in:  errors.WithStack(sqlcon.ErrNoRows),
+			in:  errors.WithStack(sqlcon.ErrNoRows()),
 			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\"}",
 		},
 		{

@@ -33,6 +33,7 @@ type Session struct {
 	ExcludeNotBeforeClaim  bool                   `json:"exclude_not_before_claim"`
 	AllowedTopLevelClaims  []string               `json:"allowed_top_level_claims"`
 	MirrorTopLevelClaims   bool                   `json:"mirror_top_level_claims"`
+	PreserveExtClaims      bool                   `json:"preserve_ext_claims"`
 }
 
 func NewTestSession(t testing.TB, subject string) *Session {
@@ -51,6 +52,7 @@ func NewSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, 
 		Extra:                 map[string]interface{}{},
 		AllowedTopLevelClaims: p.AllowedTopLevelClaims(ctx),
 		MirrorTopLevelClaims:  p.MirrorTopLevelClaims(ctx),
+		PreserveExtClaims:     p.PreserveExtClaims(ctx),
 		ExcludeNotBeforeClaim: p.ExcludeNotBeforeClaim(ctx),
 	}
 }
@@ -80,6 +82,17 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	// for every other claim that was already reserved and for mirroring, add original extra under "ext"
 	if s.MirrorTopLevelClaims {
 		topLevelExtraWithMirrorExt["ext"] = s.Extra
+	} else if s.PreserveExtClaims {
+		// include only claims that were not promoted to top level in ext
+		notTopLevel := make(map[string]interface{})
+		for k, v := range s.Extra {
+			if !slices.Contains(allowedClaimsFromConfigWithoutReserved, k) {
+				notTopLevel[k] = v
+			}
+		}
+		if len(notTopLevel) > 0 {
+			topLevelExtraWithMirrorExt["ext"] = notTopLevel
+		}
 	}
 
 	claims := &jwt.JWTClaims{

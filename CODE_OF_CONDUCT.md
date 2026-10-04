@@ -47,7 +47,7 @@ individual problems. If Ory open source software is used in production in a
 for-profit company or enterprise environment, we mandate a paid support contract
 where Ory is obligated under their service level agreements (SLAs) to offer a
 defined level of availability and responsibility. For more information about
-paid support please contact us at sales@ory.sh.
+paid support please contact us at sales@ory.com.
 
 ## Enforcement Responsibilities
 
@@ -73,7 +73,7 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-[office@ory.sh](mailto:office@ory.sh). All complaints will be reviewed and
+[office@ory.com](mailto:office@ory.com). All complaints will be reviewed and
 investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

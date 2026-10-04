@@ -21,7 +21,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
-	"github.com/ory/x/prometheusx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/urlx"
 )
 
@@ -37,7 +37,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var testServer *httptest.Server
 		{
 			reg := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
-			router := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
+			router := httprouterx.NewRouterPublic()
 			h := jwk.NewHandler(reg)
 			h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 				return h
@@ -52,7 +52,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		}
 		IDKS, _ := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
-		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
+		res, err := testhelpers.NewTestClient(t).Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
 		defer res.Body.Close() //nolint:errcheck
 
@@ -78,7 +78,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var testServer *httptest.Server
 		{
 			reg := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
-			router := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
+			router := httprouterx.NewRouterPublic()
 			h := jwk.NewHandler(reg)
 			h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 				return h
@@ -102,7 +102,7 @@ func TestHandlerWellKnown(t *testing.T) {
 			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		}
 
-		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
+		res, err := testhelpers.NewTestClient(t).Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
 		defer res.Body.Close() //nolint:errcheck
 

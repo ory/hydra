@@ -13,6 +13,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CGO_ENABLED: "0"
+
 jobs:
   oidc-conformity:
     name: Run OIDC conformity tests
@@ -26,7 +29,8 @@ jobs:
           fetch-depth: 2
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.25"
+          check-latest: true
+          go-version-file: go.mod
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
@@ -45,7 +49,7 @@ jobs:
         ports:
           - 5432:5432
       mysql:
-        image: mysql:9.4
+        image: mysql:9.6
         env:
           MYSQL_ROOT_PASSWORD: secret
         ports:
@@ -65,7 +69,8 @@ jobs:
           fetch-depth: 2
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.25"
+          check-latest: true
+          go-version-file: go.mod
       - run: go list -json > go.list
       - name: Run nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.3
@@ -78,11 +83,11 @@ jobs:
           GOGC: 100
         with:
           args: --timeout 10m0s
-          version: "v2.4.0"
+          version: latest
           only-new-issues: "true"
       - name: Run go tests
         run: |
-          go test -coverprofile coverage.out -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension ./...
+          go test -coverprofile coverage.out -failfast -timeout=20m ./...
       - name: Submit to Codecov
         run: |
           bash <(curl -s https://codecov.io/bash)
@@ -93,6 +98,7 @@ jobs:
     name: Run HSM tests
     runs-on: ubuntu-latest
     env:
+      CGO_ENABLED: "1"
       HSM_ENABLED: true
       HSM_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
       HSM_TOKEN_LABEL: hydra
@@ -101,7 +107,8 @@ jobs:
       - uses: ory/ci/checkout@master
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.25"
+          check-latest: true
+          go-version-file: go.mod
       - name: Setup HSM libs and packages
         run: |
           sudo apt install -y softhsm2 opensc
@@ -113,7 +120,7 @@ jobs:
       - name: HSM tests
         run: |
           pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra
-          go test -p 1 -failfast -short -timeout=20m -tags=sqlite,hsm ./...
+          go test -p 1 -failfast -short -timeout=20m -tags=hsm ./...
 
   test-e2e:
     name: Run end-to-end tests
@@ -132,7 +139,7 @@ jobs:
         ports:
           - 5432:5432
       mysql:
-        image: mysql:9.4
+        image: mysql:9.6
         env:
           MYSQL_ROOT_PASSWORD: test
         ports:
@@ -150,8 +157,9 @@ jobs:
       - uses: ory/ci/checkout@master
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.25"
-      - uses: actions/cache@v5
+          check-latest: true
+          go-version-file: go.mod
+      - uses: actions/cache@v6
         with:
           path: ./test/e2e/hydra
           key: ${{ runner.os }}-hydra

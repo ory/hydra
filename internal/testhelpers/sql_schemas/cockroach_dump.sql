@@ -1,4 +1,4 @@
--- migrations hash: 55b905a5cead652db5b4a5e317d60ad18bd9e6de61d4b43edcdb79244947fbf9b106783f10765f2ffa4d7952c745900c2406f522a101dbed17e5785396484e41
+-- migrations hash: 14de04dcdbd3e9b00922807be554550705bf44b836351e0eeffdac2871efff8c5cc087a08319b435d9a66cb6d9b16eed397a786833efa790956304dadc6229d8
 
 CREATE TABLE public.schema_migration (
 	version VARCHAR(48) NOT NULL,
@@ -70,6 +70,7 @@ CREATE TABLE public.hydra_client (
 	device_authorization_grant_id_token_lifespan INT8 NULL,
 	device_authorization_grant_access_token_lifespan INT8 NULL,
 	device_authorization_grant_refresh_token_lifespan INT8 NULL,
+	rotated_secrets JSONB NULL,
 	CONSTRAINT hydra_client_pkey PRIMARY KEY (id ASC, nid ASC),
 	UNIQUE INDEX hydra_client_id_key (id ASC, nid ASC),
 	UNIQUE INDEX hydra_client_pk_key (pk ASC)
@@ -181,7 +182,8 @@ CREATE TABLE public.hydra_oauth2_flow (
 	INDEX hydra_oauth2_flow_login_session_id_idx (login_session_id ASC, nid ASC),
 	INDEX hydra_oauth2_flow_sub_idx (subject ASC, nid ASC),
 	INDEX hydra_oauth2_flow_previous_consents_idx (subject ASC, client_id ASC, nid ASC, consent_skip ASC, consent_error ASC, consent_remember ASC),
-	UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx (device_challenge_id ASC)
+	UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx (device_challenge_id ASC),
+	INDEX hydra_oauth2_flow_login_session_subject_idx (nid ASC, login_session_id ASC, subject ASC) STORING (client_id) WHERE login_session_id IS NOT NULL
 );
 CREATE TABLE public.hydra_oauth2_access (
 	signature VARCHAR(255) NOT NULL,
@@ -203,7 +205,8 @@ CREATE TABLE public.hydra_oauth2_access (
 	INDEX hydra_oauth2_access_requested_at_idx (requested_at ASC, nid ASC),
 	INDEX hydra_oauth2_access_client_id_idx (client_id ASC, nid ASC),
 	INDEX hydra_oauth2_access_challenge_id_idx (challenge_id ASC),
-	INDEX hydra_oauth2_access_request_id_idx (request_id ASC, nid ASC)
+	INDEX hydra_oauth2_access_request_id_idx (request_id ASC, nid ASC),
+	INDEX hydra_oauth2_access_nid_subject_idx (nid ASC, subject ASC, client_id ASC)
 );
 CREATE TABLE public.hydra_oauth2_refresh (
 	signature VARCHAR(255) NOT NULL,
@@ -228,7 +231,8 @@ CREATE TABLE public.hydra_oauth2_refresh (
 	INDEX hydra_oauth2_refresh_client_id_idx (client_id ASC, nid ASC),
 	INDEX hydra_oauth2_refresh_challenge_id_idx (challenge_id ASC),
 	INDEX hydra_oauth2_refresh_request_id_idx (request_id ASC),
-	INDEX hydra_oauth2_refresh_requested_at_idx (nid ASC, requested_at ASC)
+	INDEX hydra_oauth2_refresh_requested_at_idx (nid ASC, requested_at ASC),
+	INDEX hydra_oauth2_refresh_nid_subject_idx (nid ASC, subject ASC, client_id ASC)
 );
 CREATE TABLE public.hydra_oauth2_code (
 	signature VARCHAR(255) NOT NULL,

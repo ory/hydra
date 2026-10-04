@@ -78,8 +78,8 @@ func buildInsertQueryArgs[T any](ctx context.Context, dialect string, mapper *re
 		pl := make([]string, len(placeholderRow))
 		copy(pl, placeholderRow)
 
-		// There is a special case - when using CockroachDB we want to generate
-		// UUIDs using "gen_random_uuid()" which ends up in a VALUE statement of:
+		// PostgreSQL-compatible databases can generate UUIDs using
+		// "gen_random_uuid()", which ends up in a VALUE statement of:
 		//
 		//	(gen_random_uuid(), ?, ?, ?),
 		for k := range placeholderRow {
@@ -93,7 +93,7 @@ func buildInsertQueryArgs[T any](ctx context.Context, dialect string, mapper *re
 				continue
 			}
 
-			if val == uuid.Nil && dialect == dbal.DriverCockroachDB {
+			if val == uuid.Nil && dbal.IsPostgresCompatible(dialect) {
 				pl[k] = "gen_random_uuid()"
 				break
 			}
@@ -131,9 +131,9 @@ func buildInsertQueryValues[T any](dialect string, mapper *reflectx.Mapper, colu
 					break // breaks switch, not for
 				} else if value, ok := field.Interface().(string); ok && len(value) > 0 {
 					break // breaks switch, not for
-				} else if dialect == dbal.DriverCockroachDB {
+				} else if dbal.IsPostgresCompatible(dialect) {
 					// This is a special case:
-					// 1. We're using cockroach
+					// 1. We're using a PostgreSQL-compatible database.
 					// 2. It's the primary key field ("ID")
 					// 3. A UUID was not yet set.
 					//
@@ -222,7 +222,7 @@ func Create[T any](ctx context.Context, p *TracerConnection, models []*T, opts .
 
 	var returningClause string
 	if conn.Dialect.Name() != dbal.DriverMySQL {
-		// PostgreSQL, CockroachDB, SQLite support RETURNING.
+		// PostgreSQL, CockroachDB, YugabyteDB, and SQLite support RETURNING.
 		returningClause = fmt.Sprintf("RETURNING %s", model.IDField())
 	}
 
@@ -246,10 +246,6 @@ func Create[T any](ctx context.Context, p *TracerConnection, models []*T, opts .
 	// Databases not supporting RETURNING will just return 0 rows.
 	count := 0
 	for rows.Next() {
-		if err := rows.Err(); err != nil {
-			return sqlcon.HandleError(err)
-		}
-
 		if err := setModelID(rows, pop.NewModel(models[count], ctx)); err != nil {
 			return err
 		}
@@ -257,10 +253,6 @@ func Create[T any](ctx context.Context, p *TracerConnection, models []*T, opts .
 	}
 
 	if err := rows.Err(); err != nil {
-		return sqlcon.HandleError(err)
-	}
-
-	if err := rows.Close(); err != nil {
 		return sqlcon.HandleError(err)
 	}
 

@@ -1,4 +1,4 @@
-FROM golang:1.25 AS builder
+FROM golang:1.26 AS builder
 
 WORKDIR /go/src/github.com/ory/hydra
 
@@ -12,12 +12,18 @@ RUN apt-get update && apt-get upgrade -y &&\
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient/
 
-ENV CGO_ENABLED=1
-
 RUN go mod download
 
 COPY . .
-RUN go build -ldflags="-extldflags=-static" -tags sqlite,sqlite_omit_load_extension -o /usr/bin/hydra
+# -buildvcs=false keeps the main module unversioned even if .git ever returns to
+# the build context. Without it, Go stamps a pseudo-version built from whatever git
+# state the builder happens to see: a shallow checkout has no reachable tag and
+# .dockerignore omits tracked paths, which yields v2.0.0-<timestamp>-<sha>+dirty
+# -- a version that sorts below every release, so vulnerability scanners report
+# advisories this build already contains the fix for. Released binaries come from
+# GoReleaser, which records the version through driver/config.Version, so nothing
+# depends on the stamp.
+RUN CGO_ENABLED=0 go build -buildvcs=false -o /usr/bin/hydra
 
 #########################
 

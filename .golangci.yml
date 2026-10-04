@@ -2,7 +2,6 @@ version: "2"
 
 linters:
   enable:
-    - gosec
     - errcheck
     - ineffassign
     - staticcheck
@@ -11,6 +10,7 @@ linters:
     staticcheck:
       checks:
         - "-SA1019"
+
   exclusions:
     rules:
       - path: '_test\.go'

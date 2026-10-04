@@ -40,10 +40,10 @@ func NewTestProvider(t testing.TB) *TestProvider {
 
 func (p *TestProvider) JsonnetVM(ctx context.Context) (VM, error) {
 	return MakeSecureVM(
+		p.pool,
 		WithContext(ctx),
-		WithProcessPool(p.pool),
 		WithJsonnetBinary(p.jsonnetBinary),
-	), nil
+	)
 }
 
 func (p *DefaultProvider) JsonnetVM(ctx context.Context) (VM, error) {
@@ -52,9 +52,9 @@ func (p *DefaultProvider) JsonnetVM(ctx context.Context) (VM, error) {
 		return nil, err
 	}
 	return MakeSecureVM(
+		p.Pool,
 		WithContext(ctx),
 		WithJsonnetBinary(self),
 		WithProcessArgs(p.Subcommand),
-		WithProcessPool(p.Pool),
-	), nil
+	)
 }

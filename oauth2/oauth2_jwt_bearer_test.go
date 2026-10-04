@@ -40,7 +40,13 @@ func TestJWTBearer(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyAccessTokenStrategy, "opaque")))
+	// This suite asserts the legacy behavior of copying the assertion audience
+	// into the access token, so it pins omit_assertion_audience to false. The
+	// default (omit) is covered by the dedicated sub-test below.
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
+		configx.WithValue(config.KeyAccessTokenStrategy, "opaque"),
+		configx.WithValue(config.KeyOAuth2GrantJWTOmitAssertionAudience, false),
+	))
 	_, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.Must(uuid.NewV4()).String()
@@ -261,6 +267,88 @@ func TestJWTBearer(t *testing.T) {
 		t.Run("strategy=jwt", run("jwt"))
 	})
 
+	t.Run("case=omits the assertion audience when omit_assertion_audience is enabled", func(t *testing.T) {
+		reg.Config().MustSet(ctx, config.KeyOAuth2GrantJWTOmitAssertionAudience, true)
+		t.Cleanup(func() {
+			reg.Config().MustSet(ctx, config.KeyOAuth2GrantJWTOmitAssertionAudience, false)
+		})
+
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+
+				token, _, err := signer.Generate(ctx, jwt.MapClaims{
+					"jti": uuid.Must(uuid.NewV4()).String(),
+					"iss": trustGrant.Issuer,
+					"sub": trustGrant.Subject,
+					"aud": reg.Config().OAuth2TokenURL(ctx).String(),
+					"exp": time.Now().Add(time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Minute).Unix(),
+				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
+				require.NoError(t, err)
+
+				conf := newConf(client)
+				conf.EndpointParams = url.Values{"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"}, "assertion": {token}}
+
+				result, err := getToken(t, conf)
+				require.NoError(t, err)
+
+				introspection := testhelpers.IntrospectToken(t, result.AccessToken, admin)
+				assert.True(t, introspection.Get("active").Bool(), "%s", introspection.Raw)
+				assert.Empty(t, introspection.Get("aud").Array(),
+					"the assertion audience must not be copied into the access token when omit_assertion_audience is true: %s", introspection.Raw)
+
+				// For the jwt strategy the access token is itself a JWT, so verify its aud claim is empty too.
+				if strategy == "jwt" {
+					jwtClaims := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(t, result.AccessToken))
+					assert.Empty(t, jwtClaims.Get("aud").Array(),
+						"the JWT access token must not carry the assertion audience when omit_assertion_audience is true: %s", jwtClaims.Raw)
+				}
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=should accept issuer-derived audience when issuer differs from public URL", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+
+				publicURL := reg.Config().PublicURL(ctx).String()
+				customIssuer := "https://auth.example.com"
+				reg.Config().MustSet(ctx, config.KeyPublicURL, publicURL)
+				reg.Config().MustSet(ctx, config.KeyIssuerURL, customIssuer)
+				defer func() {
+					reg.Config().MustSet(ctx, config.KeyIssuerURL, publicURL)
+					reg.Config().MustSet(ctx, config.KeyPublicURL, nil)
+				}()
+
+				token, _, err := signer.Generate(ctx, jwt.MapClaims{
+					"jti": uuid.Must(uuid.NewV4()).String(),
+					"iss": trustGrant.Issuer,
+					"sub": trustGrant.Subject,
+					"aud": customIssuer + "/oauth2/token",
+					"exp": time.Now().Add(time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Minute).Unix(),
+				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
+				require.NoError(t, err)
+
+				conf := newConf(client)
+				conf.EndpointParams = url.Values{"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"}, "assertion": {token}}
+
+				result, err := getToken(t, conf)
+				require.NoError(t, err)
+				require.NotNil(t, result)
+				assert.NotEmpty(t, result.AccessToken)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
 	t.Run("case=exchange for an access token without client", func(t *testing.T) {
 		t.Skip("This currently does not work because the client is a required foreign key and also required throughout the code base.")
 
@@ -279,7 +367,7 @@ func TestJWTBearer(t *testing.T) {
 				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
 				require.NoError(t, err)
 
-				res, err := http.DefaultClient.PostForm(reg.Config().OAuth2TokenURL(ctx).String(), url.Values{
+				res, err := testhelpers.NewTestClient(t).PostForm(reg.Config().OAuth2TokenURL(ctx).String(), url.Values{
 					"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
 					"assertion":  {token},
 				})

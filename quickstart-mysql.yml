@@ -3,7 +3,7 @@
 ###########################################################################
 #                                                                         #
 # If you have not yet read the tutorial, do so now:                       #
-#  https://www.ory.sh/docs/hydra/5min-tutorial                            #
+#  https://www.ory.com/docs/hydra/5min-tutorial                            #
 #                                                                         #
 # This set up is only for demonstration purposes. The login               #
 # endpoint can only be used if you follow the steps in the tutorial.      #
@@ -13,6 +13,9 @@ services:
   hydra-migrate:
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
+    depends_on:
+      "mysqld":
+        condition: service_healthy
   hydra:
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
@@ -24,3 +27,18 @@ services:
       - MYSQL_ROOT_PASSWORD=secret
     networks:
       - intranet
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "--user=root",
+          "--protocol=tcp",
+          "--password=secret",
+        ]
+      interval: 1s
+      timeout: 30s
+      retries: 30

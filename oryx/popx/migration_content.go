@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/pop/v6"
+	"github.com/ory/x/dbal"
 )
 
 func ParameterizedMigrationContent(params map[string]interface{}) func(mf Migration, c *pop.Connection, r []byte, usingTemplate bool) (string, error) {
@@ -36,7 +37,7 @@ func ParameterizedMigrationContent(params map[string]interface{}) func(mf Migrat
 				IsCockroach:    c.Dialect.Name() == "cockroach",
 				IsMySQL:        c.Dialect.Name() == "mysql",
 				IsMariaDB:      c.Dialect.Name() == "mariadb",
-				IsPostgreSQL:   c.Dialect.Name() == "postgres",
+				IsPostgreSQL:   dbal.IsPostgresCompatible(c.Dialect.Name()),
 				DialectDetails: c.Dialect.Details(),
 				Parameters:     params,
 			})

@@ -11,9 +11,6 @@ import (
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/pointerx"
-
-	"github.com/ory/hydra/v2/cmd/cli"
 )
 
 const (
@@ -82,7 +79,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 				return err
 			}
 
-			ek, encryptSecret, err := cli.NewEncryptionKey(cmd, nil)
+			ek, encryptSecret, err := NewEncryptionKey(cmd, nil)
 			if err != nil {
 				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Failed to load encryption key: %s", err)
 				return err
@@ -93,7 +90,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			if err != nil {
 				return err
 			}
-			cl.ClientId = pointerx.Ptr(flagx.MustGetString(cmd, flagClientId))
+			cl.ClientId = new(flagx.MustGetString(cmd, flagClientId))
 
 			//nolint:bodyclose
 			client, _, err := m.OAuth2API.CreateOAuth2Client(cmd.Context()).OAuth2Client(cl).Execute()
@@ -102,7 +99,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			}
 
 			if client.ClientSecret == nil && len(secret) > 0 {
-				client.ClientSecret = pointerx.Ptr(secret)
+				client.ClientSecret = new(secret)
 			}
 
 			if encryptSecret && client.ClientSecret != nil {
@@ -112,7 +109,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 					return cmdx.FailSilently(cmd)
 				}
 
-				client.ClientSecret = pointerx.Ptr(enc.Base64Encode())
+				client.ClientSecret = new(enc.Base64Encode())
 			}
 
 			cmdx.PrintRow(cmd, (*outputOAuth2Client)(client))

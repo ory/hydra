@@ -63,39 +63,67 @@ func compareMigration(a, b Migration) int {
 	return strings.Compare(a.DBType, b.DBType)
 }
 
-func (mfs Migrations) sortAndFilter(dialect string) Migrations {
-	usable := make(map[string]Migration, len(mfs))
-	for _, v := range mfs {
-		if v.DBType == dialect {
-			usable[v.Version] = v
-		} else if v.DBType == "all" {
-			// Add "all" only if we do not have a more specific migration for the dialect.
-			// If a more specific migration is found later, it will override this one.
-			if _, ok := usable[v.Version]; !ok {
-				usable[v.Version] = v
-			}
+// migrationRank ranks a migration's DBType for the given dialect and its ordered
+// fallbacks. Higher numbers indicate a better match:
+//
+//	-1      not applicable
+//	 0      "all" (generic, dialect-independent)
+//	 1..n   a fallback dialect (earlier fallbacks rank higher)
+//	 n+1    the exact dialect
+//
+// This lets a migration box prefer a dialect-specific override, then a fallback
+// dialect (e.g. postgres for a postgres-wire-compatible database), then the
+// generic file.
+func migrationRank(dbType, dialect string, fallbacks []string) int {
+	switch dbType {
+	case dialect:
+		return len(fallbacks) + 1
+	case "all":
+		return 0
+	}
+	for i, fb := range fallbacks {
+		if dbType == fb {
+			return len(fallbacks) - i
 		}
 	}
+	return -1
+}
 
-	filtered := make(Migrations, 0, len(usable))
-	for k := range usable {
-		filtered = append(filtered, usable[k])
+func (mfs Migrations) sortAndFilter(dialect string, fallbacks ...string) Migrations {
+	byVersion := make(map[string]Migration, len(mfs))
+	for _, migration := range mfs {
+		rank := migrationRank(migration.DBType, dialect, fallbacks)
+		if rank < 0 {
+			// Not applicable to this dialect.
+			continue
+		}
+		if previousMigration, ok := byVersion[migration.Version]; ok {
+			if rank < migrationRank(previousMigration.DBType, dialect, fallbacks) {
+				// Previous migration is a better match, skip this one.
+				continue
+			}
+		}
+		byVersion[migration.Version] = migration
+	}
+
+	filtered := make(Migrations, 0, len(byVersion))
+	for k := range byVersion {
+		filtered = append(filtered, byVersion[k])
 	}
 	sort.Sort(filtered)
 	return filtered
 }
 
-func (mfs Migrations) find(version, dbType string) *Migration {
+func (mfs Migrations) find(version, dialect string, fallbacks ...string) *Migration {
 	var candidate *Migration
-	for _, m := range mfs {
-		if m.Version == version {
-			switch m.DBType {
-			case "all":
-				// there might still be a more specific migration for the dbType
-				candidate = &m
-			case dbType:
-				return &m
-			}
+	bestRank := -1
+	for i := range mfs {
+		if mfs[i].Version != version {
+			continue
+		}
+		if rank := migrationRank(mfs[i].DBType, dialect, fallbacks); rank > bestRank {
+			bestRank = rank
+			candidate = &mfs[i]
 		}
 	}
 	return candidate

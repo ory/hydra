@@ -19,14 +19,14 @@ import (
 // The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:
 // `<https://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250&page_token=>; rel="first"`
 //
-// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 //
 // swagger:model keysetPaginationRequestParameters
 type RequestParameters struct {
 	// Items per Page
 	//
 	// This is the number of items per page to return.
-	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	//
 	// required: false
 	// in: query
@@ -38,7 +38,7 @@ type RequestParameters struct {
 	// Next Page Token
 	//
 	// The next page token.
-	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	//
 	// required: false
 	// in: query
@@ -50,7 +50,7 @@ type RequestParameters struct {
 // The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:
 // `<https://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250&page_token=>; rel="first"`
 //
-// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 //
 // swagger:model keysetPaginationResponseHeaders
 type ResponseHeaders struct {

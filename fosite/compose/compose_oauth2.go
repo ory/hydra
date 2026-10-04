@@ -19,6 +19,7 @@ func OAuth2AuthorizeExplicitFactory(config fosite.Configurator, storage fosite.S
 			oauth2.AuthorizeCodeStrategyProvider
 		}),
 		Storage: storage.(interface {
+			fosite.Transactional
 			oauth2.AuthorizeCodeStorageProvider
 			oauth2.AccessTokenStorageProvider
 			oauth2.RefreshTokenStorageProvider
@@ -47,6 +48,7 @@ func OAuth2RefreshTokenGrantFactory(config fosite.Configurator, storage fosite.S
 			oauth2.RefreshTokenStrategyProvider
 		}),
 		Storage: storage.(interface {
+			fosite.Transactional
 			oauth2.AccessTokenStorageProvider
 			oauth2.RefreshTokenStorageProvider
 			oauth2.TokenRevocationStorageProvider

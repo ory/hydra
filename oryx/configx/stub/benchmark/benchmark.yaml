@@ -1,5 +1,5 @@
 # Please find the documentation for this file at
-# https://www.ory.sh/oathkeeper/docs/configuration
+# https://www.ory.com/oathkeeper/docs/configuration
 
 log:
   level: debug

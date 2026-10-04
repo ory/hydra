@@ -11,13 +11,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/sqlcon/dockertest"
 )
-
-func TestMain(m *testing.M) {
-	defer dockertest.KillAllTestDatabases()
-	m.Run()
-}
 
 func TestManagers(t *testing.T) {
 	t.Parallel()

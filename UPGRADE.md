@@ -143,7 +143,7 @@ before finalizing the upgrade process.
 
 Do you want the latest features and patches without work and hassle? Are you
 looking for a reliable, scalable, and secure deployment with zero effort? We can
-run it for you! If you're interested, [contact us now](mailto:office@ory.sh)!
+run it for you! If you're interested, [contact us now](mailto:office@ory.com)!
 
 ## 1.5.0
 
@@ -225,7 +225,7 @@ possible to store arbitrary metadata for a client.
 ### OpenID Connect Front-/Backchannel Logout 1.0
 
 This patch implements OpenID Connect Front-/Backchannel Logout 1.0
-([read docs](https://www.ory.sh/docs/hydra/oauth2#logout)). Therefore, endpoint
+([read docs](https://www.ory.com/docs/hydra/oauth2#logout)). Therefore, endpoint
 `/oauth2/auth/sessions/login/revoke` has been deprecated.
 
 ### Schema Changes
@@ -340,7 +340,7 @@ of ORY Hydra. This changed. The system secret is now an array where the first
 element is used for encryption and all elements can be used for decryption.
 
 For more information on this topic, click
-[here](https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys).
+[here](https://www.ory.com/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys).
 
 To make this change work, environment variable `ROTATED_SYSTEM_SECRET` has been
 removed and can no longer be used. Command `hydra migrate secret` has also been
@@ -498,7 +498,7 @@ searching in large data sets.
 #### Access Token Audience
 
 This patch adds the access token audience feature. For more information on this,
-head over to [the docs](https://www.ory.sh/docs/hydra/advanced).
+head over to [the docs](https://www.ory.com/docs/hydra/advanced).
 
 #### Refresh Grant
 
@@ -817,7 +817,7 @@ boundaries & responsibilities) outweigh the hassle of upgrading to the new
 version.
 
 If you have difficulties upgrading and would like a helping hand, reach out to
-us at [mailto:hi@ory.sh](hi@ory.sh) and we will help you with the upgrade
+us at [hi@ory.com](mailto:hi@ory.com) and we will help you with the upgrade
 process. Our services are billed by the hour and are priced fairly.
 
 ### Upgrading from versions v0.9.x
@@ -896,7 +896,7 @@ links to an example explaining the set up of the three services.
 **This means that ORY Hydra has no longer any type of internal access control.
 Endpoints such as `POST /clients` no longer require access tokens to be
 accessed. You must secure these endpoints yourself. For more information,
-[click here](https://www.ory.sh/docs/hydra/production).**
+[click here](https://www.ory.com/docs/hydra/production).**
 
 [ORY Keto](https://github.com/ory/keto) handles access control using access
 control policies. The project currently supports the Warden API, Access Control
@@ -937,7 +937,7 @@ prior to this release. You can find the source and documentation at
 
 If you find it difficult to run this set up but would like to use the old access
 control mechanisms, feel free to reach out to us at
-[mailto:hi@ory.sh](hi@ory.sh).
+[hi@ory.com](mailto:hi@ory.com).
 
 ###### Warden API
 
@@ -1046,7 +1046,7 @@ The major difference between the old and new flow is, that authentication (user
 login) and scope authorization (user consent) are now two separate endpoints.
 
 The new User Login and Consent Flow is documented in the
-[developer guide](https://www.ory.sh/docs/hydra/).
+[developer guide](https://www.ory.com/docs/hydra/).
 
 #### Changes to the CLI
 
@@ -1485,7 +1485,7 @@ This change makes setting scopes more explicit and is more secure, as it is less
 likely to make mistakes.
 
 Read more on this strategy
-[here](https://www.ory.sh/docs/hydra/oauth2#oauth-20-scope).
+[here](https://www.ory.com/docs/hydra/oauth2#oauth-20-scope).
 
 To fall back to hierarchical scope matching, set the environment variable
 `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY`. This feature _might_ be
@@ -1578,7 +1578,7 @@ To improve ORY Hydra and understand how the software is used, optional,
 anonymized telemetry data is shared with ORY. A change was made to help us
 understand which telemetry sources belong to the same installation by hashing
 (SHA256) two environment variables which make up a unique identifier.
-[Click here](https://www.ory.sh/docs/ecosystem/sqa) to read more about how we
+[Click here](https://www.ory.com/docs/ecosystem/sqa) to read more about how we
 collect telemetry data, why we do it, and how to enable or disable it.
 
 #### URL Encoding Root Client Credentials
@@ -1592,7 +1592,7 @@ following form to specify them:
 ## 0.9.0
 
 This version adds performance metrics to `/health` and sends anonymous usage
-statistics to our servers, [click here](https://www.ory.sh/docs/ecosystem/sqa)
+statistics to our servers, [click here](https://www.ory.com/docs/ecosystem/sqa)
 for more details on this feature and how to disable it.
 
 ## 0.8.0

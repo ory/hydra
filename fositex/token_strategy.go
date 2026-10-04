@@ -23,6 +23,7 @@ type (
 	tokenStrategyDependencies interface {
 		OAuth2HMACStrategy() foauth2.CoreStrategy
 		OAuth2JWTStrategy() foauth2.AccessTokenStrategy
+		OAuth2AuthorizeCodeStrategy() foauth2.AuthorizeCodeStrategy
 		config.Provider
 	}
 )
@@ -64,15 +65,15 @@ func (t TokenStrategy) ValidateRefreshToken(ctx context.Context, requester fosit
 }
 
 func (t TokenStrategy) AuthorizeCodeSignature(ctx context.Context, token string) string {
-	return t.d.OAuth2HMACStrategy().AuthorizeCodeSignature(ctx, token)
+	return t.d.OAuth2AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, token)
 }
 
 func (t TokenStrategy) GenerateAuthorizeCode(ctx context.Context, requester fosite.Requester) (token, signature string, err error) {
-	return t.d.OAuth2HMACStrategy().GenerateAuthorizeCode(ctx, requester)
+	return t.d.OAuth2AuthorizeCodeStrategy().GenerateAuthorizeCode(ctx, requester)
 }
 
 func (t TokenStrategy) ValidateAuthorizeCode(ctx context.Context, requester fosite.Requester, token string) (err error) {
-	return t.d.OAuth2HMACStrategy().ValidateAuthorizeCode(ctx, requester, token)
+	return t.d.OAuth2AuthorizeCodeStrategy().ValidateAuthorizeCode(ctx, requester, token)
 }
 
 func withRequester(requester fosite.Requester) config.AccessTokenStrategySource {

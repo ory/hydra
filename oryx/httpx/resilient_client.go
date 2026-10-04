@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"golang.org/x/oauth2"
 
-	"github.com/hashicorp/go-retryablehttp"
-
+	"github.com/ory/herodot"
 	"github.com/ory/x/logrusx"
 )
 
@@ -28,9 +28,8 @@ type resilientOptions struct {
 }
 
 func newResilientOptions() *resilientOptions {
-	connTimeout := time.Minute
 	return &resilientOptions{
-		c:            &http.Client{Timeout: connTimeout},
+		c:            &http.Client{Timeout: time.Minute},
 		retryWaitMin: 1 * time.Second,
 		retryWaitMax: 30 * time.Second,
 		retryMax:     4,
@@ -43,51 +42,46 @@ type ResilientOptions func(o *resilientOptions)
 
 // ResilientClientWithMaxRetry sets the maximum number of retries.
 func ResilientClientWithMaxRetry(retryMax int) ResilientOptions {
-	return func(o *resilientOptions) {
-		o.retryMax = retryMax
-	}
+	return func(o *resilientOptions) { o.retryMax = retryMax }
 }
 
-// ResilientClientWithMinxRetryWait sets the minimum wait time between retries.
-func ResilientClientWithMinxRetryWait(retryWaitMin time.Duration) ResilientOptions {
-	return func(o *resilientOptions) {
-		o.retryWaitMin = retryWaitMin
-	}
+// ResilientClientWithMinRetryWait sets the minimum wait time between retries.
+func ResilientClientWithMinRetryWait(retryWaitMin time.Duration) ResilientOptions {
+	return func(o *resilientOptions) { o.retryWaitMin = retryWaitMin }
 }
 
 // ResilientClientWithMaxRetryWait sets the maximum wait time for a retry.
 func ResilientClientWithMaxRetryWait(retryWaitMax time.Duration) ResilientOptions {
-	return func(o *resilientOptions) {
-		o.retryWaitMax = retryWaitMax
-	}
+	return func(o *resilientOptions) { o.retryWaitMax = retryWaitMax }
 }
 
 // ResilientClientWithConnectionTimeout sets the connection timeout for the client.
 func ResilientClientWithConnectionTimeout(connTimeout time.Duration) ResilientOptions {
-	return func(o *resilientOptions) {
-		o.c.Timeout = connTimeout
-	}
+	return func(o *resilientOptions) { o.c.Timeout = connTimeout }
 }
 
 // ResilientClientWithLogger sets the logger to be used by the client.
 func ResilientClientWithLogger(l *logrusx.Logger) ResilientOptions {
-	return func(o *resilientOptions) {
-		o.l = l
-	}
+	return func(o *resilientOptions) { o.l = l }
 }
 
 // ResilientClientDisallowInternalIPs disallows internal IPs from being used.
 func ResilientClientDisallowInternalIPs() ResilientOptions {
-	return func(o *resilientOptions) {
-		o.noInternalIPs = true
-	}
+	return func(o *resilientOptions) { o.noInternalIPs = true }
 }
 
 // ResilientClientAllowInternalIPRequestsTo allows requests to the glob-matching URLs even
 // if they are internal IPs.
 func ResilientClientAllowInternalIPRequestsTo(urlGlobs ...string) ResilientOptions {
+	return func(o *resilientOptions) { o.internalIPExceptions = urlGlobs }
+}
+
+// ResilientClientNoFollowRedirects configures the client to not follow redirects.
+func ResilientClientNoFollowRedirects() ResilientOptions {
 	return func(o *resilientOptions) {
-		o.internalIPExceptions = urlGlobs
+		o.c.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse // don't follow redirects
+		}
 	}
 }
 
@@ -133,6 +127,14 @@ func SetOAuth2(ctx context.Context, cl *retryablehttp.Client, c OAuth2Config, t 
 	return ctx, cl
 }
 
-type OAuth2Config interface {
-	Client(context.Context, *oauth2.Token) *http.Client
-}
+type (
+	OAuth2Config interface {
+		Client(context.Context, *oauth2.Token) *http.Client
+	}
+	ClientProvider interface {
+		HTTPClient(ctx context.Context, opts ...ResilientOptions) *retryablehttp.Client
+	}
+	WriterProvider interface {
+		Writer() herodot.Writer
+	}
+)

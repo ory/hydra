@@ -4,12 +4,12 @@
 package main
 
 import (
-	"github.com/ory/hydra/v2/cmd"
+	"github.com/ory/hydra/v2/cmd/servercmd"
 	"github.com/ory/x/profilex"
 )
 
 func main() {
 	defer profilex.Profile().Stop()
 
-	cmd.Execute()
+	servercmd.Execute()
 }

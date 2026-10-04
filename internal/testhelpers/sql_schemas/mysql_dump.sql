@@ -1,4 +1,4 @@
--- migrations hash: 55b905a5cead652db5b4a5e317d60ad18bd9e6de61d4b43edcdb79244947fbf9b106783f10765f2ffa4d7952c745900c2406f522a101dbed17e5785396484e41
+-- migrations hash: 14de04dcdbd3e9b00922807be554550705bf44b836351e0eeffdac2871efff8c5cc087a08319b435d9a66cb6d9b16eed397a786833efa790956304dadc6229d8
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -71,6 +71,7 @@ CREATE TABLE `hydra_client` (
   `device_authorization_grant_id_token_lifespan` bigint DEFAULT NULL,
   `device_authorization_grant_access_token_lifespan` bigint DEFAULT NULL,
   `device_authorization_grant_refresh_token_lifespan` bigint DEFAULT NULL,
+  `rotated_secrets` json DEFAULT NULL,
   PRIMARY KEY (`id`,`nid`),
   UNIQUE KEY `hydra_client_id_key` (`id`,`nid`),
   KEY `pk_deprecated` (`pk_deprecated`),
@@ -126,6 +127,7 @@ CREATE TABLE `hydra_oauth2_access` (
   KEY `hydra_oauth2_access_requested_at_idx` (`requested_at`,`nid`),
   KEY `hydra_oauth2_access_client_id_subject_nid_idx` (`client_id`,`subject`,`nid`),
   KEY `hydra_oauth2_access_request_id_idx` (`request_id`,`nid`),
+  KEY `hydra_oauth2_access_subject_nid_idx` (`subject`,`nid`,`client_id`),
   CONSTRAINT `hydra_oauth2_access_challenge_id_fk` FOREIGN KEY (`challenge_id`) REFERENCES `hydra_oauth2_flow` (`consent_challenge_id`) ON DELETE CASCADE,
   CONSTRAINT `hydra_oauth2_access_client_id_fk` FOREIGN KEY (`client_id`, `nid`) REFERENCES `hydra_client` (`id`, `nid`) ON DELETE CASCADE,
   CONSTRAINT `hydra_oauth2_access_nid_fk_idx` FOREIGN KEY (`nid`) REFERENCES `networks` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
@@ -267,10 +269,10 @@ CREATE TABLE `hydra_oauth2_flow` (
   UNIQUE KEY `hydra_oauth2_flow_consent_challenge_idx` (`consent_challenge_id`),
   UNIQUE KEY `hydra_oauth2_flow_device_challenge_idx` (`device_challenge_id`),
   KEY `hydra_oauth2_flow_login_session_id_idx` (`login_session_id`),
-  KEY `hydra_oauth2_flow_nid_fk_idx` (`nid`),
   KEY `hydra_oauth2_flow_client_id_subject_idx` (`client_id`,`nid`,`subject`),
   KEY `hydra_oauth2_flow_sub_idx` (`subject`,`nid`),
   KEY `hydra_oauth2_flow_previous_consents_idx` (`subject`,`client_id`,`nid`,`consent_skip`,`consent_error`(2),`consent_remember`),
+  KEY `hydra_oauth2_flow_login_session_subject_idx` (`nid`,`login_session_id`,`subject`),
   CONSTRAINT `hydra_oauth2_flow_client_id_fk` FOREIGN KEY (`client_id`, `nid`) REFERENCES `hydra_client` (`id`, `nid`) ON DELETE CASCADE,
   CONSTRAINT `hydra_oauth2_flow_login_session_id_fk` FOREIGN KEY (`login_session_id`) REFERENCES `hydra_oauth2_authentication_session` (`id`) ON DELETE SET NULL,
   CONSTRAINT `hydra_oauth2_flow_nid_fk_idx` FOREIGN KEY (`nid`) REFERENCES `networks` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
@@ -423,6 +425,7 @@ CREATE TABLE `hydra_oauth2_refresh` (
   KEY `hydra_oauth2_refresh_client_id_fk` (`client_id`,`nid`),
   KEY `hydra_oauth2_refresh_request_id_idx` (`request_id`),
   KEY `hydra_oauth2_refresh_requested_at_idx` (`nid`,`requested_at`),
+  KEY `hydra_oauth2_refresh_subject_nid_idx` (`subject`,`nid`,`client_id`),
   CONSTRAINT `hydra_oauth2_refresh_challenge_id_fk` FOREIGN KEY (`challenge_id`) REFERENCES `hydra_oauth2_flow` (`consent_challenge_id`) ON DELETE CASCADE,
   CONSTRAINT `hydra_oauth2_refresh_client_id_fk` FOREIGN KEY (`client_id`, `nid`) REFERENCES `hydra_client` (`id`, `nid`) ON DELETE CASCADE,
   CONSTRAINT `hydra_oauth2_refresh_nid_fk_idx` FOREIGN KEY (`nid`) REFERENCES `networks` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT

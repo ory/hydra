@@ -4,17 +4,15 @@
 package flow
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/fosite"
-	"github.com/ory/pop/v6"
-	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
 
@@ -388,58 +386,32 @@ func (n *OAuth2ConsentRequestOpenIDConnectContext) Value() (driver.Value, error)
 //
 // swagger:model oAuth2LogoutRequest
 type LogoutRequest struct {
-	// Challenge is the identifier of the logout authentication request.
-	ID  string    `json:"challenge" db:"challenge"`
-	NID uuid.UUID `json:"-" db:"nid"`
+	// Challenge is used to retrieve/accept/deny the logout request.
+	Challenge string `json:"challenge"`
 
-	// Subject is the user for whom the logout was request.
-	Subject string `json:"subject" db:"subject"`
+	// Subject is the user for whom the logout was requested.
+	Subject string `json:"subject"`
 
 	// SessionID is the login session ID that was requested to log out.
-	SessionID string `json:"sid,omitempty" db:"sid"`
+	SessionID string `json:"sid,omitempty"`
 
 	// RequestURL is the original Logout URL requested.
-	RequestURL string `json:"request_url" db:"request_url"`
+	RequestURL string `json:"request_url"`
 
 	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
-	RPInitiated bool `json:"rp_initiated" db:"rp_initiated"`
+	RPInitiated bool `json:"rp_initiated"`
 
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"-" db:"was_used"`
+	ExpiresAt   *time.Time     `json:"expires_at"`
+	RequestedAt *time.Time     `json:"requested_at"`
+	Client      *client.Client `json:"client"`
 
-	Verifier              string         `json:"-" db:"verifier"`
-	PostLogoutRedirectURI string         `json:"-" db:"redir_url"`
-	Accepted              bool           `json:"-" db:"accepted"`
-	Rejected              bool           `db:"rejected" json:"-"`
-	ClientID              sql.NullString `json:"-" db:"client_id"`
-	ExpiresAt             sqlxx.NullTime `json:"expires_at" db:"expires_at"`
-	RequestedAt           sqlxx.NullTime `json:"requested_at" db:"requested_at"`
-	Client                *client.Client `json:"client" db:"-"`
-}
-
-func (LogoutRequest) TableName() string {
-	return "hydra_oauth2_logout_request"
-}
-
-func (r *LogoutRequest) BeforeSave(_ *pop.Connection) error {
-	if r.Client != nil {
-		r.ClientID = sql.NullString{
-			Valid:  true,
-			String: r.Client.GetID(),
-		}
-	}
-	return nil
-}
-
-func (r *LogoutRequest) AfterFind(c *pop.Connection) error {
-	if r.ClientID.Valid {
-		r.Client = &client.Client{}
-		return sqlcon.HandleError(c.Where("id = ?", r.ClientID.String).First(r.Client))
-	}
-	return nil
+	// PostLogoutRedirectURI is internal-only and round-trips through the
+	// AEAD-encrypted logout challenge/verifier via the envelope used by the
+	// SQL persister. It must not appear in the public oAuth2LogoutRequest
+	// JSON shape.
+	//
+	// swagger:ignore
+	PostLogoutRedirectURI string `json:"-"`
 }
 
 // Returned when the log out request was used.

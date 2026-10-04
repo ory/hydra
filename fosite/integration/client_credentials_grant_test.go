@@ -71,14 +71,14 @@ func runClientCredentialsGrantTest(t *testing.T, strategy oauth2.CoreStrategyPro
 		},
 		{
 			description: "should fail because of ungranted audience",
-			params:      url.Values{"audience": {"https://www.ory.sh/not-api"}},
+			params:      url.Values{"audience": {"https://www.ory.com/not-api"}},
 			setup: func() {
 				oauthClient.Scopes = []string{"fosite"}
 			},
 			err: true,
 		},
 		{
-			params:      url.Values{"audience": {"https://www.ory.sh/api"}},
+			params:      url.Values{"audience": {"https://www.ory.com/api"}},
 			description: "should pass",
 			setup: func() {
 			},

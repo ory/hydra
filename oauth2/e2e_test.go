@@ -25,7 +25,6 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/uuidx"
 )
@@ -80,7 +79,7 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 							snapshotx.WithName("login_request"))
 						return hydra.AcceptOAuth2LoginRequest{
 							Amr:     []string{"amr1", "amr2"},
-							Acr:     pointerx.Ptr("acr-value"),
+							Acr:     new("acr-value"),
 							Subject: sub,
 						}
 					}, func(t *testing.T, req *hydra.OAuth2ConsentRequest) hydra.AcceptOAuth2ConsentRequest {

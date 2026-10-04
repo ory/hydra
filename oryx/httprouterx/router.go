@@ -4,72 +4,80 @@
 package httprouterx
 
 import (
+	"context"
 	"net/http"
 	"path"
 	"strings"
-	"testing"
-
-	"github.com/ory/x/prometheusx"
 )
 
-const AdminPrefix = "/admin"
+const (
+	AdminPrefix = "/admin"
+
+	afterMatchHooks contextKey = 1
+)
 
 type (
+	contextKey         int
+	AfterMatchHookFunc func(*http.Request)
+
 	router struct {
-		Mux            *http.ServeMux
-		prefix         string
-		metricsManager *prometheusx.MetricsManager
+		mux    *http.ServeMux
+		prefix string
 	}
 	RouterAdmin  struct{ router }
 	RouterPublic struct{ router }
+
+	Router interface {
+		http.Handler
+
+		Handle(pattern string, handler http.Handler)
+		HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
+
+		GET(route string, handle http.HandlerFunc)
+		OPTIONS(route string, handle http.HandlerFunc)
+		HEAD(route string, handle http.HandlerFunc)
+		POST(route string, handle http.HandlerFunc)
+		PUT(route string, handle http.HandlerFunc)
+		PATCH(route string, handle http.HandlerFunc)
+		DELETE(route string, handle http.HandlerFunc)
+	}
 )
 
-var DefaultTestMetricsManager = prometheusx.NewMetricsManager("", "", "", "")
+func newRouter() *router { return &router{mux: http.NewServeMux()} }
+
+// NewRouter creates a new general purpose router. It should only be used when neither the admin nor the public router is applicable.
+func NewRouter() Router { return newRouter() }
 
 // NewRouterAdmin creates a new admin router.
-func NewRouterAdmin(metricsManager *prometheusx.MetricsManager) *RouterAdmin {
-	return &RouterAdmin{router: router{
-		Mux:            http.NewServeMux(),
-		metricsManager: metricsManager,
-	}}
-}
-
-func NewTestRouterAdmin(_ *testing.T) *RouterAdmin {
-	return NewRouterAdmin(DefaultTestMetricsManager)
-}
-
-func NewTestRouterAdminWithPrefix(_ *testing.T) *RouterAdmin {
-	return NewRouterAdminWithPrefix(DefaultTestMetricsManager)
+func NewRouterAdmin() *RouterAdmin {
+	return &RouterAdmin{router: *newRouter()}
 }
 
 func (r *RouterAdmin) ToPublic() *RouterPublic {
 	return &RouterPublic{router: router{
-		Mux:            r.Mux,
-		metricsManager: r.metricsManager,
+		mux:    r.mux,
+		prefix: "", // do not copy the admin prefix
 	}}
 }
 
 // NewRouterPublic returns a public router.
-func NewRouterPublic(metricsManager *prometheusx.MetricsManager) *RouterPublic {
-	return &RouterPublic{router: router{
-		Mux:            http.NewServeMux(),
-		metricsManager: metricsManager,
-	}}
-}
-
-func NewTestRouterPublic(_ *testing.T) *RouterPublic {
-	return NewRouterPublic(DefaultTestMetricsManager)
+func NewRouterPublic() *RouterPublic {
+	return &RouterPublic{router: *newRouter()}
 }
 
 // NewRouterAdminWithPrefix creates a new router with the admin prefix.
-func NewRouterAdminWithPrefix(metricsManager *prometheusx.MetricsManager) *RouterAdmin {
-	r := NewRouterAdmin(metricsManager)
+func NewRouterAdminWithPrefix() *RouterAdmin {
+	r := NewRouterAdmin()
 	r.prefix = AdminPrefix
 	return r
 }
 
 func (r *router) GET(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodGet, route, handle)
+}
+
+func (r *router) OPTIONS(route string, handle http.HandlerFunc) {
+	r.handle(http.MethodOptions, route, handle)
 }
 
 func (r *router) HEAD(route string, handle http.HandlerFunc) {
@@ -92,20 +100,33 @@ func (r *router) DELETE(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodDelete, route, handle)
 }
 
-func (r *router) Handler(method, route string, handler http.Handler) {
-	r.handle(method, route, handler)
+func (r *router) handle(method string, route string, handler http.Handler) {
+	route = path.Join(r.prefix, route)
+	r.mux.Handle(method+" "+route, afterMatchHookExecutor(handler))
 }
 
-func (r *router) handle(method string, route string, handler http.Handler) {
-	r.Mux.HandleFunc(method+" "+path.Join(r.prefix, route), func(w http.ResponseWriter, req *http.Request) {
-		// In order the get the right metrics for the right path, `req.Pattern` must have been filled by the http router.
-		// This is the case at this point, but not before e.g. when the prometheus middleware runs as a negroni middleware:
-		// the http router has not run yet and `req.Pattern` is empty.
-		r.metricsManager.ServeHTTP(w, req, handler.ServeHTTP)
+func afterMatchHookExecutor(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if hooks, ok := r.Context().Value(afterMatchHooks).([]AfterMatchHookFunc); ok {
+			for _, hook := range hooks {
+				hook(r)
+			}
+		}
+		h.ServeHTTP(w, r)
 	})
 }
 
-func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.Mux.ServeHTTP(w, req) }
+// Handle registers the handler for the given pattern. It does not prepend the admin prefix, so the caller is responsible for ensuring that the pattern is correct.
+func (r *router) Handle(pattern string, handler http.Handler) {
+	r.mux.Handle(pattern, afterMatchHookExecutor(handler))
+}
+
+// HandleFunc registers the handler for the given pattern. It does not prepend the admin prefix, so the caller is responsible for ensuring that the pattern is correct.
+func (r *router) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
+	r.Handle(pattern, http.HandlerFunc(handler))
+}
+
+func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.mux.ServeHTTP(w, req) }
 
 func TrimTrailingSlashNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	// Don't trim the root path to avoid redirect loops
@@ -127,7 +148,20 @@ func NoCacheNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFu
 func AddAdminPrefixIfNotPresentNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	if !strings.HasPrefix(r.URL.Path, AdminPrefix) {
 		r.URL.Path = path.Join(AdminPrefix, r.URL.Path)
+		if r.URL.RawPath != "" {
+			r.URL.RawPath = path.Join(AdminPrefix, r.URL.RawPath)
+		}
 	}
 
 	next(rw, r)
+}
+
+// WithAfterMatchHook adds the passed AfterMatchHookFunc to the request's context. The hook is called after the
+// router matched the request, but before it is passed to the handler. This allows middlewares to access the matched
+// pattern and other information that is only available after the router has matched the request.
+// Note that this hook is called multiple times per request if routers are nested, the hook should anticipate that.
+func WithAfterMatchHook(req *http.Request, newHooks ...AfterMatchHookFunc) *http.Request {
+	hooks, _ := req.Context().Value(afterMatchHooks).([]AfterMatchHookFunc)
+	ctx := context.WithValue(req.Context(), afterMatchHooks, append(hooks, newHooks...))
+	return req.WithContext(ctx)
 }

@@ -23,7 +23,8 @@ var _ MappedNullable = &AcceptOAuth2LoginRequest{}
 // AcceptOAuth2LoginRequest struct for AcceptOAuth2LoginRequest
 type AcceptOAuth2LoginRequest struct {
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two-factor authentication.
-	Acr     *string     `json:"acr,omitempty"`
+	Acr *string `json:"acr,omitempty"`
+	// AMR sets the Authentication Methods References value for this authentication session. You can use it to specify the method a user used to authenticate. For example, if the acr indicates a user used two-factor authentication, the amr can express they used a software-secured key.
 	Amr     []string    `json:"amr,omitempty"`
 	Context interface{} `json:"context,omitempty"`
 	// Extend OAuth2 authentication session lifespan  If set to `true`, the OAuth2 authentication cookie lifespan is extended. This is for example useful if you want the user to be able to use `prompt=none` continuously.  This value can only be set to `true` if the user has an authentication, which is the case if the `skip` value is `true`.

@@ -46,6 +46,12 @@ func (j *DefaultJWTSigner) getKeys(ctx context.Context) (private *jose.JSONWebKe
 		return private, nil
 	}
 
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return nil, errors.WithStack(fosite.ErrServerError.
+			WithWrap(err).
+			WithHintf(`Could not load the signing keys for "%s" because the request was canceled or timed out. This usually indicates a database timeout, a temporarily unavailable database, or a canceled upstream request.`, j.setID))
+	}
+
 	var netError net.Error
 	if errors.As(err, &netError) {
 		return nil, errors.WithStack(fosite.ErrServerError.

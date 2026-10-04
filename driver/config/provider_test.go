@@ -91,6 +91,9 @@ func TestCORSOptions(t *testing.T) {
 	conf, enabled := p.CORSPublic(ctx)
 	assert.True(t, enabled)
 
+	// configx sets AllowOriginVaryRequestFunc (boundary-safe matching); a func
+	// value is not comparable, so drop it before the struct equality.
+	conf.AllowOriginVaryRequestFunc = nil
 	assert.EqualValues(t, cors.Options{
 		AllowedOrigins:   []string{},
 		AllowedMethods:   []string{"POST", "GET", "PUT", "PATCH", "DELETE", "CONNECT", "HEAD", "OPTIONS", "TRACE"},
@@ -105,7 +108,7 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 	serve := p.ServeAdmin(t.Context())
 	assert.False(t, serve.RequestLog.DisableHealth)
 
-	p = newProvider(t, configx.WithValue("serve.admin.requestlog.disable_health", true))
+	p = newProvider(t, configx.WithValue("serve.admin.request_log.disable_for_health", true))
 	serve = p.ServeAdmin(t.Context())
 	assert.True(t, serve.RequestLog.DisableHealth)
 }
@@ -115,7 +118,7 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	serve := p.ServePublic(t.Context())
 	assert.False(t, serve.RequestLog.DisableHealth)
 
-	p = newProvider(t, configx.WithValue("serve.public.requestlog.disable_health", true))
+	p = newProvider(t, configx.WithValue("serve.public.request_log.disable_for_health", true))
 	serve = p.ServePublic(t.Context())
 	assert.True(t, serve.RequestLog.DisableHealth)
 }
@@ -128,6 +131,14 @@ func TestPublicAllowDynamicRegistration(t *testing.T) {
 	p = newProvider(t, configx.WithValue(KeyPublicAllowDynamicRegistration, true))
 	value = p.PublicAllowDynamicRegistration(t.Context())
 	assert.True(t, value)
+}
+
+func TestLegacyAllowInsecureOrigins(t *testing.T) {
+	p := newProvider(t)
+	assert.False(t, p.LegacyAllowInsecureOrigins(t.Context()), "must default to false (strict)")
+
+	p = newProvider(t, configx.WithValue(KeyFeatureFlagsLegacyAllowInsecureOrigins, true))
+	assert.True(t, p.LegacyAllowInsecureOrigins(t.Context()))
 }
 
 func TestProviderIssuerURL(t *testing.T) {
@@ -221,12 +232,12 @@ func TestProviderValidates(t *testing.T) {
 	expectedPublicPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-public-api",
-		Mode:  0775,
+		Mode:  0o775,
 	}
 	expectedAdminPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-admin-api",
-		Mode:  0770,
+		Mode:  0o770,
 	}
 	assert.Equal(t, expectedPublicPermission, &servePublic.Socket)
 	assert.Equal(t, expectedAdminPermission, &serveAdmin.Socket)
@@ -243,10 +254,14 @@ func TestProviderValidates(t *testing.T) {
 
 	gc, enabled := c.CORSAdmin(ctx)
 	assert.False(t, enabled)
+	// configx sets AllowOriginVaryRequestFunc (boundary-safe matching); a func
+	// value is not comparable, so drop it before the struct equality.
+	gc.AllowOriginVaryRequestFunc = nil
 	assert.Equal(t, expectedCors, gc)
 
 	gc, enabled = c.CORSPublic(ctx)
 	assert.False(t, enabled)
+	gc.AllowOriginVaryRequestFunc = nil
 	assert.Equal(t, expectedCors, gc)
 
 	assert.Equal(t, []string{"127.0.0.1/32"}, c.Source(ctx).Strings("serve.tls.allow_termination_from"))
@@ -353,7 +368,7 @@ func TestProviderValidates(t *testing.T) {
 				LocalAgentAddress: "127.0.0.1:6831",
 				Sampling: otelx.JaegerSampling{
 					ServerURL:    "http://sampling",
-					TraceIdRatio: 1,
+					TraceIDRatio: 1,
 				},
 			},
 			Zipkin: otelx.ZipkinConfig{
@@ -380,13 +395,13 @@ func TestSetPerm(t *testing.T) {
 	_ = (&configx.UnixPermission{
 		Owner: "",
 		Group: "",
-		Mode:  0654,
+		Mode:  0o654,
 	}).SetPermission(path)
 
 	stat, err := f.Stat()
 	require.NoError(t, err)
 
-	assert.Equal(t, os.FileMode(0654), stat.Mode())
+	assert.Equal(t, os.FileMode(0o654), stat.Mode())
 
 	require.NoError(t, f.Close())
 	require.NoError(t, os.Remove(path))
@@ -502,6 +517,7 @@ func TestJWTBearer(t *testing.T) {
 	assert.Equal(t, 1.0, p.GetJWTMaxDuration(ctx).Hours())
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIDOptional(ctx))
+	assert.Equal(t, true, p.GetGrantTypeJWTBearerOmitAssertionAudience(ctx), "should default to true when not set")
 
 	p2 := MustNew(t, l)
 
@@ -509,11 +525,13 @@ func TestJWTBearer(t *testing.T) {
 	p2.MustSet(ctx, KeyOAuth2GrantJWTMaxDuration, "24h")
 	p2.MustSet(ctx, KeyOAuth2GrantJWTIssuedDateOptional, true)
 	p2.MustSet(ctx, KeyOAuth2GrantJWTIDOptional, true)
+	p2.MustSet(ctx, KeyOAuth2GrantJWTOmitAssertionAudience, false)
 
 	// assert.Equal(t, true, p2.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
 	assert.Equal(t, 24.0, p2.GetJWTMaxDuration(ctx).Hours())
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIDOptional(ctx))
+	assert.Equal(t, false, p2.GetGrantTypeJWTBearerOmitAssertionAudience(ctx))
 }
 
 func TestJWTScopeClaimStrategy(t *testing.T) {

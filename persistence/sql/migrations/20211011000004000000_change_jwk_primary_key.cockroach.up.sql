@@ -1,0 +1,21 @@
+-- CockroachDB's declarative schema changer (observed on v26.1.1 and v26.1.2)
+-- creates a phantom secondary UNIQUE index on the old primary key columns when
+-- using `ALTER TABLE ... DROP CONSTRAINT "primary", ADD CONSTRAINT ... PRIMARY KEY`,
+-- contradicting the documented behavior that this pattern replaces the primary
+-- key without creating a secondary index. This step drops the phantom index
+-- left behind by the step-3 migration above.
+--
+-- Historical context: this phantom index caused production 409 Conflict errors
+-- on /.well-known/jwks.json on fresh CockroachDB v26.1 installs. The
+-- jwk.SQLData Go struct used to carry a PKDeprecated int64 field with a
+-- db:"pk_deprecated" tag, so pop included pk_deprecated = 0 in every INSERT.
+-- The first row succeeded; every subsequent insert collided on the phantom
+-- unique index. The struct field has been removed in the same change as this
+-- migration, so pop now omits the column from INSERTs entirely and CockroachDB
+-- applies the column's SERIAL default, producing unique values per row.
+--
+-- IF EXISTS is used because customers whose migrations ran on older
+-- CockroachDB versions (where the legacy schema changer honored the
+-- documented behavior) will not have this phantom index.
+
+DROP INDEX IF EXISTS hydra_jwk_pk_deprecated_key CASCADE;

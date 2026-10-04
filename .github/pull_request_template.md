@@ -24,7 +24,7 @@ Pull requests introducing new features, which do not have a design document link
 get merged.
 
 You can discuss changes with maintainers either in the Github Discussions in this repository or
-join the [Ory Chat](https://www.ory.sh/chat).
+join the [Ory Chat](https://www.ory.com/chat).
 -->
 
 ## Checklist
@@ -46,7 +46,7 @@ If you're unsure about any of them, don't hesitate to ask. We're here to help!
 - [ ] I confirm that this pull request does not address a security
       vulnerability. If this pull request addresses a security vulnerability, I
       confirm that I got the approval (please contact
-      [security@ory.sh](mailto:security@ory.sh)) from the maintainers to push
+      [security@ory.com](mailto:security@ory.com)) from the maintainers to push
       the changes.
 - [ ] I have added tests that prove my fix is effective or that my feature
       works.

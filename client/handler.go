@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -47,6 +48,8 @@ func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
 	r.PATCH(ClientsHandlerPath+"/{id}", h.patchOAuth2Client)
 	r.DELETE(ClientsHandlerPath+"/{id}", h.deleteOAuth2Client)
 	r.PUT(ClientsHandlerPath+"/{id}/lifespans", h.setOAuth2ClientLifespans)
+	r.POST(ClientsHandlerPath+"/{id}/secrets/rotate", h.rotateOAuth2ClientSecret)
+	r.DELETE(ClientsHandlerPath+"/{id}/secrets/rotate", h.deleteRotatedOAuth2ClientSecrets)
 }
 
 func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic) {
@@ -59,9 +62,7 @@ func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic) {
 // OAuth 2.0 Client Creation Parameters
 //
 // swagger:parameters createOAuth2Client
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type createOAuth2Client struct {
+type _ struct {
 	// OAuth 2.0 Client Request Body
 	//
 	// in: body
@@ -88,6 +89,9 @@ type createOAuth2Client struct {
 //	  201: oAuth2Client
 //	  400: errorOAuth2BadRequest
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
@@ -101,9 +105,7 @@ func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request) {
 // OpenID Connect Dynamic Client Registration Parameters
 //
 // swagger:parameters createOidcDynamicClient
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type createOidcDynamicClient struct {
+type _ struct {
 	// Dynamic Client Registration Request Body
 	//
 	// in: body
@@ -139,6 +141,9 @@ type createOidcDynamicClient struct {
 //	  201: oAuth2Client
 //	  400: errorOAuth2BadRequest
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -156,12 +161,12 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err))
+		return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err))
 	}
 
 	if isDynamic {
 		if c.Secret != "" {
-			return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
+			return nil, errors.WithStack(herodot.ErrBadRequest().WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
 		}
 		// We do not allow to set the client ID for dynamic clients.
 		c.ID = uuidx.NewV4().String()
@@ -205,9 +210,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 // Set OAuth 2.0 Client Parameters
 //
 // swagger:parameters setOAuth2Client
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type setOAuth2Client struct {
+type _ struct {
 	// OAuth 2.0 Client ID
 	//
 	// in: path
@@ -226,9 +229,11 @@ type setOAuth2Client struct {
 // # Set OAuth 2.0 Client
 //
 // Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,
-// otherwise the existing secret is used.
+// otherwise the existing secret is used. Rotated secrets will be cleared if you pass a new `client_secret`.
 //
 // If set, the secret is echoed in the response. It is not possible to retrieve it later on.
+//
+// To perform a seamless client secret rotation, use the `rotateOAuth2ClientSecret` endpoint instead.
 //
 // OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
@@ -246,10 +251,13 @@ type setOAuth2Client struct {
 //	  400: errorOAuth2BadRequest
 //	  404: errorOAuth2NotFound
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -283,9 +291,7 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(co
 // Set Dynamic Client Parameters
 //
 // swagger:parameters setOidcDynamicClient
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type setOidcDynamicClient struct {
+type _ struct {
 	// OAuth 2.0 Client ID
 	//
 	// in: path
@@ -334,6 +340,9 @@ type setOidcDynamicClient struct {
 //	  200: oAuth2Client
 //	  404: errorOAuth2NotFound
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -348,12 +357,12 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
 		return
 	}
 
 	if c.Secret != "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrForbidden.WithReasonf("It is not allowed to choose your own OAuth2 Client secret.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrForbidden().WithReasonf("It is not allowed to choose your own OAuth2 Client secret.")))
 		return
 	}
 
@@ -378,9 +387,7 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 // Patch OAuth 2.0 Client Parameters
 //
 // swagger:parameters patchOAuth2Client
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type patchOAuth2Client struct {
+type _ struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
@@ -398,9 +405,12 @@ type patchOAuth2Client struct {
 //
 // # Patch OAuth 2.0 Client
 //
-// Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`
-// the secret will be updated and returned via the API. This is the
-// only time you will be able to retrieve the client secret, so write it down and keep it safe.
+// Patch an existing OAuth 2.0 Client using JSON Patch. If you update
+// `client_secret`, the secret will be updated and returned via the API. This is
+// the only time you will be able to retrieve the client secret. Passing a new
+// `client_secret` will clear all rotated secrets.
+//
+// To perform a seamless client secret rotation, use the `rotateOAuth2ClientSecret` endpoint instead.
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
@@ -417,6 +427,9 @@ type patchOAuth2Client struct {
 //	  200: oAuth2Client
 //	  404: errorOAuth2NotFound
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -433,7 +446,7 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 
 	oldSecret := client.Secret
 
-	client, err = jsonx.ApplyJSONPatch(patchJSON, client, "/id")
+	client, err = jsonx.ApplyJSONPatch(patchJSON, client, "/id", "/RotatedSecrets", "rotated_secrets")
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -443,8 +456,10 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	// GetConcreteClient returns a client with the hashed secret, however updateClient expects
 	// an empty secret if the secret hasn't changed. As such we need to check if the patch has
 	// updated the secret or not
-	if oldSecret == client.Secret {
+	if client.Secret == oldSecret {
 		client.Secret = ""
+	} else {
+		client.RotatedSecrets = []string{} // explicitly clear
 	}
 
 	if err := h.updateClient(r.Context(), client, h.r.ClientValidator().Validate); err != nil {
@@ -458,9 +473,7 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 // Paginated OAuth2 Client List Response
 //
 // swagger:response listOAuth2Clients
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type listOAuth2ClientsResponse struct {
+type _ struct {
 	keysetpagination.ResponseHeaders
 
 	// List of OAuth 2.0 Clients
@@ -472,9 +485,7 @@ type listOAuth2ClientsResponse struct {
 // Paginated OAuth2 Client List Parameters
 //
 // swagger:parameters listOAuth2Clients
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type listOAuth2ClientsParameters struct {
+type _ struct {
 	keysetpagination.RequestParameters
 
 	// The name of the clients to filter by.
@@ -506,11 +517,14 @@ type listOAuth2ClientsParameters struct {
 //	Responses:
 //	  200: listOAuth2Clients
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request) {
 	pageKeys := h.r.Config().GetPaginationEncryptionKeys(r.Context())
 	pagination, err := keysetpagination.ParseQueryParams(pageKeys, r.URL.Query())
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse pagination parameters: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to parse pagination parameters: %s", err)))
 		return
 	}
 	filters := Filter{
@@ -540,9 +554,7 @@ func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request) {
 // Get OAuth2 Client Parameters
 //
 // swagger:parameters getOAuth2Client
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type adminGetOAuth2Client struct {
+type _ struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
@@ -570,6 +582,9 @@ type adminGetOAuth2Client struct {
 //	Responses:
 //	  200: oAuth2Client
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -585,9 +600,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 // Get OpenID Connect Dynamic Client Parameters
 //
 // swagger:parameters getOidcDynamicClient
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type getOidcDynamicClient struct {
+type _ struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
@@ -621,6 +634,9 @@ type getOidcDynamicClient struct {
 //	Responses:
 //	  200: oAuth2Client
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -635,7 +651,7 @@ func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), client.GetID())
 	if err != nil {
-		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
+		err = herodot.ErrUnauthorized().WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -648,9 +664,7 @@ func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 // Delete OAuth2 Client Parameters
 //
 // swagger:parameters deleteOAuth2Client
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type deleteOAuth2Client struct {
+type _ struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
@@ -680,6 +694,9 @@ type deleteOAuth2Client struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) deleteOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
@@ -693,9 +710,7 @@ func (h *Handler) deleteOAuth2Client(w http.ResponseWriter, r *http.Request) {
 // Set OAuth 2.0 Client Token Lifespans
 //
 // swagger:parameters setOAuth2ClientLifespans
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type setOAuth2ClientLifespans struct {
+type _ struct {
 	// OAuth 2.0 Client ID
 	//
 	// in: path
@@ -720,6 +735,9 @@ type setOAuth2ClientLifespans struct {
 //	Responses:
 //	  200: oAuth2Client
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -730,7 +748,7 @@ func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Reques
 
 	var ls Lifespans
 	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest().WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -746,9 +764,7 @@ func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Reques
 }
 
 // swagger:parameters deleteOidcDynamicClient
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type dynamicClientRegistrationDeleteOAuth2Client struct {
+type _ struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
@@ -783,6 +799,9 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) deleteOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -805,13 +824,13 @@ func (h *Handler) deleteOidcDynamicClient(w http.ResponseWriter, r *http.Request
 func (h *Handler) ValidDynamicAuth(r *http.Request, id string) (fosite.Client, error) {
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
-		return nil, herodot.ErrUnauthorized.
+		return nil, herodot.ErrUnauthorized().
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
 	}
 
 	if len(c.RegistrationAccessTokenSignature) == 0 {
-		return nil, errors.WithStack(herodot.ErrUnauthorized.
+		return nil, errors.WithStack(herodot.ErrUnauthorized().
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("The OAuth2 Client does not have a registration access token."))
 	}
 
@@ -830,14 +849,14 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, id string) (fosite.Client, e
 		},
 		token,
 	); err != nil {
-		return nil, herodot.ErrUnauthorized.
+		return nil, herodot.ErrUnauthorized().
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
 	}
 
 	signature := h.r.OAuth2EnigmaStrategy().Signature(token)
 	if subtle.ConstantTimeCompare([]byte(c.RegistrationAccessTokenSignature), []byte(signature)) == 0 {
-		return nil, errors.WithStack(herodot.ErrUnauthorized.
+		return nil, errors.WithStack(herodot.ErrUnauthorized().
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("Registration access tokens do not match."))
 	}
 
@@ -846,7 +865,131 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, id string) (fosite.Client, e
 
 func (h *Handler) requireDynamicAuth(r *http.Request) *herodot.DefaultError {
 	if !h.r.Config().PublicAllowDynamicRegistration(r.Context()) {
-		return herodot.ErrNotFound.WithReason("Dynamic registration is not enabled.")
+		return herodot.ErrNotFound().WithReason("Dynamic registration is not enabled.")
 	}
 	return nil
+}
+
+// Rotate OAuth2 Client Secret Parameters
+//
+// swagger:parameters rotateOAuth2ClientSecret
+type _ struct {
+	// OAuth 2.0 Client ID
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route POST /admin/clients/{id}/secrets/rotate oAuth2 rotateOAuth2ClientSecret
+//
+// # Rotate OAuth 2.0 Client Secret
+//
+// Rotates an OAuth 2.0 client's secrets. The old secret will remain valid for
+// authentication, allowing for zero-downtime secret rotations. A new secret
+// will be generated and returned in the response.
+//
+// Up to five rotated secrets are retained. Use the
+// `deleteRotatedOAuth2ClientSecrets` endpoint to remove old rotated secrets
+// when they are no longer needed.
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: oAuth2Client
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
+func (h *Handler) rotateOAuth2ClientSecret(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	if authMethod := c.GetTokenEndpointAuthMethod(); !slices.Contains([]string{"client_secret_basic", "client_secret_post"}, authMethod) {
+		h.r.Writer().WriteError(w, r, herodot.ErrBadRequest().WithReasonf("The client is configured to use the %q authentication method, which does not support client secret rotation.", authMethod))
+		return
+	}
+
+	// Move current secret to rotated secrets
+	oldSecret := string(c.GetHashedSecret())
+	if oldSecret != "" {
+		c.RotatedSecrets = append([]string{oldSecret}, c.RotatedSecrets[:min(4, len(c.RotatedSecrets))]...) // Keep only the 5 most recent secrets
+	}
+
+	secretb, err := x.GenerateSecret(26)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	newSecret := string(secretb)
+	c.Secret = newSecret
+
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	c.Secret = newSecret
+	h.r.Writer().Write(w, r, c)
+}
+
+// Delete Rotated OAuth2 Client Secrets Parameters
+//
+// swagger:parameters deleteRotatedOAuth2ClientSecrets
+type _ struct {
+	// OAuth 2.0 Client ID
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route DELETE /admin/clients/{id}/secrets/rotate oAuth2 deleteRotatedOAuth2ClientSecrets
+//
+// # Delete Rotated OAuth 2.0 Client Secrets
+//
+// Removes all rotated secrets from an OAuth 2.0 client. This should be called after all services
+// have been updated to use the new secret and the old secrets are no longer needed.
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: oAuth2Client
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
+func (h *Handler) deleteRotatedOAuth2ClientSecrets(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	if authMethod := c.GetTokenEndpointAuthMethod(); !slices.Contains([]string{"client_secret_basic", "client_secret_post"}, authMethod) {
+		h.r.Writer().WriteError(w, r, herodot.ErrBadRequest().WithReasonf("The client is configured to use the %q authentication method, which does not support client secret rotation.", authMethod))
+		return
+	}
+
+	c.Secret = ""                 // current secret unchanged
+	c.RotatedSecrets = []string{} // explicitly clear
+
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	c.Secret = ""
+	h.r.Writer().Write(w, r, c)
 }

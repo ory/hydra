@@ -24,7 +24,7 @@ import (
 // Optionally, [otelx.JaegerConfig.LocalAgentAddress] can be set to specify a different target.
 //
 // By default, unless a parent sampler has taken a sampling decision, every span is sampled.
-// [otelx.JaegerSampling.TraceIdRatio] may be used to customize the sampling probability,
+// [otelx.JaegerSampling.TraceIDRatio] may be used to customize the sampling probability,
 // optionally alongside [otelx.JaegerSampling.ServerURL] to consult a remote server
 // for the sampling strategy to be used.
 func SetupJaeger(t *Tracer, tracerName string, c *Config) (trace.Tracer, error) {
@@ -51,7 +51,7 @@ func SetupJaeger(t *Tracer, tracerName string, c *Config) (trace.Tracer, error) 
 	}
 
 	samplingServerURL := c.Providers.Jaeger.Sampling.ServerURL
-	traceIdRatio := c.Providers.Jaeger.Sampling.TraceIdRatio
+	traceIdRatio := c.Providers.Jaeger.Sampling.TraceIDRatio
 
 	sampler := sdktrace.TraceIDRatioBased(traceIdRatio)
 

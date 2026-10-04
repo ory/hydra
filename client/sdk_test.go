@@ -22,39 +22,38 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/uuidx"
 )
 
 func createTestClient(prefix string) hydra.OAuth2Client {
 	return hydra.OAuth2Client{
-		ClientName:                pointerx.Ptr(prefix + "name"),
-		ClientSecret:              pointerx.Ptr(prefix + "secret"),
-		ClientUri:                 pointerx.Ptr("https://example.org/" + prefix + "uri"),
+		ClientName:                new(prefix + "name"),
+		ClientSecret:              new(prefix + "secret"),
+		ClientUri:                 new("https://example.org/" + prefix + "uri"),
 		Contacts:                  []string{prefix + "peter", prefix + "pan"},
 		GrantTypes:                []string{prefix + "client_credentials", prefix + "authorize_code"},
-		LogoUri:                   pointerx.Ptr("https://example.org/" + prefix + "logo"),
-		Owner:                     pointerx.Ptr(prefix + "an-owner"),
-		PolicyUri:                 pointerx.Ptr("https://example.org/" + prefix + "policy-uri"),
-		Scope:                     pointerx.Ptr(prefix + "foo bar baz"),
-		TosUri:                    pointerx.Ptr("https://example.org/" + prefix + "tos"),
+		LogoUri:                   new("https://example.org/" + prefix + "logo"),
+		Owner:                     new(prefix + "an-owner"),
+		PolicyUri:                 new("https://example.org/" + prefix + "policy-uri"),
+		Scope:                     new(prefix + "foo bar baz"),
+		TosUri:                    new("https://example.org/" + prefix + "tos"),
 		ResponseTypes:             []string{prefix + "id_token", prefix + "code"},
 		RedirectUris:              []string{"https://" + prefix + "redirect-url", "https://" + prefix + "redirect-uri"},
-		ClientSecretExpiresAt:     pointerx.Ptr[int64](0),
-		TokenEndpointAuthMethod:   pointerx.Ptr("client_secret_basic"),
-		UserinfoSignedResponseAlg: pointerx.Ptr("none"),
-		SubjectType:               pointerx.Ptr("public"),
+		ClientSecretExpiresAt:     new(int64(0)),
+		TokenEndpointAuthMethod:   new("client_secret_basic"),
+		UserinfoSignedResponseAlg: new("none"),
+		SubjectType:               new("public"),
 		Metadata:                  map[string]interface{}{"foo": "bar"},
 		// because these values are not nullable in the SQL schema, we have to set them not nil
 		AllowedCorsOrigins: []string{},
 		Audience:           []string{},
 		Jwks:               &hydra.JsonWebKeySet{},
-		SkipConsent:        pointerx.Ptr(false),
+		SkipConsent:        new(false),
 	}
 }
 
@@ -68,9 +67,8 @@ func TestClientSDK(t *testing.T) {
 		config.KeyPublicAllowDynamicRegistration: true,
 	})))
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	routerAdmin := x.NewRouterAdmin(metrics)
-	routerPublic := x.NewRouterPublic(metrics)
+	routerAdmin := httprouterx.NewRouterAdminWithPrefix()
+	routerPublic := httprouterx.NewRouterPublic()
 	clHandler := client.NewHandler(r)
 	clHandler.SetPublicRoutes(routerPublic)
 	clHandler.SetAdminRoutes(routerAdmin)
@@ -120,7 +118,7 @@ func TestClientSDK(t *testing.T) {
 		assert.EqualValues(t, "bar", result.Metadata.(map[string]interface{})["foo"])
 
 		// secret is not returned on GetOAuth2Client
-		compareClient.ClientSecret = pointerx.Ptr("")
+		compareClient.ClientSecret = new("")
 		gresult, _, err := c.OAuth2API.GetOAuth2Client(context.Background(), *createClient.ClientId).Execute()
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
@@ -153,7 +151,7 @@ func TestClientSDK(t *testing.T) {
 
 		// again, test if secret is not returned on Get
 		compareClient = updateClient
-		compareClient.ClientSecret = pointerx.Ptr("")
+		compareClient.ClientSecret = new("")
 		gresult, _, err = c.OAuth2API.GetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
@@ -168,7 +166,7 @@ func TestClientSDK(t *testing.T) {
 
 	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
 		result, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{
-			TokenEndpointAuthMethod: pointerx.Ptr("none"),
+			TokenEndpointAuthMethod: new("none"),
 		}).Execute()
 		require.NoError(t, err)
 
@@ -182,7 +180,7 @@ func TestClientSDK(t *testing.T) {
 
 	t.Run("case=id can be set", func(t *testing.T) {
 		id := uuidx.NewV4().String()
-		result, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: pointerx.Ptr(id)}).Execute()
+		result, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: new(id)}).Execute()
 		require.NoError(t, err)
 
 		assert.Equal(t, id, pointerx.Deref(result.ClientId))

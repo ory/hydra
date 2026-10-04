@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 
 	crypto11 "github.com/ThalesGroup/crypto11"
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockContext is a mock of Context interface.

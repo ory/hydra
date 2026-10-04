@@ -1,4 +1,4 @@
-npmName: "@ory/kratos-client"
+npmName: "@ory/hydra-client"
 npmVersion: 0.0.0
 # typescriptThreePlus: true
 #npmRepository: https://github.com/ory/sdk.git

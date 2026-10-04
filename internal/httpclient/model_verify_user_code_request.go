@@ -23,9 +23,11 @@ type VerifyUserCodeRequest struct {
 	Client              *OAuth2Client `json:"client,omitempty"`
 	DeviceCodeRequestId *string       `json:"device_code_request_id,omitempty"`
 	// RequestURL is the original Device Authorization URL requested.
-	RequestUrl                   *string  `json:"request_url,omitempty"`
+	RequestUrl *string `json:"request_url,omitempty"`
+	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
-	RequestedScope               []string `json:"requested_scope,omitempty"`
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	RequestedScope []string `json:"requested_scope,omitempty"`
 }
 
 // NewVerifyUserCodeRequest instantiates a new VerifyUserCodeRequest object

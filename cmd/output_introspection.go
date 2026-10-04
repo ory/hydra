@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ory/x/pointerx"
-
 	hydra "github.com/ory/hydra-client-go/v2"
 )
 
@@ -22,23 +20,23 @@ func (outputOAuth2TokenIntrospection) Header() []string {
 
 func (i outputOAuth2TokenIntrospection) Columns() []string {
 	if i.Sub == nil {
-		i.Sub = pointerx.String("")
+		i.Sub = new("")
 	}
 
 	if i.ClientId == nil {
-		i.ClientId = pointerx.String("")
+		i.ClientId = new("")
 	}
 
 	if i.Scope == nil {
-		i.Scope = pointerx.String("")
+		i.Scope = new("")
 	}
 
 	if i.TokenUse == nil {
-		i.TokenUse = pointerx.String("")
+		i.TokenUse = new("")
 	}
 
 	if i.Exp == nil {
-		i.Exp = pointerx.Int64(0)
+		i.Exp = new(int64(0))
 	}
 
 	return []string{

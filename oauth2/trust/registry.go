@@ -6,12 +6,13 @@ package trust
 import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/logrusx"
 )
 
 type InternalRegistry interface {
-	x.RegistryWriter
-	x.RegistryLogger
+	httpx.WriterProvider
+	logrusx.Provider
 	Registry
 	config.Provider
 	jwk.ManagerProvider

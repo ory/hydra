@@ -166,3 +166,8 @@ func DSNRedacted(dsn string) (string, error) {
 	res += afterUsernamePassword
 	return res, nil
 }
+
+func StripQueryParamsFromDSN(dsn string) string {
+	before, _, _ := strings.Cut(dsn, "?")
+	return before
+}

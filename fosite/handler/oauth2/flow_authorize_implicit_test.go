@@ -69,12 +69,12 @@ func TestAuthorizeImplicit_EndpointHandler(t *testing.T) {
 			setup: func() {
 				areq.ResponseTypes = fosite.Arguments{"token"}
 				areq.RequestedScope = fosite.Arguments{"scope"}
-				areq.RequestedAudience = fosite.Arguments{"https://www.ory.sh/not-api"}
+				areq.RequestedAudience = fosite.Arguments{"https://www.ory.com/not-api"}
 				areq.Client = &fosite.DefaultClient{
 					GrantTypes:    fosite.Arguments{"implicit"},
 					ResponseTypes: fosite.Arguments{"token"},
 					Scopes:        []string{"scope"},
-					Audience:      []string{"https://www.ory.sh/api"},
+					Audience:      []string{"https://www.ory.com/api"},
 				}
 			},
 			expectErr: fosite.ErrInvalidRequest,
@@ -82,7 +82,7 @@ func TestAuthorizeImplicit_EndpointHandler(t *testing.T) {
 		{
 			description: "should fail because persistence failed",
 			setup: func() {
-				areq.RequestedAudience = fosite.Arguments{"https://www.ory.sh/api"}
+				areq.RequestedAudience = fosite.Arguments{"https://www.ory.com/api"}
 				chgenp.EXPECT().AccessTokenStrategy().Return(chgen).Times(1)
 				chgen.EXPECT().GenerateAccessToken(gomock.Any(), areq).AnyTimes().Return("access.ats", "ats", nil)
 				provider.EXPECT().AccessTokenStorage().Return(store).Times(1)

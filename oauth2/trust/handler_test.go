@@ -27,10 +27,8 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/prometheusx"
+	"github.com/ory/x/httprouterx"
 )
 
 // Define the suite, and absorb the built-in basic suite
@@ -51,8 +49,7 @@ func (s *HandlerTestSuite) SetupTest() {
 		config.KeyDefaultClientScope:    []string{"foo", "bar"},
 	})))
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	router := x.NewRouterAdmin(metrics)
+	router := httprouterx.NewRouterAdminWithPrefix()
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry)
@@ -148,7 +145,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithSubjectAndAnySubject() {
 
 func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithUnknownJWK() {
 	createRequestParams := hydra.TrustOAuth2JwtGrantIssuer{
-		AllowAnySubject: pointerx.Ptr(true),
+		AllowAnySubject: new(true),
 		ExpiresAt:       time.Now().Add(1 * time.Hour),
 		Issuer:          "ory",
 		Jwk: hydra.JsonWebKey{
@@ -308,8 +305,8 @@ func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
 		Issuer:          issuer,
 		Jwk:             s.generateJWK(s.publicKey),
 		Scope:           scope,
-		Subject:         pointerx.Ptr(subject),
-		AllowAnySubject: pointerx.Ptr(allowAnySubject),
+		Subject:         new(subject),
+		AllowAnySubject: new(allowAnySubject),
 	}
 }
 

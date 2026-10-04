@@ -77,7 +77,7 @@ func (f *Fosite) NewAccessRequest(ctx context.Context, r *http.Request, session 
 		accessRequest.Client = client
 	}
 
-	var found = false
+	found := false
 	for _, loader := range f.Config.GetTokenEndpointHandlers(ctx) {
 		// Is the loader responsible for handling the request?
 		if !loader.CanHandleTokenEndpointRequest(ctx, accessRequest) {

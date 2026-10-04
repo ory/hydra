@@ -1,4 +1,4 @@
-FROM golang:1.25 AS builder
+FROM golang:1.26 AS builder
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
@@ -22,7 +22,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -tags sqlite -o /usr/bin/hydra
+RUN go build  -o /usr/bin/hydra
 
 VOLUME /mnt/sqlite
 

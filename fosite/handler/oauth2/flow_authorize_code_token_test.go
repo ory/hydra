@@ -6,6 +6,7 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -410,7 +411,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 						areq.Form.Add("code", code)
 
 						require.NoError(t, store.CreateAuthorizeCodeSession(context.Background(), sig, areq))
-						require.NoError(t, store.InvalidateAuthorizeCodeSession(context.Background(), sig))
+						require.NoError(t, store.InvalidateAuthorizeCodeSession(context.Background(), code, sig))
 					},
 					description: "should fail because code has been used already",
 					expectErr:   fosite.ErrInvalidGrant,
@@ -459,6 +460,7 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 	for k, c := range []struct {
 		description string
 		setup       func(
+			t *testing.T,
 			mockTransactional *internal.MockTransactional,
 			tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
 			tokenRevocationStorage *internal.MockTokenRevocationStorage,
@@ -476,10 +478,15 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 			refreshTokenStrategy *internal.MockRefreshTokenStrategy,
 		)
 		expectError error
+		// expectStatusCode, when non-zero, asserts the HTTP status the
+		// client would receive — i.e. the outermost RFC6749 error's code,
+		// which is what masking a grant error as a server error changes.
+		expectStatusCode int
 	}{
 		{
 			description: "transaction should be committed successfully if no errors occur",
 			setup: func(
+				t *testing.T,
 				mockTransactional *internal.MockTransactional,
 				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
 				tokenRevocationStorage *internal.MockTokenRevocationStorage,
@@ -510,12 +517,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
 
@@ -556,18 +563,15 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up transaction expectations
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
-					Return(nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 			},
 		},
 		{
 			description: "transaction should be rolled back if `InvalidateAuthorizeCodeSession` returns an error",
 			setup: func(
+				t *testing.T,
 				mockTransactional *internal.MockTransactional,
 				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
 				tokenRevocationStorage *internal.MockTokenRevocationStorage,
@@ -604,31 +608,89 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
 
 				// Set up transaction expectations
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
 		},
 		{
+			description: "a client-facing grant error from a transactional storage call is preserved, not masked as a server error",
+			setup: func(
+				t *testing.T,
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(2)
+
+				// A losing concurrent redemption: InvalidateAuthorizeCodeSession
+				// reports the code was already used by mapping its unique
+				// violation to ErrInvalidGrant.
+				authorizeCodeStorage.
+					EXPECT().
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(request, nil).
+					Times(1)
+				authorizeCodeStorage.
+					EXPECT().
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(fosite.ErrInvalidGrant.WithHint("Authorization code has already been used.")).
+					Times(1)
+
+				// Set up transaction expectations
+				mockTransactional.
+					EXPECT().
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
+					Times(1)
+			},
+			expectError:      fosite.ErrInvalidGrant,
+			expectStatusCode: http.StatusBadRequest,
+		},
+		{
 			description: "transaction should be rolled back if `CreateAccessTokenSession` returns an error",
 			setup: func(
+				t *testing.T,
 				mockTransactional *internal.MockTransactional,
 				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
 				tokenRevocationStorage *internal.MockTokenRevocationStorage,
@@ -665,12 +727,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
 
@@ -691,13 +753,8 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up transaction expectations
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
@@ -705,6 +762,7 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "should result in a server error if transaction cannot be created",
 			setup: func(
+				t *testing.T,
 				mockTransactional *internal.MockTransactional,
 				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
 				tokenRevocationStorage *internal.MockTokenRevocationStorage,
@@ -741,21 +799,23 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 
 				// Set up transaction expectations
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(nil, errors.New("Whoops, unable to create transaction!"))
+					Transaction(propagatedContext, gomock.Any()).
+					Return(errors.New("Whoops, unable to create transaction!")).
+					Times(1)
 			},
 			expectError: fosite.ErrServerError,
 		},
 		{
 			description: "should result in a server error if transaction cannot be rolled back",
 			setup: func(
+				t *testing.T,
 				mockTransactional *internal.MockTransactional,
 				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
 				tokenRevocationStorage *internal.MockTokenRevocationStorage,
@@ -792,24 +852,20 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
 
 				// Set up transaction expectations
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(errors.New("Whoops, unable to rollback transaction!")).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
@@ -817,6 +873,7 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "should result in a server error if transaction cannot be committed",
 			setup: func(
+				t *testing.T,
 				mockTransactional *internal.MockTransactional,
 				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
 				tokenRevocationStorage *internal.MockTokenRevocationStorage,
@@ -853,12 +910,12 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up authorize code storage expectations
 				authorizeCodeStorage.
 					EXPECT().
-					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
+					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				authorizeCodeStorage.
 					EXPECT().
-					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
 
@@ -893,17 +950,11 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				// Set up transaction expectations
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
-					Return(errors.New("Whoops, unable to commit transaction!")).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error {
+						require.NoError(t, f(ctx))
+						return errors.New("Whoops, unable to commit transaction!")
+					}).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
@@ -974,6 +1025,7 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 
 			// set up mock expectations
 			c.setup(
+				t,
 				mockTransactional,
 				tokenRevocationStorageProvider,
 				tokenRevocationStorage,
@@ -992,8 +1044,11 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 			)
 
 			// invoke function under test
-			if err := handler.PopulateTokenEndpointResponse(propagatedContext, request, fosite.NewAccessResponse()); c.expectError != nil {
-				assert.EqualError(t, err, c.expectError.Error())
+			err = handler.PopulateTokenEndpointResponse(propagatedContext, request, fosite.NewAccessResponse())
+			assert.ErrorIs(t, err, c.expectError)
+			if c.expectStatusCode != 0 {
+				assert.Equal(t, c.expectStatusCode, fosite.ErrorToRFC6749Error(err).StatusCode(),
+					"client-facing status code")
 			}
 		})
 	}

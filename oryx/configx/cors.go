@@ -5,8 +5,11 @@ package configx
 
 import (
 	_ "embed"
+	"net/http"
 
 	"github.com/rs/cors"
+
+	"github.com/ory/x/corsx"
 )
 
 const CORSConfigSchemaID = "ory://cors-config"
@@ -16,8 +19,13 @@ var CORSConfigSchema []byte
 
 func (p *Provider) CORS(prefix string, defaults cors.Options) (cors.Options, bool) {
 	prefix = cleanPrefix(prefix)
-
+	allowedOrigins := p.StringsF(prefix+"cors.allowed_origins", defaults.AllowedOrigins)
+	allowInsecureOrigins := p.BoolF("feature_flags.legacy_allow_insecure_origins", false)
 	return cors.Options{
+		// Populated even though rs/cors ignores it once AllowOriginVaryRequestFunc
+		// is set: some consumers read AllowedOrigins directly — notably hydra's
+		// oauth2cors.Middleware (which builds its own matcher and treats an empty
+		// list as "allow all", a CORS bypass) and oathkeeper's address detection.
 		AllowedOrigins:     p.StringsF(prefix+"cors.allowed_origins", defaults.AllowedOrigins),
 		AllowedMethods:     p.StringsF(prefix+"cors.allowed_methods", defaults.AllowedMethods),
 		AllowedHeaders:     p.StringsF(prefix+"cors.allowed_headers", defaults.AllowedHeaders),
@@ -26,5 +34,8 @@ func (p *Provider) CORS(prefix string, defaults cors.Options) (cors.Options, boo
 		OptionsPassthrough: p.BoolF(prefix+"cors.options_passthrough", defaults.OptionsPassthrough),
 		MaxAge:             p.IntF(prefix+"cors.max_age", defaults.MaxAge),
 		Debug:              p.BoolF(prefix+"cors.debug", defaults.Debug),
+		AllowOriginVaryRequestFunc: func(_ *http.Request, origin string) (bool, []string) {
+			return corsx.CheckOrigin(allowedOrigins, origin, allowInsecureOrigins), nil
+		},
 	}, p.Bool(prefix + "cors.enabled")
 }

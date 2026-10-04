@@ -12,7 +12,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strconv"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/gorilla/sessions"
 	pkgerr "github.com/pkg/errors"
@@ -23,6 +25,7 @@ import (
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
@@ -39,9 +42,15 @@ func init() {
 func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	t.Parallel()
 
-	r, err := New(t.Context(), WithConfigOptions(
+	ts := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		t.Error("Should not be called")
+		writer.WriteHeader(http.StatusInternalServerError)
+	}))
+	t.Cleanup(ts.Close)
+
+	r, err := New(t.Context(), WithAutoMigrate(), WithConfigOptions(
 		configx.WithValues(map[string]any{
-			config.KeyDSN:                         "memory",
+			config.KeyDSN:                         dbal.NewSQLiteTestDatabase(t),
 			config.HSMEnabled:                     "false",
 			config.KeyClientHTTPNoPrivateIPRanges: true,
 		}),
@@ -49,8 +58,10 @@ func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	))
 	require.NoError(t, err)
 
-	_, err = r.OAuth2Config().GetJWKSFetcherStrategy(t.Context()).Resolve(t.Context(), "http://localhost:8080", true)
-	require.ErrorAs(t, err, new(httpx.ErrPrivateIPAddressDisallowed))
+	_, err = r.OAuth2Config().GetJWKSFetcherStrategy(t.Context()).Resolve(t.Context(), ts.URL, true)
+	rfcErr, ok := errors.AsType[*fosite.RFC6749Error](err)
+	require.True(t, ok, "expected a fosite.RFC6749Error, got %T: %+v", err, err)
+	require.Contains(t, rfcErr.DebugField, "no route to host")
 }
 
 func TestRegistrySQL_newKeyStrategy_handlesNetworkError(t *testing.T) {
@@ -122,7 +133,9 @@ func TestRegistrySQL_HTTPClient(t *testing.T) {
 		config.KeyDSN:                              dbal.NewSQLiteTestDatabase(t),
 		config.KeyClientHTTPNoPrivateIPRanges:      true,
 		config.KeyClientHTTPPrivateIPExceptionURLs: []string{ts.URL + "/exception/*"},
-	})))
+	})), WithHTTPClientOptions(
+		httpx.ResilientClientAllowInternalIPRequestsTo(ts.URL+"/*"),
+	))
 	require.NoError(t, err)
 
 	t.Run("case=matches exception glob", func(t *testing.T) {
@@ -132,9 +145,54 @@ func TestRegistrySQL_HTTPClient(t *testing.T) {
 	})
 
 	t.Run("case=does not match exception glob", func(t *testing.T) {
-		_, err := r.HTTPClient(t.Context()).Get(ts.URL + "/foo")
-		assert.ErrorContains(t, err, "prohibited IP address")
+		_, err := r.HTTPClient(
+			t.Context(),
+			httpx.ResilientClientAllowInternalIPRequestsTo(ts.URL+"/*"),
+		).Get(ts.URL + "/foo")
+		assert.Error(t, err)
 	})
+}
+
+func TestRegistrySQL_HTTPClientOptions(t *testing.T) {
+	t.Parallel()
+
+	newRegistry := func(t *testing.T, opts ...OptionsModifier) *RegistrySQL {
+		t.Helper()
+		opts = append([]OptionsModifier{
+			SkipNetworkInit(),
+			DisableValidation(),
+			WithConfigOptions(configx.WithValue(config.KeyDSN, dbal.NewSQLiteTestDatabase(t))),
+		}, opts...)
+		r, err := New(t.Context(), opts...)
+		require.NoError(t, err)
+		return r
+	}
+
+	defaultClient := newRegistry(t).HTTPClient(t.Context())
+	assert.Equal(t, 2, defaultClient.RetryMax)
+	assert.Equal(t, time.Second, defaultClient.RetryWaitMin)
+	assert.Equal(t, 30*time.Second, defaultClient.RetryWaitMax)
+
+	var requests atomic.Int32
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		requests.Add(1)
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	t.Cleanup(ts.Close)
+
+	fastClient := newRegistry(t, WithHTTPClientOptions(
+		httpx.ResilientClientWithMinRetryWait(time.Millisecond),
+		httpx.ResilientClientWithMaxRetryWait(time.Millisecond),
+	)).HTTPClient(t.Context())
+	assert.Equal(t, 2, fastClient.RetryMax)
+	assert.Equal(t, time.Millisecond, fastClient.RetryWaitMin)
+	assert.Equal(t, time.Millisecond, fastClient.RetryWaitMax)
+
+	start := time.Now()
+	_, err := fastClient.Get(ts.URL)
+	require.Error(t, err)
+	require.Less(t, time.Since(start), time.Second)
+	require.EqualValues(t, 3, requests.Load(), "expected the initial request plus two retries")
 }
 
 func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
@@ -146,7 +204,7 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 		WithConfigOptions(
 			configx.SkipValidation(),
 			configx.WithValues(map[string]any{
-				config.KeyDSN:     "memory",
+				config.KeyDSN:     dbal.NewSQLiteTestDatabase(t),
 				config.HSMEnabled: false,
 			}),
 		),

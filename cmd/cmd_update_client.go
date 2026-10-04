@@ -4,16 +4,14 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/v2/cmd/cli"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/pointerx"
 )
 
 func NewUpdateClientCmd() *cobra.Command {
@@ -28,7 +26,9 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 
   {{ .CommandPath }} e6e96aa5-9cd2-4a70-bf56-ad6434c8aaa2 --name "my app" --grant-type client_credentials --response-type token --scope core,foobar --keybase keybase_username
 `,
-		Long: `This command replaces an OAuth 2.0 Client by its ID. Please be aware that this command replaces the entire client. If only the name flag (-n "my updated app") is provided, the all other fields are updated to their default values.`,
+		Long: `This command updates an OAuth 2.0 Client by its ID. Only the fields provided as flags are changed; all other fields keep their current values.
+
+To replace the entire client with a new configuration, use the --file flag. Fields missing from the file are reset to their default values.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
@@ -36,24 +36,39 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			}
 
 			secret := flagx.MustGetString(cmd, "secret")
-			ek, encryptSecret, err := cli.NewEncryptionKey(cmd, nil)
+			ek, encryptSecret, err := NewEncryptionKey(cmd, nil)
 			if err != nil {
 				return err
 			}
 
 			id := args[0]
-			cc, err := clientFromFlags(cmd)
-			if err != nil {
-				return err
-			}
+			var client *hydra.OAuth2Client
+			if flagx.MustGetString(cmd, flagFile) != "" {
+				cc, err := clientFromFlags(cmd)
+				if err != nil {
+					return err
+				}
 
-			client, _, err := m.OAuth2API.SetOAuth2Client(context.Background(), id).OAuth2Client(cc).Execute() //nolint:bodyclose
-			if err != nil {
-				return cmdx.PrintOpenAPIError(cmd, err)
+				// In file mode the --secret flag is ignored like all other client
+				// flags. Only a secret that is part of the request may be echoed.
+				secret = ""
+				if cc.ClientSecret != nil {
+					secret = *cc.ClientSecret
+				}
+
+				client, _, err = m.OAuth2API.SetOAuth2Client(cmd.Context(), id).OAuth2Client(cc).Execute() //nolint:bodyclose
+				if err != nil {
+					return cmdx.PrintOpenAPIError(cmd, err)
+				}
+			} else {
+				client, _, err = m.OAuth2API.PatchOAuth2Client(cmd.Context(), id).JsonPatch(clientPatchFromFlags(cmd)).Execute() //nolint:bodyclose
+				if err != nil {
+					return cmdx.PrintOpenAPIError(cmd, err)
+				}
 			}
 
 			if client.ClientSecret == nil && len(secret) > 0 {
-				client.ClientSecret = pointerx.Ptr(secret)
+				client.ClientSecret = new(secret)
 			}
 
 			if encryptSecret && client.ClientSecret != nil {
@@ -63,7 +78,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 					return cmdx.FailSilently(cmd)
 				}
 
-				client.ClientSecret = pointerx.Ptr(enc.Base64Encode())
+				client.ClientSecret = new(enc.Base64Encode())
 			}
 
 			cmdx.PrintRow(cmd, (*outputOAuth2Client)(client))

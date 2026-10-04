@@ -28,7 +28,7 @@ func TestDeleteJwks(t *testing.T) {
 
 	t.Run("case=deletes jwks", func(t *testing.T) {
 		set := uuid.Must(uuid.NewV4()).String()
-		_ = createJWK(t, reg, set, "RS256")
+		_ = createJWK(t, reg, set, "ES256")
 		stdout := cmdx.ExecNoErr(t, c, set)
 		assert.Equal(t, fmt.Sprintf(`"%s"`, set), strings.TrimSpace(stdout))
 
@@ -39,8 +39,8 @@ func TestDeleteJwks(t *testing.T) {
 	t.Run("case=deletes multiple jwkss", func(t *testing.T) {
 		set1 := uuid.Must(uuid.NewV4()).String()
 		set2 := uuid.Must(uuid.NewV4()).String()
-		_ = createJWK(t, reg, set1, "RS256")
-		_ = createJWK(t, reg, set2, "RS256")
+		_ = createJWK(t, reg, set1, "ES256")
+		_ = createJWK(t, reg, set2, "ES256")
 		assertx.EqualAsJSON(t, []string{set1, set2}, json.RawMessage(cmdx.ExecNoErr(t, c, set1, set2)))
 
 		_, err := reg.KeyManager().GetKeySet(t.Context(), set1)

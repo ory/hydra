@@ -27,7 +27,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/pointerx"
 	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/sqlxx"
@@ -77,7 +76,7 @@ func createTestFlow(nid uuid.UUID, state flow.State) *flow.Flow {
 		GrantedScope:               []string{"openid"},
 		GrantedAudience:            []string{"https://api.example.org"},
 		ConsentRemember:            true,
-		ConsentRememberFor:         pointerx.Ptr(3000),
+		ConsentRememberFor:         new(3000),
 		ConsentHandledAt:           sqlxx.NullTime{},
 		SessionIDToken:             map[string]interface{}{"sub": "test-subject", "foo": "bar"},
 		SessionAccessToken:         map[string]interface{}{"scp": []string{"openid", "profile"}, "aud": []string{"https://api.example.org"}},
@@ -656,6 +655,6 @@ func TestUpdateLegacyChallenges(t *testing.T) {
 		}
 		require.NoError(t, err)
 
-		require.NoError(t, os.WriteFile(fmt.Sprintf("fixtures/legacy_challenges/%s.txt", name), []byte(challenge), 0644))
+		require.NoError(t, os.WriteFile(fmt.Sprintf("fixtures/legacy_challenges/%s.txt", name), []byte(challenge), 0o644))
 	}
 }

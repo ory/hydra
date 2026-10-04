@@ -386,8 +386,8 @@ func TestRefreshFlowTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					Times(1)
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorage.
 					EXPECT().
@@ -407,11 +407,6 @@ func TestRefreshFlowTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				mockTokenRevocationStorage.
 					EXPECT().
 					RevokeAccessToken(propagatedContext, gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
 					Return(nil).
 					Times(1)
 			},
@@ -566,17 +561,17 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 
 	for _, testCase := range []struct {
 		description string
-		setup       func()
+		setup       func(t *testing.T)
 		expectError error
 	}{
 		{
 			description: "transaction should be committed successfully if no errors occur",
-			setup: func() {
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -603,21 +598,16 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
 		},
 		{
 			description: "transaction should be rolled back if call to `RevokeAccessToken` results in an error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -628,11 +618,6 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					EXPECT().
 					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
@@ -640,12 +625,12 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 		{
 			description: "should result in a fosite.ErrInvalidRequest if call to `RevokeAccessToken` results in a " +
 				"fosite.ErrSerializationFailure error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -657,22 +642,17 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(fosite.ErrSerializationFailure).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
 			expectError: fosite.ErrInvalidRequest,
 		},
 		{
 			description: "transaction should be rolled back if call to `RotateRefreshToken` results in an error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -683,11 +663,6 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					EXPECT().
 					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
@@ -695,12 +670,12 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 		{
 			description: "should result in a fosite.ErrInvalidRequest if call to `RotateRefreshToken` results in a " +
 				"fosite.ErrSerializationFailure error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -711,11 +686,6 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					EXPECT().
 					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(fosite.ErrSerializationFailure).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
 					Times(1)
 			},
 			expectError: fosite.ErrInvalidRequest,
@@ -723,11 +693,11 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 		{
 			description: "should result in a fosite.ErrInvalidRequest if call to `CreateAccessTokenSession` results in " +
 				"a fosite.ErrSerializationFailure error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -748,22 +718,17 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(fosite.ErrSerializationFailure).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
 					Times(1)
 			},
 			expectError: fosite.ErrInvalidRequest,
 		},
 		{
 			description: "transaction should be rolled back if call to `CreateAccessTokenSession` results in an error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -784,23 +749,18 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
 		},
 		{
 			description: "transaction should be rolled back if call to `CreateRefreshTokenSession` results in an error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockRefreshTokenStorageProvider.
 					EXPECT().
@@ -827,190 +787,44 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
 			expectError: fosite.ErrServerError,
 		},
 		{
-			description: "should result in a fosite.ErrInvalidRequest if call to `CreateRefreshTokenSession` results in " +
-				"a fosite.ErrSerializationFailure error",
-			setup: func() {
+			description: "should result in a fosite.ErrInvalidRequest if transaction returns fosite.ErrSerializationFailure error",
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
-					Times(1)
-				mockRefreshTokenStorageProvider.
-					EXPECT().
-					RefreshTokenStorage().
-					Return(mockRefreshTokenStorage).
-					Times(2)
-				mockRefreshTokenStorage.
-					EXPECT().
-					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockAccessTokenStorageProvider.
-					EXPECT().
-					AccessTokenStorage().
-					Return(mockAccessTokenStorage).
-					Times(1)
-				mockAccessTokenStorage.
-					EXPECT().
-					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockRefreshTokenStorage.
-					EXPECT().
-					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
+					Transaction(propagatedContext, gomock.Any()).
 					Return(fosite.ErrSerializationFailure).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
 					Times(1)
 			},
 			expectError: fosite.ErrInvalidRequest,
 		},
 		{
-			description: "should result in a server error if transaction cannot be created",
-			setup: func() {
+			description: "should result in a server error if transaction fails",
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(nil, errors.New("Could not create transaction!")).
-					Times(1)
-			},
-			expectError: fosite.ErrServerError,
-		},
-		{
-			description: "should result in a server error if transaction cannot be rolled back",
-			setup: func() {
-				request.GrantTypes = fosite.Arguments{"refresh_token"}
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
-					Times(1)
-				mockRefreshTokenStorageProvider.
-					EXPECT().
-					RefreshTokenStorage().
-					Return(mockRefreshTokenStorage).
-					Times(1)
-				mockRefreshTokenStorage.
-					EXPECT().
-					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(fosite.ErrNotFound).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(errors.New("Could not rollback transaction!")).
-					Times(1)
-			},
-			expectError: fosite.ErrServerError,
-		},
-		{
-			description: "should result in a server error if transaction cannot be committed",
-			setup: func() {
-				request.GrantTypes = fosite.Arguments{"refresh_token"}
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
-					Times(1)
-				mockRefreshTokenStorageProvider.
-					EXPECT().
-					RefreshTokenStorage().
-					Return(mockRefreshTokenStorage).
-					Times(2)
-				mockRefreshTokenStorage.
-					EXPECT().
-					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockAccessTokenStorageProvider.
-					EXPECT().
-					AccessTokenStorage().
-					Return(mockAccessTokenStorage).
-					Times(1)
-				mockAccessTokenStorage.
-					EXPECT().
-					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockRefreshTokenStorage.
-					EXPECT().
-					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
+					Transaction(propagatedContext, gomock.Any()).
 					Return(errors.New("Could not commit transaction!")).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
-			expectError: nil,
+			expectError: fosite.ErrServerError,
 		},
 		{
-			description: "should result in a `fosite.ErrInvalidRequest` if transaction fails to commit due to a " +
-				"`fosite.ErrSerializationFailure` error",
-			setup: func() {
+			description: "should result in a fosite.ErrInvalidRequest if transaction fails to commit due to a fosite.ErrSerializationFailure error",
+			setup: func(t *testing.T) {
 				request.GrantTypes = fosite.Arguments{"refresh_token"}
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
-					Times(1)
-				mockRefreshTokenStorageProvider.
-					EXPECT().
-					RefreshTokenStorage().
-					Return(mockRefreshTokenStorage).
-					Times(2)
-				mockRefreshTokenStorage.
-					EXPECT().
-					RotateRefreshToken(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockAccessTokenStorageProvider.
-					EXPECT().
-					AccessTokenStorage().
-					Return(mockAccessTokenStorage).
-					Times(1)
-				mockAccessTokenStorage.
-					EXPECT().
-					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockRefreshTokenStorage.
-					EXPECT().
-					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
+					Transaction(propagatedContext, gomock.Any()).
 					Return(fosite.ErrSerializationFailure).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
-			expectError: nil,
+			expectError: fosite.ErrInvalidRequest,
 		},
 	} {
 		t.Run(fmt.Sprintf("scenario=%s", testCase.description), func(t *testing.T) {
@@ -1050,11 +864,10 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 				},
 			}
 
-			testCase.setup()
+			testCase.setup(t)
 
-			if err := handler.PopulateTokenEndpointResponse(propagatedContext, request, response); testCase.expectError != nil {
-				assert.EqualError(t, err, testCase.expectError.Error())
-			}
+			err := handler.PopulateTokenEndpointResponse(propagatedContext, request, response)
+			assert.ErrorIs(t, err, testCase.expectError)
 		})
 	}
 }

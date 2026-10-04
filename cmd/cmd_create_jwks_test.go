@@ -28,6 +28,8 @@ func TestCreateJWKS(t *testing.T) {
 		assert.Len(t, actual.Get("keys.0").Array(), 1, "%s", actual.Raw)
 		assert.NotEmpty(t, actual.Get("keys.0.kid").Array(), "%s", actual.Raw)
 		assert.Equal(t, "ES256", actual.Get("keys.0.alg").String(), "%s", actual.Raw)
+		assert.Equal(t, set, actual.Get("set").String(), "%s", actual.Raw)
+		assert.Equal(t, set, actual.Get("keys.0.set").String(), "%s", actual.Raw)
 
 		expected, err := reg.KeyManager().GetKeySet(t.Context(), set)
 		require.NoError(t, err)
@@ -36,9 +38,9 @@ func TestCreateJWKS(t *testing.T) {
 
 	t.Run("case=gets jwks public", func(t *testing.T) {
 		set := uuid.Must(uuid.NewV4()).String()
-		actual := gjson.Parse(cmdx.ExecNoErr(t, c, set, "--use", "enc", "--alg", "RS256", "--public"))
+		actual := gjson.Parse(cmdx.ExecNoErr(t, c, set, "--use", "enc", "--alg", "ES256", "--public"))
 
 		assert.NotEmptyf(t, actual.Get("keys.0.kid").String(), "Expected kid to be set but got: %s", actual.Raw)
-		assert.Empty(t, actual.Get("keys.0.p").String(), "public key should not contain private key components: %s", actual.Raw)
+		assert.Empty(t, actual.Get("keys.0.d").String(), "public key should not contain private key components: %s", actual.Raw)
 	})
 }

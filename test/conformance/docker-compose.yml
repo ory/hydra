@@ -1,15 +1,15 @@
-version: "3.7"
-
 services:
   hydra-migrate:
+    image: hydra-migrate:head
     build:
-      # When running with `run.sh` the cwd is the project's root.
+      # When running with `start.sh` the cwd is the project's root.
       context: .
       dockerfile: ./test/conformance/hydra/Dockerfile
 
   hydra:
+    image: hydra-serve:head
     build:
-      # When running with `run.sh` the cwd is the project's root.
+      # When running with `start.sh` the cwd is the project's root.
       context: .
       dockerfile: ./test/conformance/hydra/Dockerfile
     environment:
@@ -34,7 +34,7 @@ services:
   httpd:
     image: oryd/hydra-oidc-httpd:latest
     #    build:
-    #      # When running with `run.sh` the cwd is the project's root.
+    #      # When running with `start.sh` the cwd is the project's root.
     #      context: ./test/conformance
     #      dockerfile: httpd/Dockerfile
     ports:
@@ -48,7 +48,7 @@ services:
   server:
     image: oryd/hydra-oidc-server:latest
     #    build:
-    #      # When running with `run.sh` the cwd is the project's root.
+    #      # When running with `start.sh` the cwd is the project's root.
     #      context: ./test/conformance
     #      dockerfile: Dockerfile
     depends_on:

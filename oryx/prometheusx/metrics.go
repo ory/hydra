@@ -5,19 +5,20 @@ package prometheusx
 
 import (
 	"net/http"
-	"strconv"
+	"regexp"
+	"strings"
+	"sync"
+	"time"
 
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-
-	"github.com/ory/x/httpx"
-
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/urfave/negroni"
+
+	"github.com/ory/x/httprouterx"
 )
 
-// Metrics prototypes
-type Metrics struct {
+type HTTPMetrics struct {
 	responseTime    *prometheus.HistogramVec
 	totalRequests   *prometheus.CounterVec
 	duration        *prometheus.HistogramVec
@@ -26,11 +27,9 @@ type Metrics struct {
 	handlerStatuses *prometheus.CounterVec
 }
 
-const HTTPMetrics = "http"
-const GRPCMetrics = "grpc"
+const HTTPPrefix = "http"
 
-// NewMetrics creates new custom Prometheus metrics
-func NewMetrics(app, metricsPrefix, version, hash, date string) *Metrics {
+func NewHTTPMetrics(app, metricsPrefix, version, hash, date string) *HTTPMetrics {
 	labels := map[string]string{
 		"app":       app,
 		"version":   version,
@@ -42,15 +41,12 @@ func NewMetrics(app, metricsPrefix, version, hash, date string) *Metrics {
 		metricsPrefix += "_"
 	}
 
-	pm := &Metrics{
-		responseTime: prometheus.NewHistogramVec(
-			prometheus.HistogramOpts{
-				Name:        metricsPrefix + "response_time_seconds",
-				Help:        "Description",
-				ConstLabels: labels,
-			},
-			[]string{"endpoint"},
-		),
+	pm := &HTTPMetrics{
+		responseTime: prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Name:        metricsPrefix + "response_time_seconds",
+			Help:        "Description",
+			ConstLabels: labels,
+		}, []string{"endpoint"}),
 		totalRequests: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name:        metricsPrefix + "requests_total",
 			Help:        "number of requests",
@@ -91,7 +87,7 @@ func NewMetrics(app, metricsPrefix, version, hash, date string) *Metrics {
 }
 
 // Describe implements prometheus Collector interface.
-func (h *Metrics) Describe(in chan<- *prometheus.Desc) {
+func (h *HTTPMetrics) Describe(in chan<- *prometheus.Desc) {
 	h.duration.Describe(in)
 	h.totalRequests.Describe(in)
 	h.requestSize.Describe(in)
@@ -101,7 +97,7 @@ func (h *Metrics) Describe(in chan<- *prometheus.Desc) {
 }
 
 // Collect implements prometheus Collector interface.
-func (h *Metrics) Collect(in chan<- prometheus.Metric) {
+func (h *HTTPMetrics) Collect(in chan<- prometheus.Metric) {
 	h.duration.Collect(in)
 	h.totalRequests.Collect(in)
 	h.requestSize.Collect(in)
@@ -110,43 +106,100 @@ func (h *Metrics) Collect(in chan<- prometheus.Metric) {
 	h.responseTime.Collect(in)
 }
 
-func (h Metrics) instrumentHandlerStatusBucket(next http.Handler) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(rw, r)
+func (h *HTTPMetrics) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	rr := negroni.NewResponseWriter(rw)
+	start := time.Now()
 
-		status, _ := httpx.GetResponseMeta(rw)
+	var pattern string
+	next(rr, httprouterx.WithAfterMatchHook(r, func(r *http.Request) {
+		pattern = r.Pattern
+	}))
 
-		statusBucket := "unknown"
-		switch {
-		case status >= 200 && status <= 299:
-			statusBucket = "2xx"
-		case status >= 300 && status <= 399:
-			statusBucket = "3xx"
-		case status >= 400 && status <= 499:
-			statusBucket = "4xx"
-		case status >= 500 && status <= 599:
-			statusBucket = "5xx"
-		}
+	latency := time.Since(start)
+	code := StatusCodeToString(rr.Status())
+	method := sanitizeMethod(r.Method)
+	endpoint := getLabelForPattern(pattern)
 
-		h.handlerStatuses.With(prometheus.Labels{"method": r.Method, "status_bucket": statusBucket}).
-			Inc()
+	// Latency histograms and request counters carry trace exemplars so that
+	// dashboards can link latency outliers and error spikes to traces. The
+	// request's span is still open here: the tracing middleware wraps this
+	// one.
+	ctx := r.Context()
+	h.responseSize.WithLabelValues(code, method).Observe(float64(rr.Size()))
+	AddWithExemplar(ctx, h.totalRequests.WithLabelValues(code, method, endpoint), 1)
+	ObserveWithExemplar(ctx, h.duration.WithLabelValues(code, method, endpoint), latency.Seconds())
+	ObserveWithExemplar(ctx, h.responseTime.WithLabelValues(endpoint), latency.Seconds())
+	h.requestSize.WithLabelValues(code, method).Observe(float64(computeApproximateRequestSize(r)))
+
+	statusBucket := "unknown"
+	switch status := rr.Status(); {
+	case status >= 200 && status <= 299:
+		statusBucket = "2xx"
+	case status >= 300 && status <= 399:
+		statusBucket = "3xx"
+	case status >= 400 && status <= 499:
+		statusBucket = "4xx"
+	case status >= 500 && status <= 599:
+		statusBucket = "5xx"
 	}
+
+	AddWithExemplar(ctx, h.handlerStatuses.WithLabelValues(r.Method, statusBucket), 1)
 }
 
-// Instrument will instrument any http.HandlerFunc with custom metrics
-func (h Metrics) Instrument(rw http.ResponseWriter, next http.HandlerFunc, endpoint string) http.HandlerFunc {
-	labels := prometheus.Labels{}
-	labelsWithEndpoint := prometheus.Labels{"endpoint": endpoint}
-	if status, _ := httpx.GetResponseMeta(rw); status != 0 {
-		labels = prometheus.Labels{"code": strconv.Itoa(status)}
-		labelsWithEndpoint["code"] = labels["code"]
-	}
-	wrapped := promhttp.InstrumentHandlerResponseSize(h.responseSize.MustCurryWith(labels), next)
-	wrapped = promhttp.InstrumentHandlerCounter(h.totalRequests.MustCurryWith(labelsWithEndpoint), wrapped)
-	wrapped = promhttp.InstrumentHandlerDuration(h.duration.MustCurryWith(labelsWithEndpoint), wrapped)
-	wrapped = promhttp.InstrumentHandlerDuration(h.responseTime.MustCurryWith(prometheus.Labels{"endpoint": endpoint}), wrapped)
-	wrapped = promhttp.InstrumentHandlerRequestSize(h.requestSize.MustCurryWith(labels), wrapped)
-	wrapped = h.instrumentHandlerStatusBucket(wrapped)
+var (
+	paramPlaceHolderRE = regexp.MustCompile(`\{[a-zA-Z0-9_-]+}`)
+	// patternLabelCache is used to cache the generated label for a given pattern to avoid recomputing it on every request.
+	// We use a sync.Map over a ristretto cache as the number of unique patterns is expected to be low and the cache will not grow indefinitely.
+	//
+	// > The sync.Map type is optimized for two common use cases: (1) when the entry for a given
+	// > key is only ever written once but read many times, as in caches that only grow,
+	// > or (2) when multiple goroutines read, write, and overwrite entries for disjoint
+	// > sets of keys. In these two cases, use of a Map may significantly reduce lock
+	// > contention compared to a Go map paired with a separate [Mutex] or [RWMutex].
+	// https://pkg.go.dev/sync#Map
+	patternLabelCache = sync.Map{}
+)
 
-	return wrapped.ServeHTTP
+func getLabelForPattern(pattern string) string {
+	if label, ok := patternLabelCache.Load(pattern); ok {
+		return label.(string)
+	}
+
+	cleanedPattern := pattern
+	// remove the method if it is included
+	if _, pattern, ok := strings.Cut(cleanedPattern, " "); ok {
+		cleanedPattern = pattern
+	}
+	// trim space, just to be sure
+	cleanedPattern = strings.TrimSpace(cleanedPattern)
+
+	label := paramPlaceHolderRE.ReplaceAllString(strings.TrimSuffix(cleanedPattern, "/{$}"), "{param}")
+	// Cache the generated label for the pattern to avoid recomputing it on every request.
+	patternLabelCache.Store(pattern, label)
+	return label
+}
+
+// computeApproximateRequestSize is copied from the promhttp package as it is not exported
+func computeApproximateRequestSize(r *http.Request) int {
+	s := 0
+	if r.URL != nil {
+		s += len(r.URL.String())
+	}
+
+	s += len(r.Method)
+	s += len(r.Proto)
+	for name, values := range r.Header {
+		s += len(name)
+		for _, value := range values {
+			s += len(value)
+		}
+	}
+	s += len(r.Host)
+
+	// N.B. r.Form and r.MultipartForm are assumed to be included in r.URL.
+
+	if r.ContentLength != -1 {
+		s += int(r.ContentLength)
+	}
+	return s
 }

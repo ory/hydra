@@ -3,12 +3,12 @@
 </h1>
 
 <h4 align="center">
-  <a href="https://www.ory.sh/chat">Chat</a> ·
+  <a href="https://www.ory.com/chat">Chat</a> ·
   <a href="https://github.com/ory/hydra/discussions">Discussions</a> ·
-  <a href="https://www.ory.sh/l/sign-up-newsletter">Newsletter</a> ·
-  <a href="https://www.ory.sh/docs/">Docs</a> ·
+  <a href="https://www.ory.com/l/sign-up-newsletter">Newsletter</a> ·
+  <a href="https://www.ory.com/docs/">Docs</a> ·
   <a href="https://console.ory.sh/">Try Ory Network</a> ·
-  <a href="https://www.ory.sh/jobs/">Jobs</a>
+  <a href="https://www.ory.com/jobs/">Jobs</a>
 </h4>
 
 Ory Hydra is a hardened, OpenID Certified OAuth 2.0 Server and OpenID Connect
@@ -48,7 +48,7 @@ consent app, giving you absolute control over the user interface and experience.
 
 Ory Hydra is a server implementation of the OAuth 2.0 authorization framework
 and the OpenID Connect Core 1.0. It follows
-[cloud architecture best practices](https://www.ory.sh/docs/ecosystem/software-architecture-philosophy)
+[cloud architecture best practices](https://www.ory.com/docs/ecosystem/software-architecture-philosophy)
 and focuses on:
 
 - OAuth 2.0 and OpenID Connect flows
@@ -59,8 +59,8 @@ and focuses on:
 - Low latency and high throughput
 
 We recommend starting with the
-[Ory Hydra introduction docs](https://www.ory.sh/docs/hydra) to learn more about
-its architecture, feature set, and how it compares to other systems.
+[Ory Hydra introduction docs](https://www.ory.com/docs/hydra) to learn more
+about its architecture, feature set, and how it compares to other systems.
 
 ### Why Ory Hydra
 
@@ -133,7 +133,7 @@ You can run Ory Hydra in two main ways:
 
 ### Use Ory Hydra on the Ory Network
 
-The [Ory Network](https://www.ory.sh/cloud) is the fastest way to use Ory
+The [Ory Network](https://www.ory.com/cloud) is the fastest way to use Ory
 services in production. **Ory OAuth2 & OpenID Connect** is powered by the open
 source Ory Hydra server and is API compatible.
 
@@ -151,7 +151,7 @@ The Ory Network provides:
 - GDPR friendly storage with data locality and compliance in mind
 - Web based Ory Console and Ory CLI for administration and operations
 - Cloud native APIs compatible with the open source servers
-- Fair, usage based [pricing](https://www.ory.sh/pricing)
+- Fair, usage based [pricing](https://www.ory.com/pricing)
 
 Sign up for a
 [free developer account](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme)
@@ -162,7 +162,7 @@ to get started.
 You can run Ory Hydra yourself for full control over infrastructure, deployment,
 and customization.
 
-The [install guide](https://www.ory.sh/docs/hydra/install) explains how to:
+The [install guide](https://www.ory.com/docs/hydra/install) explains how to:
 
 - Install Hydra on Linux, macOS, Windows, and Docker
 - Configure databases such as PostgreSQL, MySQL, and CockroachDB
@@ -194,11 +194,11 @@ For guaranteed CVE fixes, current enterprise builds, advanced features, and
 support in production, you need a valid
 [Ory Enterprise License](https://www.ory.com/ory-enterprise-license) and access
 to the Ory Enterprise Docker registry. To learn more,
-[contact the Ory team](https://www.ory.sh/contact/).
+[contact the Ory team](https://www.ory.com/contact/).
 
 ## Quickstart
 
-Install the [Ory CLI](https://www.ory.sh/docs/guides/cli/installation) and
+Install the [Ory CLI](https://www.ory.com/docs/guides/cli/installation) and
 create a new project to try Ory OAuth2 & OpenID Connect.
 
 ```bash
@@ -257,7 +257,7 @@ this would have been possible without each and everyone of you!
 The following list represents companies that have accompanied us along the way
 and that have made outstanding contributions to our ecosystem. _If you think
 that your company deserves a spot here, reach out to
-<a href="mailto:office@ory.sh">office@ory.sh</a> now_!
+<a href="mailto:office@ory.com">office@ory.com</a> now_!
 
 <table>
     <thead>
@@ -278,7 +278,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://openai.com/">openai.com</a></td>
-            <td><a href="https://www.ory.sh/case-studies/openai">OpenAI Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/openai">OpenAI Case Study</a></td>
         </tr>
         <tr>
             <td>Fandom</td>
@@ -289,7 +289,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://www.fandom.com/">fandom.com</a></td>
-            <td><a href="https://www.ory.sh/case-studies/fandom">Fandom Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/fandom">Fandom Case Study</a></td>
         </tr>
         <tr>
             <td>Lumin</td>
@@ -300,7 +300,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://www.luminpdf.com/">luminpdf.com</a></td>
-            <td><a href="https://www.ory.sh/case-studies/lumin">Lumin Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/lumin">Lumin Case Study</a></td>
         </tr>
         <tr>
             <td>Sencrop</td>
@@ -311,7 +311,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://sencrop.com/">sencrop.com</a></td>
-            <td><a href="https://www.ory.sh/case-studies/sencrop">Sencrop Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/sencrop">Sencrop Case Study</a></td>
         </tr>
         <tr>
             <td>OSINT Industries</td>
@@ -322,7 +322,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://www.osint.industries/">osint.industries</a></td>
-            <td><a href="https://www.ory.sh/case-studies/osint">OSINT Industries Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/osint">OSINT Industries Case Study</a></td>
         </tr>
         <tr>
             <td>HGV</td>
@@ -333,7 +333,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://www.hgv.it/">hgv.it</a></td>
-            <td><a href="https://www.ory.sh/case-studies/hgv">HGV Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/hgv">HGV Case Study</a></td>
         </tr>
         <tr>
             <td>Maxroll</td>
@@ -344,7 +344,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://maxroll.gg/">maxroll.gg</a></td>
-            <td><a href="https://www.ory.sh/case-studies/maxroll">Maxroll Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/maxroll">Maxroll Case Study</a></td>
         </tr>
         <tr>
             <td>Zezam</td>
@@ -355,7 +355,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://www.zezam.io/">zezam.io</a></td>
-            <td><a href="https://www.ory.sh/case-studies/zezam">Zezam Case Study</a></td>
+            <td><a href="https://www.ory.com/case-studies/zezam">Zezam Case Study</a></td>
         </tr>
         <tr>
             <td>T.RowePrice</td>
@@ -613,7 +613,7 @@ dependencies (Java, Node, Ruby, libxml, ...).
 
 [Ory Kratos](https://github.com/ory/kratos) is an API-first Identity and User
 Management system that is built according to
-[cloud architecture best practices](https://www.ory.sh/docs/next/ecosystem/software-architecture-philosophy).
+[cloud architecture best practices](https://www.ory.com/docs/next/ecosystem/software-architecture-philosophy).
 It implements core use cases that almost every software application needs to
 deal with: Self-service Login and Registration, Multi-Factor Authentication
 (MFA/2FA), Account Recovery and Verification, Profile, and Account Management.
@@ -646,13 +646,13 @@ to perform a certain action on a resource.
 ## Documentation
 
 The full Ory Hydra documentation is available at
-[www.ory.sh/docs/hydra](https://www.ory.sh/docs/hydra), including:
+[www.ory.com/docs/hydra](https://www.ory.com/docs/hydra), including:
 
-- [Installation guides](https://www.ory.sh/docs/hydra/install)
-- [Configuration reference](https://www.ory.sh/docs/hydra/reference/configuration)
-- [HTTP API documentation](https://www.ory.sh/docs/hydra/sdk/api)
-- [Security architecture](https://www.ory.sh/docs/hydra/security-architecture)
-- [Performance benchmarks](https://www.ory.sh/docs/performance/hydra)
+- [Installation guides](https://www.ory.com/docs/hydra/install)
+- [Configuration reference](https://www.ory.com/docs/hydra/reference/configuration)
+- [HTTP API documentation](https://www.ory.com/docs/hydra/sdk/api)
+- [Security architecture](https://www.ory.com/docs/hydra/security-architecture)
+- [Performance benchmarks](https://www.ory.com/docs/performance/hydra)
 
 For upgrading and changelogs, check
 [releases tab](https://github.com/ory/hydra/releases) and
@@ -675,7 +675,7 @@ OAuth2 and OAuth2 related specifications are over 400 written pages.
 Implementing OAuth2 is easy, getting it right is hard. Ory Hydra is trusted by
 companies all around the world, has a vibrant community and faces millions of
 requests in production each day. Read
-[the security guide](https://www.ory.sh/docs/hydra/security-architecture) for
+[the security guide](https://www.ory.com/docs/hydra/security-architecture) for
 more details on cryptography and security concepts.
 
 ### Disclosing vulnerabilities
@@ -683,12 +683,12 @@ more details on cryptography and security concepts.
 If you think you found a security vulnerability, please refrain from posting it
 publicly on the forums, the chat, or GitHub. You can find all info for
 responsible disclosure in our
-[security.txt](https://www.ory.sh/.well-known/security.txt).
+[security.txt](https://www.ory.com/.well-known/security.txt).
 
 ## Telemetry
 
 Our services collect summarized, anonymized data that can optionally be turned
-off. Click [here](https://www.ory.sh/docs/ecosystem/sqa) to learn more.
+off. Click [here](https://www.ory.com/docs/ecosystem/sqa) to learn more.
 
 ## Libraries and third-party projects
 
@@ -699,9 +699,9 @@ Official:
 Community:
 
 - Visit
-  [this document for an overview of community projects and articles](https://www.ory.sh/docs/ecosystem/community)
+  [this document for an overview of community projects and articles](https://www.ory.com/docs/ecosystem/community)
 
 Developer Blog:
 
-- Visit the [Ory Blog](https://www.ory.sh/blog/) for guides, tutorials and
+- Visit the [Ory Blog](https://www.ory.com/blog/) for guides, tutorials and
   articles around Ory Hydra and the Ory ecosystem.

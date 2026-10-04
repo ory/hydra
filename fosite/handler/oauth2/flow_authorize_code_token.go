@@ -26,7 +26,7 @@ func (c *AuthorizeExplicitGrantHandler) HandleTokenEndpointRequest(ctx context.C
 
 	code := request.GetRequestForm().Get("code")
 	signature := c.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, code)
-	authorizeRequest, err := c.Storage.AuthorizeCodeStorage().GetAuthorizeCodeSession(ctx, signature, request.GetSession())
+	authorizeRequest, err := c.Storage.AuthorizeCodeStorage().GetAuthorizeCodeSession(ctx, code, signature, request.GetSession())
 	if errors.Is(err, fosite.ErrInvalidatedAuthorizeCode) {
 		if authorizeRequest == nil {
 			return fosite.ErrServerError.
@@ -120,7 +120,7 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 
 	code := requester.GetRequestForm().Get("code")
 	signature := c.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, code)
-	authorizeRequest, err := c.Storage.AuthorizeCodeStorage().GetAuthorizeCodeSession(ctx, signature, requester.GetSession())
+	authorizeRequest, err := c.Storage.AuthorizeCodeStorage().GetAuthorizeCodeSession(ctx, code, signature, requester.GetSession())
 	if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	} else if err := c.Strategy.AuthorizeCodeStrategy().ValidateAuthorizeCode(ctx, requester, code); err != nil {
@@ -149,26 +149,30 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 		}
 	}
 
-	ctx, err = fosite.MaybeBeginTx(ctx, c.Storage)
-	if err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	}
-	defer func() {
-		if err != nil {
-			if rollBackTxnErr := fosite.MaybeRollbackTx(ctx, c.Storage); rollBackTxnErr != nil {
-				err = errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebugf("error: %s; rollback error: %s", err, rollBackTxnErr))
+	err = c.Storage.Transaction(ctx, func(ctx context.Context) error {
+		if err := c.Storage.AuthorizeCodeStorage().InvalidateAuthorizeCodeSession(ctx, code, signature); err != nil {
+			return err
+		}
+		if err := c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, accessSignature, requester.Sanitize([]string{})); err != nil {
+			return err
+		}
+		if refreshSignature != "" {
+			if err := c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshSignature, accessSignature, requester.Sanitize([]string{})); err != nil {
+				return err
 			}
 		}
-	}()
-
-	if err = c.Storage.AuthorizeCodeStorage().InvalidateAuthorizeCodeSession(ctx, signature); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	} else if err = c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, accessSignature, requester.Sanitize([]string{})); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	} else if refreshSignature != "" {
-		if err = c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshSignature, accessSignature, requester.Sanitize([]string{})); err != nil {
-			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
+		return nil
+	})
+	if err != nil {
+		// A storage call inside the transaction may return a deliberate
+		// client-facing grant error (e.g. invalid_grant when a code was
+		// already used). Preserve its status instead of masking it as a
+		// server error, so a losing concurrent redemption returns 400
+		// invalid_grant rather than 500.
+		if errors.Is(err, fosite.ErrInvalidGrant) {
+			return errorsx.WithStack(err)
 		}
+		return errors.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	responder.SetAccessToken(access)
@@ -178,10 +182,6 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 	responder.SetScopes(requester.GetGrantedScopes())
 	if refresh != "" {
 		responder.SetExtra("refresh_token", refresh)
-	}
-
-	if err = fosite.MaybeCommitTx(ctx, c.Storage); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	return nil

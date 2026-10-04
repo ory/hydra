@@ -7,10 +7,14 @@ services:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
     command: migrate sql up -e --yes
     restart: on-failure
+    depends_on:
+      "postgresd":
+        condition: service_healthy
 
   hydra:
     depends_on:
-      - hydra-migrate
+      hydra-migrate:
+        condition: service_completed_successfully
     environment:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
 
@@ -18,7 +22,13 @@ services:
     image: postgres:11.8
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hydra"]
+      interval: 1s
+      timeout: 30s
+      retries: 30
     environment:
+      - PGUSER=hydra
       - POSTGRES_USER=hydra
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=hydra

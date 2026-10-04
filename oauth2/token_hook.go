@@ -13,10 +13,12 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/otelx"
+
 	"github.com/hashicorp/go-retryablehttp"
 
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/reqlog"
 
 	"github.com/ory/hydra/v2/driver/config"
@@ -87,7 +89,7 @@ func applyAuth(req *retryablehttp.Request, auth *config.Auth) error {
 	return nil
 }
 
-func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, hookConfig *config.HookConfig, reqBodyBytes []byte, session *Session) error {
+func executeHookAndUpdateSession(ctx context.Context, reg httpx.ClientProvider, hookConfig *config.HookConfig, reqBodyBytes []byte, session *Session) error {
 	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, hookConfig.URL, bytes.NewReader(reqBodyBytes))
 	if err != nil {
 		return errors.WithStack(
@@ -161,10 +163,14 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 // TokenHook is an AccessRequestHook called for all grant types.
 func TokenHook(reg interface {
 	config.Provider
-	x.HTTPClientProvider
+	httpx.ClientProvider
+	otelx.Provider
 },
 ) AccessRequestHook {
-	return func(ctx context.Context, requester fosite.AccessRequester) error {
+	return func(ctx context.Context, requester fosite.AccessRequester) (err error) {
+		ctx, span := reg.Tracer(ctx).Tracer().Start(ctx, "oauth2.AccessRequestHook")
+		defer otelx.End(span, &err)
+
 		hookConfig := reg.Config().TokenHookConfig(ctx)
 		if hookConfig == nil {
 			return nil

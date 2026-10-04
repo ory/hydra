@@ -34,7 +34,7 @@ func (h *Handler) fallbackHandler(title, heading string, sc int, configKey strin
 	You are seeing this page because configuration key <code>{{ .Key }}</code> is not set.
 </p>
 <p>
-	If you are an administrator, please read <a href="https://www.ory.sh/docs">the guide</a> to understand what you
+	If you are an administrator, please read <a href="https://www.ory.com/docs">the guide</a> to understand what you
 	need to do. If you are a user, please contact the administrator.
 </p>
 </body>
@@ -78,7 +78,7 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request) {
 	You are seeing this page because configuration key <code>{{ .Key }}</code> is not set.
 </p>
 <p>
-	If you are an administrator, please read <a href="https://www.ory.sh/docs">the guide</a> to understand what you
+	If you are an administrator, please read <a href="https://www.ory.com/docs">the guide</a> to understand what you
 	need to do. If you are a user, please contact the administrator.
 </p>
 </body>

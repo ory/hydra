@@ -18,6 +18,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -49,7 +50,6 @@ import (
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/josex"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/snapshotx"
 )
 
@@ -91,8 +91,8 @@ func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APICl
 
 		acceptBody := hydra.AcceptOAuth2LoginRequest{
 			Subject:  subject,
-			Remember: pointerx.Ptr(!rr.Skip),
-			Acr:      pointerx.Ptr("1"),
+			Remember: new(!rr.Skip),
+			Acr:      new("1"),
 			Amr:      []string{"pwd"},
 			Context:  map[string]interface{}{"context": "bar"},
 		}
@@ -132,8 +132,8 @@ func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.API
 		acceptBody := hydra.AcceptOAuth2ConsentRequest{
 			GrantScope:               []string{"hydra", "offline", "openid"},
 			GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
-			Remember:                 pointerx.Ptr(true),
-			RememberFor:              pointerx.Ptr[int64](0),
+			Remember:                 new(true),
+			RememberFor:              new(int64(0)),
 			Session: &hydra.AcceptOAuth2ConsentRequestSession{
 				AccessToken: map[string]interface{}{"foo": "bar"},
 				IdToken:     map[string]interface{}{"bar": "baz", "email": "foo@bar.com"},
@@ -422,7 +422,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						func(w http.ResponseWriter, r *http.Request) {
 							acceptBody := hydra.AcceptOAuth2LoginRequest{
 								Subject: subject,
-								Acr:     pointerx.Ptr("1"),
+								Acr:     new("1"),
 								Amr:     []string{"pwd"},
 								Context: map[string]interface{}{"context": "bar"},
 							}
@@ -562,7 +562,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								require.EqualError(t, err, "invalid_request")
 							})
 						}
-
 					})
 
 					t.Run("followup=access token and id token are valid", func(t *testing.T) {
@@ -591,7 +590,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				)
 
 				withWrongClientAfterLogin := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -606,7 +606,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					},
 				}
 				withWrongClientAfterConsent := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -622,7 +623,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				}
 
 				withWrongScopeAfterLogin := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -638,7 +640,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				}
 
 				withWrongScopeAfterConsent := &http.Client{
-					Jar: testhelpers.NewEmptyCookieJar(t),
+					Jar:       testhelpers.NewEmptyCookieJar(t),
+					Transport: testhelpers.NewTestTransport(t),
 					CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 						if req.URL.Path != "/oauth2/auth" {
 							return nil
@@ -687,7 +690,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
 					_, res, err := adminClient.OAuth2API.AcceptOAuth2LoginRequest(ctx).
 						LoginChallenge(r.URL.Query().Get("login_challenge")).
-						AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: pointerx.Ptr(true)}).Execute()
+						AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: new(true)}).Execute()
 					require.Error(t, err) // expects 400
 					body := string(ioutilx.MustReadAll(res.Body))
 					assert.Contains(t, body, "Field 'subject' must not be empty", "%s", body)
@@ -1267,8 +1270,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						return &hydra.AcceptOAuth2ConsentRequest{
 							GrantScope:               ocr.RequestedScope,
 							GrantAccessTokenAudience: ocr.RequestedAccessTokenAudience,
-							Remember:                 pointerx.Ptr(true),
-							RememberFor:              pointerx.Ptr[int64](0),
+							Remember:                 new(true),
+							RememberFor:              new(int64(0)),
 							Session: &hydra.AcceptOAuth2ConsentRequestSession{
 								AccessToken: map[string]interface{}{"crid": ocr.ConsentRequestId},
 								IdToken:     map[string]interface{}{"crid": ocr.ConsentRequestId},
@@ -1348,13 +1351,18 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				// * A test suite with a variety of concurrent refresh token chains.
 				run := func(t *testing.T, strategy string) {
 					c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+					flowTransport := testhelpers.NewTestTransport(t)
 					testhelpers.NewLoginConsentUI(t, reg.Config(),
 						acceptLoginHandler(t, c, adminClient, reg, subject, nil),
 						acceptConsentHandler(t, c, adminClient, reg, subject, nil),
 					)
 
 					issueTokens := func(t *testing.T) *oauth2.Token {
-						code, _ := getAuthorizeCode(t, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
+						flowClient := &http.Client{
+							Jar:       testhelpers.NewEmptyCookieJar(t),
+							Transport: flowTransport,
+						}
+						code, _ := getAuthorizeCode(t, conf, flowClient, oauth2.SetAuthURLParam("nonce", nonce))
 						require.NotEmpty(t, code)
 						token, err := conf.Exchange(context.Background(), code)
 						iat := time.Now()
@@ -1367,22 +1375,36 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						return token
 					}
 
-					refreshTokens := func(t *testing.T, token *oauth2.Token) *oauth2.Token {
+					// refreshTokenExchange performs only the grace-window-critical part of a
+					// refresh: it rotates the token via the token endpoint and returns the new
+					// token plus the issued-at time captured just before the exchange. Keep this
+					// fast — when a token is refreshed twice within the rotation grace period, the
+					// two exchanges must happen close together, so the slow assertions live in
+					// assertRefreshedToken, which runs afterwards.
+					refreshTokenExchange := func(t *testing.T, token *oauth2.Token) (*oauth2.Token, time.Time) {
 						require.NotEmpty(t, token.RefreshToken)
 						token.Expiry = time.Now().Add(-time.Hour * 24)
 						iat := time.Now()
 						refreshedToken, err := conf.TokenSource(context.Background(), token).Token()
 						require.NoError(t, err)
+						return refreshedToken, iat
+					}
 
-						require.NotEqual(t, token.AccessToken, refreshedToken.AccessToken)
-						require.NotEqual(t, token.RefreshToken, refreshedToken.RefreshToken)
-						require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
+					assertRefreshedToken := func(t *testing.T, prev, refreshed *oauth2.Token, iat time.Time) {
+						require.NotEqual(t, prev.AccessToken, refreshed.AccessToken)
+						require.NotEqual(t, prev.RefreshToken, refreshed.RefreshToken)
+						require.NotEqual(t, prev.Extra("id_token"), refreshed.Extra("id_token"))
 
-						introspectAccessToken(t, conf, refreshedToken, subject)
-						assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
-						assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
-						assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
-						return refreshedToken
+						introspectAccessToken(t, conf, refreshed, subject)
+						assertJWTAccessToken(t, strategy, conf, refreshed, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
+						assertIDToken(t, refreshed, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+						assertRefreshToken(t, refreshed, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+					}
+
+					refreshTokens := func(t *testing.T, token *oauth2.Token) *oauth2.Token {
+						refreshed, iat := refreshTokenExchange(t, token)
+						assertRefreshedToken(t, token, refreshed, iat)
+						return refreshed
 					}
 
 					assertInactive := func(t *testing.T, token string, c *oauth2.Config) {
@@ -1396,20 +1418,27 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
 
 						token := issueTokens(t)
-						_ = refreshTokens(t, token)
 
-						assertInactive(t, token.AccessToken, conf) // Original access token is invalid
+						// Refresh the same token twice within the grace period. Keep the two
+						// exchanges close together — only a single cheap introspect runs between
+						// them — and defer the slow assertions until afterwards, so a loaded shard
+						// can not push the second refresh past the grace window.
+						refreshed1, iat1 := refreshTokenExchange(t, token)
+						assertInactive(t, token.AccessToken, conf) // Original access token is invalid after the first graceful refresh.
+						refreshed2, iat2 := refreshTokenExchange(t, token)
 
-						_ = refreshTokens(t, token)
-						assertInactive(t, token.AccessToken, conf) // Original access token is still invalid
+						assertRefreshedToken(t, token, refreshed1, iat1)
+						assertRefreshedToken(t, token, refreshed2, iat2)
+						assertInactive(t, token.AccessToken, conf) // Original access token is still invalid.
 					})
 
 					t.Run("an expired refresh token can not be used even if we are in the grace period", func(t *testing.T) {
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "5s")
-						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1s")
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
 
 						token := issueTokens(t)
-						time.Sleep(time.Second * 2) // Let token expire - we need 2 seconds to reliably be longer than TTL
+						refreshTokenExchange(t, token)
+						expireRefreshToken(t, reg, token.RefreshToken)
 
 						token.Expiry = time.Now().Add(-time.Hour * 24)
 						_, err := conf.TokenSource(ctx, token).Token()
@@ -1426,7 +1455,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						token := issueTokens(t)
 						refreshed := refreshTokens(t, token)
 
-						time.Sleep(time.Second * 2) // Wait for the grace period to end
+						backdateRefreshTokenFirstUsedAt(t, reg, token.RefreshToken, 2*time.Second)
 
 						token.Expiry = time.Now().Add(-time.Hour * 24)
 						_, err := conf.TokenSource(ctx, token).Token()
@@ -1461,43 +1490,59 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						reg.Config().Delete(ctx, config.KeyTokenHook)
 						reg.Config().Delete(ctx, config.KeyRefreshTokenHook)
 
-						createTokenGenerations := func(t *testing.T, count int, sleep time.Duration) [][]*oauth2.Token {
+						createTokenGenerations := func(t *testing.T, count int, elapseGracePeriod bool) [][]*oauth2.Token {
 							generations := make([][]*oauth2.Token, count)
 							generations[0] = []*oauth2.Token{issueTokens(t)}
 							// Start from the first generation. For every next generation, we refresh all the tokens of the previous generation twice.
 							for i := range len(generations) - 1 {
 								// Loop invariants:
-								// - `generations` is constant is size (it is right-sized when created), thus it is safe to index it concurrently.
+								// - `generations` is constant in size (it is right-sized when created), thus it is safe to index it concurrently.
 								// - The current generation (`generations[i]`) is constant in size, thus it is safe to iterate over it.
-								// - The next generation (`generations[i+1]`) is *not* constant in size. Elements are appended to it concurrently, and thus it is guarded by `mtx`.
-								// - Elements of the current generation *are* modified in `refreshToken` (!), and thus are guarded by `mtx`.
-								// - Elements of the current and next generation are concurrently read/written inside the `gen` function, and thus are guarded by `mtx`.
+								// - Each token of the current generation is owned by exactly one worker, which refreshes it twice. No other goroutine touches that token, so the token mutation and the two exchanges need no locking.
+								// - The next generation (`generations[i+1]`) is *not* constant in size. Workers append to it concurrently, so only the append is guarded by `mtx`.
 								generations[i+1] = make([]*oauth2.Token, 0, len(generations[i])*2)
 								mtx := sync.Mutex{}
 
 								var wg sync.WaitGroup
-								gen := func(token *oauth2.Token) {
+								worker := func(token *oauth2.Token) {
 									defer wg.Done()
 
+									// Refresh the same token twice back-to-back. The only work between
+									// the first exchange (which sets first_used_at) and the second is a
+									// single token-endpoint round trip, so the second refresh stays
+									// comfortably inside the grace period even on a loaded CI shard. The
+									// slow assertions run afterwards, outside the grace window.
+									refreshed1, iat1 := refreshTokenExchange(t, token)
+									refreshed2, iat2 := refreshTokenExchange(t, token)
+
+									assertRefreshedToken(t, token, refreshed1, iat1)
+									assertRefreshedToken(t, token, refreshed2, iat2)
+
+									// The unlock is deferred so that the mutex is released even if a
+									// future change adds a failing require after the lock, which would
+									// otherwise exit this goroutine via runtime.Goexit and deadlock the
+									// siblings.
 									mtx.Lock()
-									generations[i+1] = append(generations[i+1], refreshTokens(t, token))
-									mtx.Unlock()
+									defer mtx.Unlock()
+									generations[i+1] = append(generations[i+1], refreshed1, refreshed2)
 								}
 
 								for _, token := range generations[i] {
-									wg.Add(2)
+									wg.Add(1)
 									if dbName != "cockroach" {
-										// We currently only support TX retries on cockroach
-										gen(token)
-										gen(token)
+										// We currently only support TX retries on cockroach.
+										worker(token)
 									} else {
-										go gen(token)
-										go gen(token)
+										go worker(token)
 									}
 								}
 
 								wg.Wait()
-								time.Sleep(sleep)
+								if elapseGracePeriod {
+									for _, token := range generations[i] {
+										backdateRefreshTokenFirstUsedAt(t, reg, token.RefreshToken, aboveGracePeriod)
+									}
+								}
 							}
 							return generations
 						}
@@ -1506,7 +1551,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1s")
 							reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
 							// This test only works if the refresh token lifespan is longer than the grace period.
-							generations := createTokenGenerations(t, 4, time.Second*2)
+							generations := createTokenGenerations(t, 4, true)
 
 							generationIndex := rng.Intn(len(generations) - 1) // Exclude the last generation
 							tokenIndex := rng.Intn(len(generations[generationIndex]))
@@ -1538,7 +1583,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
 								reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 0)
 							})
-							generations := createTokenGenerations(t, 4, time.Second*2)
+							generations := createTokenGenerations(t, 4, false)
 
 							token := generations[0][0]
 							token.Expiry = time.Now().Add(-time.Hour * 24)
@@ -1558,10 +1603,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							}
 						})
 
-						for _, withSleep := range []time.Duration{0, aboveGracePeriod} {
-							t.Run(fmt.Sprintf("withSleep=%s", withSleep), func(t *testing.T) {
+						for _, elapseGracePeriod := range []bool{false, true} {
+							t.Run(fmt.Sprintf("elapseGracePeriod=%t", elapseGracePeriod), func(t *testing.T) {
 								createTokenGenerations := func(t *testing.T, count int) [][]*oauth2.Token {
-									return createTokenGenerations(t, count, withSleep)
+									return createTokenGenerations(t, count, elapseGracePeriod)
 								}
 
 								t.Run("only the most recent token generation is valid across the board", func(t *testing.T) {
@@ -1615,7 +1660,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									token := generations[len(generations)-1][0]
 
 									finalToken := refreshTokens(t, token)
-									time.Sleep(aboveGracePeriod) // Wait for the grace period to end
+									backdateRefreshTokenFirstUsedAt(t, reg, token.RefreshToken, aboveGracePeriod)
 
 									token.Expiry = time.Now().Add(-time.Hour * 24)
 									_, err := conf.TokenSource(ctx, token).Token()
@@ -1798,7 +1843,7 @@ func createVerifiableCredential(
 	require.NoError(t, json.NewEncoder(&body).Encode(createVerifiableCredentialReq))
 	req := httpx.MustNewRequest("POST", reg.Config().CredentialsEndpointURL(ctx).String(), &body, "application/json")
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-	res, err := http.DefaultClient.Do(req)
+	res, err := testhelpers.NewTestClient(t).Do(req)
 	require.NoError(t, err)
 	defer res.Body.Close() //nolint:errcheck
 
@@ -1827,7 +1872,7 @@ func doPrimingRequest(
 	require.NoError(t, json.NewEncoder(&body).Encode(createVerifiableCredentialReq))
 	req := httpx.MustNewRequest("POST", reg.Config().CredentialsEndpointURL(ctx).String(), &body, "application/json")
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
-	res, err := http.DefaultClient.Do(req)
+	res, err := testhelpers.NewTestClient(t).Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -1878,8 +1923,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			handler := hydraoauth2.NewHandler(reg)
 			var callbackHandler http.HandlerFunc
 
-			metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-
 			var adminTs *httptest.Server
 			{
 				n := negroni.New()
@@ -1887,7 +1930,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				n.UseFunc(httprouterx.NoCacheNegroni)
 				n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-				router := x.NewRouterAdmin(metrics)
+				router := httprouterx.NewRouterAdminWithPrefix()
 				handler.SetAdminRoutes(router)
 				n.UseHandler(router)
 
@@ -1901,7 +1944,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 				n.UseFunc(httprouterx.NoCacheNegroni)
 
-				router := x.NewRouterPublic(metrics)
+				router := httprouterx.NewRouterPublic()
 				router.GET("/callback", func(w http.ResponseWriter, r *http.Request) {
 					callbackHandler(w, r)
 				})
@@ -2084,7 +2127,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						tc.cj = testhelpers.NewEmptyCookieJar(t)
 					}
 
-					resp, err := (&http.Client{Jar: tc.cj}).Do(req)
+					resp, err := (&http.Client{Jar: tc.cj, Transport: testhelpers.NewTestTransport(t)}).Do(req)
 					require.NoError(t, err, tc.authURL, publicTs.URL)
 					defer resp.Body.Close() //nolint:errcheck
 
@@ -2107,13 +2150,13 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					}
 
 					t.Run("case=userinfo", func(t *testing.T) {
-						var makeRequest = func(req *http.Request) *http.Response {
-							resp, err = http.DefaultClient.Do(req)
+						makeRequest := func(req *http.Request) *http.Response {
+							resp, err = testhelpers.NewTestClient(t).Do(req)
 							require.NoError(t, err)
 							return resp
 						}
 
-						var testSuccess = func(response *http.Response) {
+						testSuccess := func(response *http.Response) {
 							defer resp.Body.Close() //nolint:errcheck
 
 							require.Equal(t, http.StatusOK, resp.StatusCode)
@@ -2181,7 +2224,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						req, err := http.NewRequest("GET", publicTs.URL+"/userinfo", nil)
 						require.NoError(t, err)
 						req.Header.Add("Authorization", "bearer "+token.AccessToken)
-						res, err := http.DefaultClient.Do(req)
+						res, err := testhelpers.NewTestClient(t).Do(req)
 						require.NoError(t, err)
 						assert.EqualValues(t, http.StatusUnauthorized, res.StatusCode)
 					})
@@ -2326,7 +2369,9 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					t.Run("should fail token refresh with `server_error` if refresh hook fails", func(t *testing.T) {
 						run := func(hookType string) func(t *testing.T) {
 							return func(t *testing.T) {
+								var requests atomic.Int32
 								hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+									requests.Add(1)
 									w.WriteHeader(http.StatusInternalServerError)
 								}))
 								defer hs.Close()
@@ -2342,6 +2387,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								res, err := testRefresh(t, &refreshedToken, publicTs.URL, false)
 								require.NoError(t, err)
 								assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+								require.EqualValues(t, 3, requests.Load(), "expected the initial hook request plus two retries")
 
 								var errBody fosite.RFC6749ErrorJson
 								require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
@@ -2459,7 +2505,7 @@ func testRefresh(t *testing.T, token *oauth2.Token, u string, sleep bool) (*http
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth(oauthClientConfig.ClientID, oauthClientConfig.ClientSecret)
 
-	return http.DefaultClient.Do(req)
+	return testhelpers.NewTestClient(t).Do(req)
 }
 
 func withScope(scope string) func(*client.Client) {

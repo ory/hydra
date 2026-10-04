@@ -20,9 +20,9 @@ var _ MappedNullable = &TokenPagination{}
 
 // TokenPagination struct for TokenPagination
 type TokenPagination struct {
-	// Items per page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// Items per page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	PageSize *int64 `json:"page_size,omitempty"`
-	// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	PageToken *string `json:"page_token,omitempty"`
 }
 
@@ -34,8 +34,6 @@ func NewTokenPagination() *TokenPagination {
 	this := TokenPagination{}
 	var pageSize int64 = 250
 	this.PageSize = &pageSize
-	var pageToken string = "1"
-	this.PageToken = &pageToken
 	return &this
 }
 
@@ -46,8 +44,6 @@ func NewTokenPaginationWithDefaults() *TokenPagination {
 	this := TokenPagination{}
 	var pageSize int64 = 250
 	this.PageSize = &pageSize
-	var pageToken string = "1"
-	this.PageToken = &pageToken
 	return &this
 }
 

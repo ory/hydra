@@ -15,11 +15,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/negroni"
 
 	"github.com/ory/x/httprouterx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/urlx"
 
@@ -28,10 +26,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -130,17 +126,14 @@ func TestHandler(t *testing.T) {
 	newServer := func(t *testing.T, dynamicEnabled bool) (adminTs *httptest.Server, publicTs *httptest.Server) {
 		require.NoError(t, reg.Config().Set(ctx, config.KeyPublicAllowDynamicRegistration, dynamicEnabled))
 
-		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 		{
 			n := negroni.New()
 			n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 			n.UseFunc(httprouterx.NoCacheNegroni)
 			n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
-			n.Use(metrics)
 
-			router := x.NewRouterAdmin(metrics)
+			router := httprouterx.NewRouterAdminWithPrefix()
 			h.SetAdminRoutes(router)
-			router.Handler("GET", prometheusx.MetricsPrometheusPath, promhttp.Handler())
 			n.UseHandler(router)
 
 			adminTs = httptest.NewServer(n)
@@ -152,7 +145,7 @@ func TestHandler(t *testing.T) {
 			n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 			n.UseFunc(httprouterx.NoCacheNegroni)
 
-			router := x.NewRouterPublic(metrics)
+			router := httprouterx.NewRouterPublic()
 			h.SetPublicRoutes(router)
 			n.UseHandler(router)
 
@@ -164,9 +157,9 @@ func TestHandler(t *testing.T) {
 	}
 
 	fetch := func(t *testing.T, url string) (string, *http.Response) {
-		res, err := http.Get(url)
+		res, err := testhelpers.NewTestClient(t).Get(url)
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 		body, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(body), res
@@ -177,9 +170,9 @@ func TestHandler(t *testing.T) {
 		require.NoError(t, err)
 		r.Header.Set("Authorization", "Bearer "+token)
 		r.Header.Set("Accept", "application/json")
-		res, err := http.DefaultClient.Do(r)
+		res, err := testhelpers.NewTestClient(t).Do(r)
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 		out, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(out), res
@@ -193,7 +186,7 @@ func TestHandler(t *testing.T) {
 		r.Header.Set("Content-Type", "application/json")
 		res, err := ts.Client().Do(r)
 		require.NoError(t, err)
-		defer res.Body.Close() //nolint:errcheck
+		defer func() { _ = res.Body.Close() }()
 		rb, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(rb), res
@@ -257,7 +250,7 @@ func TestHandler(t *testing.T) {
 
 						res, err := publicTs.Client().Do(req)
 						require.NoError(t, err)
-						defer res.Body.Close() //nolint:errcheck
+						defer func() { _ = res.Body.Close() }()
 
 						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)
@@ -632,18 +625,6 @@ func TestHandler(t *testing.T) {
 			body, res = makeJSON(t, adminTs, "PUT", urlx.MustJoin(client.ClientsHandlerPath, url.PathEscape(gjson.Get(body, "client_id").String()), "lifespans"), testhelpers.TestLifespans)
 			require.Equal(t, http.StatusOK, res.StatusCode, body)
 			snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.client_id", "body.created_at", "body.updated_at"))
-			// Check metrics.
-			{
-				req, _ := http.NewRequest("GET", adminTs.URL+"/admin"+prometheusx.MetricsPrometheusPath, nil)
-				res, err := adminTs.Client().Do(req)
-				require.NoError(t, err)
-				require.EqualValues(t, http.StatusOK, res.StatusCode)
-
-				respBody, err := io.ReadAll(res.Body)
-				require.NoError(t, err)
-				require.NotEmpty(t, respBody)
-			}
-
 		})
 
 		t.Run("case=delete existing client", func(t *testing.T) {

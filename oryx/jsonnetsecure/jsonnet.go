@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/google/go-jsonnet"
+	"github.com/pkg/errors"
 )
 
 type (
@@ -64,13 +65,6 @@ func WithContext(ctx context.Context) Option {
 	}
 }
 
-func WithProcessPool(p Pool) Option {
-	return func(o *vmOptions) {
-		pool, _ := p.(*pool)
-		o.pool = pool
-	}
-}
-
 func WithJsonnetBinary(jsonnetBinaryPath string) Option {
 	return func(o *vmOptions) {
 		o.jsonnetBinaryPath = jsonnetBinaryPath
@@ -83,19 +77,45 @@ func WithProcessArgs(args ...string) Option {
 	}
 }
 
-func MakeSecureVM(opts ...Option) VM {
+// ErrNoProcessPool is returned by MakeSecureVM when called without a process
+// pool. It is a distinct error because the alternative — quietly returning an
+// in-process VM — would strip the isolation callers of this package rely on.
+var ErrNoProcessPool = errors.New("jsonnetsecure: a process pool is required; use MakeInProcessVM to evaluate in this process without isolation")
+
+// MakeSecureVM returns a VM that evaluates snippets in a worker process taken
+// from p, so that a snippet which exhausts memory, spins on the CPU, or crashes
+// takes down only that worker.
+//
+// p is a required argument rather than an option because a VM without a pool
+// offers no isolation at all. Passing a nil pool returns ErrNoProcessPool.
+func MakeSecureVM(p Pool, opts ...Option) (VM, error) {
+	// A nil *pool inside a non-nil Pool interface is not reachable from outside
+	// this package (Pool has an unexported method), but check the concrete
+	// value anyway so a future in-package mistake cannot slip through.
+	concrete, _ := p.(*pool)
+	if p == nil || concrete == nil {
+		return nil, errors.WithStack(ErrNoProcessPool)
+	}
+
 	options := newVMOptions()
 	for _, o := range opts {
 		o(options)
 	}
+	options.pool = concrete
 
-	if options.pool != nil {
-		return NewProcessPoolVM(options)
-	} else {
-		vm := jsonnet.MakeVM()
-		vm.Importer(new(ErrorImporter))
-		return vm
-	}
+	return NewProcessPoolVM(options), nil
+}
+
+// MakeInProcessVM returns a Jsonnet VM that evaluates in the calling process
+// with imports disabled. It provides no isolation: a malicious or buggy snippet
+// can exhaust this process's memory and CPU, so it is only safe for trusted
+// input. The two legitimate uses are the jsonnet subcommand, which is itself
+// the isolation boundary, and offline CLI linting. Everything that evaluates
+// tenant-supplied Jsonnet must use MakeSecureVM.
+func MakeInProcessVM() *jsonnet.VM {
+	vm := jsonnet.MakeVM()
+	vm.Importer(new(ErrorImporter))
+	return vm
 }
 
 // ErrorImporter errors when calling "import".

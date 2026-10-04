@@ -130,7 +130,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 					"updated_at",
 				})
 
-				require.ErrorIs(t, m.CreateClient(ctx, &client), sqlcon.ErrUniqueViolation)
+				require.ErrorIs(t, m.CreateClient(ctx, &client), sqlcon.ErrUniqueViolation())
 			})
 
 			t.Run("lifecycle=update", func(t *testing.T) {
@@ -160,7 +160,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 					c, err := m.GetClient(ctx, expected.GetID())
 					if check != original {
 						t.Run(fmt.Sprintf("case=must not find client %s", expected.GetID()), func(t *testing.T) {
-							require.ErrorIs(t, err, sqlcon.ErrNoRows)
+							require.ErrorIs(t, err, sqlcon.ErrNoRows())
 						})
 					} else {
 						t.Run("case=updates must not override each other", func(t *testing.T) {
@@ -182,9 +182,9 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 					assert.NoError(t, m.DeleteClient(ctx, client.GetID()))
 
 					_, err := m.GetClient(ctx, client.GetID())
-					assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+					assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 
-					assert.ErrorIs(t, m.DeleteClient(ctx, client.GetID()), sqlcon.ErrNoRows)
+					assert.ErrorIs(t, m.DeleteClient(ctx, client.GetID()), sqlcon.ErrNoRows())
 				})
 			}
 		})
@@ -240,7 +240,7 @@ func TestHelperCreateGetUpdateDeleteClient(t1, t2 Storage) func(t *testing.T) {
 		{
 			t2c3.ID = uuidx.NewV4().String()
 			require.NoError(t, t2.CreateClient(ctx, &t2c3))
-			require.ErrorIs(t, t2.CreateClient(ctx, &t2c3), sqlcon.ErrUniqueViolation)
+			require.ErrorIs(t, t2.CreateClient(ctx, &t2c3), sqlcon.ErrUniqueViolation())
 		}
 
 		c2Template := &Client{
@@ -341,11 +341,11 @@ func TestHelperCreateGetUpdateDeleteClient(t1, t2 Storage) func(t *testing.T) {
 		testHelperUpdateClient(t, ctx, t1, t1c1)
 		testHelperUpdateClient(t, ctx, t2, &t2c1)
 
-		assert.ErrorIs(t, t1.DeleteClient(ctx, t2c3.ID), sqlcon.ErrNoRows)
+		assert.ErrorIs(t, t1.DeleteClient(ctx, t2c3.ID), sqlcon.ErrNoRows())
 
 		assert.NoError(t, t1.DeleteClient(ctx, t1c1.ID))
 		_, err = t1.GetClient(ctx, t1c1.ID)
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows())
 	}
 }
 

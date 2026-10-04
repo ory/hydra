@@ -97,6 +97,7 @@ Class | Method | HTTP request | Description
 *OAuth2API* | [**CreateOAuth2Client**](docs/OAuth2API.md#createoauth2client) | **Post** /admin/clients | Create OAuth 2.0 Client
 *OAuth2API* | [**DeleteOAuth2Client**](docs/OAuth2API.md#deleteoauth2client) | **Delete** /admin/clients/{id} | Delete OAuth 2.0 Client
 *OAuth2API* | [**DeleteOAuth2Token**](docs/OAuth2API.md#deleteoauth2token) | **Delete** /admin/oauth2/tokens | Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
+*OAuth2API* | [**DeleteRotatedOAuth2ClientSecrets**](docs/OAuth2API.md#deleterotatedoauth2clientsecrets) | **Delete** /admin/clients/{id}/secrets/rotate | Delete Rotated OAuth 2.0 Client Secrets
 *OAuth2API* | [**DeleteTrustedOAuth2JwtGrantIssuer**](docs/OAuth2API.md#deletetrustedoauth2jwtgrantissuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
 *OAuth2API* | [**GetOAuth2Client**](docs/OAuth2API.md#getoauth2client) | **Get** /admin/clients/{id} | Get an OAuth 2.0 Client
 *OAuth2API* | [**GetOAuth2ConsentRequest**](docs/OAuth2API.md#getoauth2consentrequest) | **Get** /admin/oauth2/auth/requests/consent | Get OAuth 2.0 Consent Request
@@ -118,6 +119,7 @@ Class | Method | HTTP request | Description
 *OAuth2API* | [**RevokeOAuth2ConsentSessions**](docs/OAuth2API.md#revokeoauth2consentsessions) | **Delete** /admin/oauth2/auth/sessions/consent | Revoke OAuth 2.0 Consent Sessions of a Subject
 *OAuth2API* | [**RevokeOAuth2LoginSessions**](docs/OAuth2API.md#revokeoauth2loginsessions) | **Delete** /admin/oauth2/auth/sessions/login | Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
 *OAuth2API* | [**RevokeOAuth2Token**](docs/OAuth2API.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth 2.0 Access or Refresh Token
+*OAuth2API* | [**RotateOAuth2ClientSecret**](docs/OAuth2API.md#rotateoauth2clientsecret) | **Post** /admin/clients/{id}/secrets/rotate | Rotate OAuth 2.0 Client Secret
 *OAuth2API* | [**SetOAuth2Client**](docs/OAuth2API.md#setoauth2client) | **Put** /admin/clients/{id} | Set OAuth 2.0 Client
 *OAuth2API* | [**SetOAuth2ClientLifespans**](docs/OAuth2API.md#setoauth2clientlifespans) | **Put** /admin/clients/{id}/lifespans | Set OAuth2 Client Token Lifespans
 *OAuth2API* | [**TrustOAuth2JwtGrantIssuer**](docs/OAuth2API.md#trustoauth2jwtgrantissuer) | **Post** /admin/trust/grants/jwt-bearer/issuers | Trust OAuth2 JWT Bearer Grant Type Issuer

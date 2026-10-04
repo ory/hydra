@@ -9,9 +9,13 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/otelx"
+
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
@@ -25,23 +29,25 @@ import (
 )
 
 type registry interface {
-	x.HTTPClientProvider
+	httpx.ClientProvider
 
 	contextx.Provider
 	config.Provider
 	persistence.Provider
-	x.RegistryLogger
-	x.RegistryWriter
+	logrusx.Provider
+	httpx.WriterProvider
 	x.RegistryCookieStore
 	client.Registry
 	consent.Registry
 	jwk.Registry
 	trust.Registry
 	oauth2.Registry
-	x.TracingProvider
+	otelx.Provider
 	x.NetworkProvider
 
 	kratos.Provider
+
+	fosite.Transactional
 }
 
 func newRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (*RegistrySQL, error) {

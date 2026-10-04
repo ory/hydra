@@ -215,7 +215,9 @@ func TestDeviceTokenRequest(t *testing.T) {
 			}
 
 			var token *oauth2.Token
-			token, err = oauthClient.DeviceAccessToken(context.Background(), &oauth2.DeviceAuthResponse{DeviceCode: code})
+			// Interval: 1 keeps the x/oauth2 poll loop at its 1s floor; a zero
+			// value makes the client fall back to its own 5s default.
+			token, err = oauthClient.DeviceAccessToken(context.Background(), &oauth2.DeviceAuthResponse{DeviceCode: code, Interval: 1})
 
 			if testCase.check != nil {
 				testCase.check(t, token, err)
@@ -292,8 +294,8 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
 				Subject:  subject,
-				Remember: pointerx.Ptr(!rr.Skip),
-				Acr:      pointerx.Ptr("1"),
+				Remember: new(!rr.Skip),
+				Acr:      new("1"),
 				Amr:      []string{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
@@ -333,7 +335,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
-					GrantScope: scopes, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
+					GrantScope: scopes, Remember: new(true), RememberFor: new(int64(0)),
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
@@ -408,10 +410,6 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 		assert.EqualValues(t, scopes, i.Get("scp").Raw, "%s", i)
 		return i
-	}
-
-	waitForRefreshTokenExpiry := func() {
-		time.Sleep(reg.Config().GetRefreshTokenLifespan(ctx) + time.Second)
 	}
 
 	t.Run("case=checks if request fails when audience does not match", func(t *testing.T) {
@@ -550,18 +548,18 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 					assert.False(t, i.Get("active").Bool(), "%s", i)
 				})
 
-				t.Run("followup=original refresh token is no longer valid", func(t *testing.T) {
-					_, err := conf.TokenSource(context.Background(), token).Token()
-					assert.Error(t, err)
-				})
-
 				t.Run("followup=but fail subsequent refresh because expiry was reached", func(t *testing.T) {
-					waitForRefreshTokenExpiry()
+					expireRefreshToken(t, reg, refreshedToken.RefreshToken)
 
 					// Force golang to refresh token
 					refreshedToken.Expiry = refreshedToken.Expiry.Add(-time.Hour * 24)
 					_, err := conf.TokenSource(context.Background(), refreshedToken).Token()
 					require.Error(t, err)
+				})
+
+				t.Run("followup=original refresh token is no longer valid", func(t *testing.T) {
+					_, err := conf.TokenSource(context.Background(), token).Token()
+					assert.Error(t, err)
 				})
 			})
 		}

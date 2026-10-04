@@ -24,7 +24,7 @@ Pull requests introducing new features, which do not have a design document link
 get merged.
 
 You can discuss changes with maintainers either in the Github Discussions in this repository or
-join the [Ory Chat](https://www.ory.sh/chat).
+join the [Ory Chat](https://slack.ory.com).
 -->
 
 ## Checklist

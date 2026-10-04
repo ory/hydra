@@ -1,4 +1,4 @@
--- migrations hash: 55b905a5cead652db5b4a5e317d60ad18bd9e6de61d4b43edcdb79244947fbf9b106783f10765f2ffa4d7952c745900c2406f522a101dbed17e5785396484e41
+-- migrations hash: 14de04dcdbd3e9b00922807be554550705bf44b836351e0eeffdac2871efff8c5cc087a08319b435d9a66cb6d9b16eed397a786833efa790956304dadc6229d8
 
 
 
@@ -76,7 +76,8 @@ CREATE TABLE public.hydra_client (
     skip_logout_consent boolean,
     device_authorization_grant_id_token_lifespan bigint,
     device_authorization_grant_access_token_lifespan bigint,
-    device_authorization_grant_refresh_token_lifespan bigint
+    device_authorization_grant_refresh_token_lifespan bigint,
+    rotated_secrets jsonb
 );
 
 ALTER TABLE public.hydra_client OWNER TO postgres;
@@ -441,6 +442,8 @@ CREATE INDEX hydra_oauth2_access_challenge_id_idx ON public.hydra_oauth2_access 
 
 CREATE INDEX hydra_oauth2_access_client_id_idx ON public.hydra_oauth2_access USING btree (client_id, nid);
 
+CREATE INDEX hydra_oauth2_access_nid_subject_idx ON public.hydra_oauth2_access USING btree (nid, subject, client_id);
+
 CREATE INDEX hydra_oauth2_access_request_id_idx ON public.hydra_oauth2_access USING btree (request_id, nid);
 
 CREATE INDEX hydra_oauth2_access_requested_at_idx ON public.hydra_oauth2_access USING btree (requested_at, nid);
@@ -469,6 +472,8 @@ CREATE UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx ON public.hydra_oauth
 
 CREATE INDEX hydra_oauth2_flow_login_session_id_idx ON public.hydra_oauth2_flow USING btree (login_session_id, nid);
 
+CREATE INDEX hydra_oauth2_flow_login_session_subject_idx ON public.hydra_oauth2_flow USING btree (nid, login_session_id, subject) INCLUDE (client_id) WHERE (login_session_id IS NOT NULL);
+
 CREATE INDEX hydra_oauth2_flow_previous_consents_idx ON public.hydra_oauth2_flow USING btree (subject, client_id, nid, consent_skip, consent_error, consent_remember);
 
 CREATE INDEX hydra_oauth2_flow_sub_idx ON public.hydra_oauth2_flow USING btree (subject, nid);
@@ -492,6 +497,8 @@ CREATE INDEX hydra_oauth2_pkce_client_id_idx ON public.hydra_oauth2_pkce USING b
 CREATE INDEX hydra_oauth2_refresh_challenge_id_idx ON public.hydra_oauth2_refresh USING btree (challenge_id);
 
 CREATE INDEX hydra_oauth2_refresh_client_id_idx ON public.hydra_oauth2_refresh USING btree (client_id, nid);
+
+CREATE INDEX hydra_oauth2_refresh_nid_subject_idx ON public.hydra_oauth2_refresh USING btree (nid, subject, client_id);
 
 CREATE INDEX hydra_oauth2_refresh_request_id_idx ON public.hydra_oauth2_refresh USING btree (request_id);
 

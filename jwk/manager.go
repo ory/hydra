@@ -61,15 +61,13 @@ type (
 	}
 
 	SQLData struct {
-		ID  uuid.UUID `db:"pk"`
-		NID uuid.UUID `json:"-" db:"nid"`
-		// This field is deprecated and will be removed
-		PKDeprecated int64     `json:"-" db:"pk_deprecated"`
-		Set          string    `db:"sid"`
-		KID          string    `db:"kid"`
-		Version      int       `db:"version"`
-		CreatedAt    time.Time `db:"created_at"`
-		Key          string    `db:"keydata"`
+		ID        uuid.UUID `db:"pk"`
+		NID       uuid.UUID `json:"-" db:"nid"`
+		Set       string    `db:"sid"`
+		KID       string    `db:"kid"`
+		Version   int       `db:"version"`
+		CreatedAt time.Time `db:"created_at"`
+		Key       string    `db:"keydata"`
 	}
 
 	SQLDataRows []SQLData

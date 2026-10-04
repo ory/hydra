@@ -103,8 +103,19 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		request.GrantScope(scope)
 	}
 
-	for _, audience := range claims.Audience {
-		request.GrantAudience(audience)
+	// The audience of the assertion JWT identifies this authorization server (RFC 7523
+	// section 3), not the resource the access token is for, so it is omitted from the
+	// access token unless the deployment opts into the legacy copy behavior. Config is an
+	// optional interface here to avoid widening fosite.Configurator; at runtime it is always
+	// implemented (the default provider omits by default).
+	omitAudience := true
+	if p, ok := c.Config.(fosite.GrantTypeJWTBearerOmitAssertionAudienceProvider); ok {
+		omitAudience = p.GetGrantTypeJWTBearerOmitAssertionAudience(ctx)
+	}
+	if !omitAudience {
+		for _, audience := range claims.Audience {
+			request.GrantAudience(audience)
+		}
 	}
 
 	session, err := c.getSessionFromRequest(request)

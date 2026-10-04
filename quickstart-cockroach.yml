@@ -3,7 +3,7 @@
 ###########################################################################
 #                                                                         #
 # If you have not yet read the tutorial, do so now:                       #
-#  https://www.ory.sh/docs/hydra/5min-tutorial                            #
+#  https://www.ory.com/docs/hydra/5min-tutorial                            #
 #                                                                         #
 # This set up is only for demonstration purposes. The login               #
 # endpoint can only be used if you follow the steps in the tutorial.      #
@@ -13,6 +13,9 @@ services:
   hydra-migrate:
     environment:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
+    depends_on:
+      "cockroachd":
+        condition: service_healthy
   hydra:
     environment:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
@@ -23,3 +26,12 @@ services:
     command: start-single-node --insecure
     networks:
       - intranet
+    volumes:
+      - cockroach-data:/cockroach/cockroach-data:rw
+    healthcheck:
+      test: ["CMD", "cockroach", "node", "status", "--insecure"]
+      interval: 1s
+      timeout: 30s
+      retries: 30
+volumes:
+  cockroach-data:

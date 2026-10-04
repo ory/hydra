@@ -15,6 +15,9 @@ on:
     - cron: "0 11 * * 6"
   merge_group:
 
+env:
+  CGO_ENABLED: "0"
+
 jobs:
   analyze:
     name: Analyze
@@ -31,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
@@ -44,7 +47,8 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.25"
+          check-latest: true
+          go-version-file: go.mod
       - run: go version
 
       # Initializes the CodeQL tools for scanning.

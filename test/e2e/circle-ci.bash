@@ -20,12 +20,11 @@ killall hydra || true
 ! nc -zv 127.0.0.1 5003
 
 # Install Ory Hydra
-export GO111MODULE=on
 if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
 
-(cd ../../; go build -tags sqlite -o test/e2e/hydra . )
+go -C ../../ build  -o test/e2e/hydra .
 
 # Install oauth2-client
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then

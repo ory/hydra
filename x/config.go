@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-//go:generate ../.bin/mockgen -package mock -destination ../internal/mock/config_cookie.go . CookieConfigProvider
+//go:generate go tool mockgen -package mock -destination ../internal/mock/config_cookie.go . CookieConfigProvider
 
 package x
 

@@ -5,6 +5,7 @@ package openid
 
 import (
 	"context"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
 )
@@ -64,7 +64,7 @@ func (v *OpenIDConnectRequestValidator) ValidatePrompt(ctx context.Context, req 
 		//  be processed as if no previous request had been approved.
 
 		checker := v.Config.GetRedirectSecureChecker(ctx)
-		if stringslice.Has(requiredPrompt, "none") {
+		if slices.Contains(requiredPrompt, "none") {
 			if !checker(ctx, req.GetRedirectURI()) {
 				return errorsx.WithStack(fosite.ErrConsentRequired.WithHint("OAuth 2.0 Client is marked public and redirect uri is not considered secure (https missing), but \"prompt=none\" was requested."))
 			}
@@ -80,7 +80,7 @@ func (v *OpenIDConnectRequestValidator) ValidatePrompt(ctx context.Context, req 
 		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Used unknown value '%s' for prompt parameter", requiredPrompt))
 	}
 
-	if stringslice.Has(requiredPrompt, "none") && len(requiredPrompt) > 1 {
+	if slices.Contains(requiredPrompt, "none") && len(requiredPrompt) > 1 {
 		// If this parameter contains none with any other value, an error is returned.
 		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Parameter 'prompt' was set to 'none', but contains other values as well which is not allowed."))
 	}
@@ -115,7 +115,7 @@ func (v *OpenIDConnectRequestValidator) ValidatePrompt(ctx context.Context, req 
 		}
 	}
 
-	if stringslice.Has(requiredPrompt, "none") {
+	if slices.Contains(requiredPrompt, "none") {
 		if claims.AuthTime.IsZero() {
 			return errorsx.WithStack(fosite.ErrServerError.WithDebug("Failed to validate OpenID Connect request because because auth_time is missing from session."))
 		}
@@ -125,7 +125,7 @@ func (v *OpenIDConnectRequestValidator) ValidatePrompt(ctx context.Context, req 
 		}
 	}
 
-	if stringslice.Has(requiredPrompt, "login") {
+	if slices.Contains(requiredPrompt, "login") {
 		if claims.AuthTime.Before(claims.RequestedAt) {
 			return errorsx.WithStack(fosite.ErrLoginRequired.WithHintf("Failed to validate OpenID Connect request because prompt was set to 'login' but auth_time ('%s') happened before the authorization request ('%s') was registered, indicating that the user was not re-authenticated which is forbidden.", claims.AuthTime, claims.RequestedAt))
 		}
@@ -155,7 +155,7 @@ func (v *OpenIDConnectRequestValidator) ValidatePrompt(ctx context.Context, req 
 
 func isWhitelisted(items []string, whiteList []string) bool {
 	for _, item := range items {
-		if !stringslice.Has(whiteList, item) {
+		if !slices.Contains(whiteList, item) {
 			return false
 		}
 	}

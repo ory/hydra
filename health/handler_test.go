@@ -13,11 +13,10 @@ import (
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/healthx"
-	"github.com/ory/x/prometheusx"
+	"github.com/ory/x/httprouterx"
 )
 
 func TestPublicHealthHandler(t *testing.T) {
@@ -26,7 +25,7 @@ func TestPublicHealthHandler(t *testing.T) {
 		require.NoError(t, err)
 		req.Host = "example.com"
 		req.Header.Add("Origin", "https://example.com")
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := testhelpers.NewTestClient(t).Do(req)
 		require.NoError(t, err)
 		return resp
 	}
@@ -73,7 +72,7 @@ func TestPublicHealthHandler(t *testing.T) {
 			require.NoError(t, reg.Migrator().MigrateUp(t.Context()))
 			require.NoError(t, reg.InitNetwork(t.Context()))
 
-			public := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
+			public := httprouterx.NewRouterPublic()
 			reg.RegisterPublicRoutes(t.Context(), public)
 
 			ts := httptest.NewServer(public)

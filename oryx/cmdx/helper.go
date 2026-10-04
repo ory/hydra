@@ -21,13 +21,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/pkg/errors"
-
-	"github.com/ory/x/logrusx"
 )
 
 var (
-	// ErrNilDependency is returned if a dependency is missing.
-	ErrNilDependency = fmt.Errorf("a dependency was expected to be defined but is nil. Please open an issue with the stack trace")
 	// ErrNoPrintButFail is returned to detect a failure state that was already reported to the user in some way
 	ErrNoPrintButFail = fmt.Errorf("this error should never be printed")
 
@@ -107,19 +103,6 @@ func Fatalf(message string, args ...interface{}) {
 	os.Exit(1)
 }
 
-// ExpectDependency expects every dependency to be not nil or it fatals.
-// Deprecated: do not use this function in commands, as it makes it impossible to test them. Instead, return the error.
-func ExpectDependency(logger *logrusx.Logger, dependencies ...interface{}) {
-	if logger == nil {
-		panic("missing logger for dependency check")
-	}
-	for _, d := range dependencies {
-		if d == nil {
-			logger.WithError(errors.WithStack(ErrNilDependency)).Fatalf("A fatal issue occurred.")
-		}
-	}
-}
-
 // CallbackWriter will execute each callback once the message is received.
 // The full matched message is passed to the callback. An error returned from the callback is returned by Write.
 type CallbackWriter struct {
@@ -179,10 +162,7 @@ func ExecBackgroundCtx(ctx context.Context, cmd *cobra.Command, stdIn io.Reader,
 // Exec runs the provided cobra command with the given reader as STD_IN and the given args.
 // Returns STD_OUT, STD_ERR and the error from the execution.
 func Exec(t testing.TB, cmd *cobra.Command, stdIn io.Reader, args ...string) (string, string, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	return ExecCtx(ctx, cmd, stdIn, args...)
+	return ExecCtx(t.Context(), cmd, stdIn, args...)
 }
 
 func ExecCtx(ctx context.Context, cmd *cobra.Command, stdIn io.Reader, args ...string) (string, string, error) {
@@ -199,10 +179,7 @@ func ExecCtx(ctx context.Context, cmd *cobra.Command, stdIn io.Reader, args ...s
 // ExecNoErr is a helper that assumes a successful run from Exec.
 // Returns STD_OUT.
 func ExecNoErr(t testing.TB, cmd *cobra.Command, args ...string) string {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	return ExecNoErrCtx(ctx, t, cmd, args...)
+	return ExecNoErrCtx(t.Context(), t, cmd, args...)
 }
 
 func ExecNoErrCtx(ctx context.Context, t require.TestingT, cmd *cobra.Command, args ...string) string {
@@ -218,10 +195,7 @@ func ExecNoErrCtx(ctx context.Context, t require.TestingT, cmd *cobra.Command, a
 // ExecExpectedErr is a helper that assumes a failing run from Exec returning ErrNoPrintButFail
 // Returns STD_ERR.
 func ExecExpectedErr(t testing.TB, cmd *cobra.Command, args ...string) string {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	return ExecExpectedErrCtx(ctx, t, cmd, args...)
+	return ExecExpectedErrCtx(t.Context(), t, cmd, args...)
 }
 
 func ExecExpectedErrCtx(ctx context.Context, t require.TestingT, cmd *cobra.Command, args ...string) string {

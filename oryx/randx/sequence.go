@@ -6,6 +6,8 @@ package randx
 import (
 	"crypto/rand"
 	"math/big"
+
+	"github.com/pkg/errors"
 )
 
 var rander = rand.Reader // random function
@@ -57,4 +59,17 @@ func MustString(l int, allowedRunes []rune) string {
 		panic(err)
 	}
 	return string(seq)
+}
+
+func GenerateNonce() ([]byte, error) {
+	const challengeSize = 32
+
+	challenge := make([]byte, challengeSize)
+
+	_, err := rand.Read(challenge)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return challenge, nil
 }

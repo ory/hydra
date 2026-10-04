@@ -22,7 +22,7 @@ import (
 )
 
 func TestUnsignedToken(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		name         string
 		jwtHeaders   map[string]interface{}
 		expectedType string
@@ -63,7 +63,7 @@ func TestUnsignedToken(t *testing.T) {
 }
 
 func TestJWTHeaders(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		name         string
 		jwtHeaders   map[string]interface{}
 		expectedType string
@@ -91,12 +91,12 @@ func TestJWTHeaders(t *testing.T) {
 	}
 }
 
-var keyFuncError error = fmt.Errorf("error loading key")
 var (
+	errKeyFunc        error          = fmt.Errorf("error loading key")
 	jwtTestDefaultKey *rsa.PublicKey = parseRSAPublicKeyFromPEM(defaultPubKeyPEM)
 	defaultKeyFunc    Keyfunc        = func(t *Token) (interface{}, error) { return jwtTestDefaultKey, nil }
 	emptyKeyFunc      Keyfunc        = func(t *Token) (interface{}, error) { return nil, nil }
-	errorKeyFunc      Keyfunc        = func(t *Token) (interface{}, error) { return nil, keyFuncError }
+	errorKeyFunc      Keyfunc        = func(t *Token) (interface{}, error) { return nil, errKeyFunc }
 	nilKeyFunc        Keyfunc        = nil
 )
 
@@ -131,7 +131,7 @@ func TestParser_Parse(t *testing.T) {
 		tokenString string
 		generate    *generate
 	}
-	var jwtTestData = []struct {
+	jwtTestData := []struct {
 		expected
 		given
 	}{
@@ -439,8 +439,8 @@ func TestParser_Parse(t *testing.T) {
 						t.Errorf("[%v] Errors don't match expectation.  %v != %v", data.name, e, data.errors)
 					}
 
-					if err.Error() == keyFuncError.Error() && ve.Inner != keyFuncError {
-						t.Errorf("[%v] Inner error does not match expectation.  %v != %v", data.name, ve.Inner, keyFuncError)
+					if err.Error() == errKeyFunc.Error() && ve.Inner != errKeyFunc {
+						t.Errorf("[%v] Inner error does not match expectation.  %v != %v", data.name, ve.Inner, errKeyFunc)
 					}
 				}
 			}

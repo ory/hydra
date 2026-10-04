@@ -25,7 +25,7 @@ func Encode(offset int64) string {
 func decode(s string) (int, error) {
 	b, err := base64.RawURLEncoding.DecodeString(s)
 	if err != nil {
-		return 0, errors.WithStack(herodot.ErrBadRequest.WithWrap(err).WithReasonf("Unable to parse pagination token: %s", err))
+		return 0, errors.WithStack(herodot.ErrBadRequest().WithWrap(err).WithReasonf("Unable to parse pagination token: %s", err))
 	}
 
 	return int(gjson.Get(string(b), "offset").Int()), nil

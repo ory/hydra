@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	gomock "go.uber.org/mock/gomock"
+	"go.uber.org/mock/gomock"
 
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"

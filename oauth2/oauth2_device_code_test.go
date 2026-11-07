@@ -458,7 +458,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			acceptConsentHandler(t, c, subject, conf.Scopes, nil),
 		)
 
-		resp, err := getDeviceCode(t, conf, nil)
+		resp, err := getDeviceCode(t, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
 		require.NoError(t, err)
 		require.NotEmpty(t, resp.DeviceCode)
 		require.NotEmpty(t, resp.UserCode)
@@ -471,7 +471,8 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		assert.Empty(t, token.Extra("c_nonce_draft_00"), "should not be set if not requested")
 		assert.Empty(t, token.Extra("c_nonce_expires_in_draft_00"), "should not be set if not requested")
 		introspectAccessToken(t, conf, token, subject)
-		assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+		claims := assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+		assert.Equal(t, nonce, claims.Get("nonce").String(), "%s", claims)
 		assert.Empty(t, token.RefreshToken)
 	})
 	t.Run("case=perform device flow with refresh token", func(t *testing.T) {

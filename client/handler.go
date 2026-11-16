@@ -195,7 +195,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 
 	c.RegistrationAccessToken = token
 	c.RegistrationAccessTokenSignature = signature
-	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath, url.PathEscape(c.GetID())).String()
+	c.RegistrationClientURI = h.registrationClientURI(r.Context(), c.GetID())
 
 	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
 		return nil, err
@@ -381,6 +381,7 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	c.RegistrationClientURI = h.registrationClientURI(r.Context(), c.GetID())
 	h.r.Writer().Write(w, r, &c)
 }
 
@@ -658,6 +659,7 @@ func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 
 	c.Secret = ""
 	c.Metadata = nil
+	c.RegistrationClientURI = h.registrationClientURI(r.Context(), c.GetID())
 	h.r.Writer().Write(w, r, c)
 }
 
@@ -992,4 +994,9 @@ func (h *Handler) deleteRotatedOAuth2ClientSecrets(w http.ResponseWriter, r *htt
 
 	c.Secret = ""
 	h.r.Writer().Write(w, r, c)
+}
+
+// registrationClientURI returns the URL used to read, update, or delete a dynamically registered client.
+func (h *Handler) registrationClientURI(ctx context.Context, id string) string {
+	return urlx.AppendPaths(h.r.Config().PublicURL(ctx), DynClientsHandlerPath, url.PathEscape(id)).String()
 }

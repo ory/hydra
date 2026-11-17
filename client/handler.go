@@ -998,5 +998,11 @@ func (h *Handler) deleteRotatedOAuth2ClientSecrets(w http.ResponseWriter, r *htt
 
 // registrationClientURI returns the URL used to read, update, or delete a dynamically registered client.
 func (h *Handler) registrationClientURI(ctx context.Context, id string) string {
-	return urlx.AppendPaths(h.r.Config().PublicURL(ctx), DynClientsHandlerPath, url.PathEscape(id)).String()
+	return buildRegistrationClientURI(h.r.Config().PublicURL(ctx), id)
+}
+
+// buildRegistrationClientURI appends the registration path and the client ID to base.
+// JoinPath expects escaped elements, so the ID is escaped exactly once.
+func buildRegistrationClientURI(base *url.URL, id string) string {
+	return urlx.AppendPaths(base, DynClientsHandlerPath).JoinPath(url.PathEscape(id)).String()
 }

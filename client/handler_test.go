@@ -274,6 +274,33 @@ func TestHandler(t *testing.T) {
 		})
 	})
 
+	t.Run("case=dynamic registration returns registration_client_uri on GET and PUT", func(t *testing.T) {
+		_, publicTs := newServer(t, true)
+
+		body, res := makeJSON(t, publicTs, "POST", client.DynClientsHandlerPath, &client.Client{
+			RedirectURIs: []string{"http://localhost:3000/cb"},
+		})
+		require.Equal(t, http.StatusCreated, res.StatusCode, body)
+		id := gjson.Get(body, "client_id").String()
+		token := gjson.Get(body, "registration_access_token").String()
+		expectedURI := reg.Config().PublicURL(ctx).String() + "oauth2/register/" + id
+		require.Equal(t, expectedURI, gjson.Get(body, "registration_client_uri").String(), body)
+
+		path := urlx.MustJoin(publicTs.URL, client.DynClientsHandlerPath, url.PathEscape(id))
+
+		body, res = fetchWithBearerAuth(t, "GET", path, token, nil)
+		require.Equal(t, http.StatusOK, res.StatusCode, body)
+		assert.Equal(t, expectedURI, gjson.Get(body, "registration_client_uri").String(), body)
+
+		var b bytes.Buffer
+		require.NoError(t, json.NewEncoder(&b).Encode(&client.Client{
+			RedirectURIs: []string{"http://localhost:3000/cb"},
+		}))
+		body, res = fetchWithBearerAuth(t, "PUT", path, token, &b)
+		require.Equal(t, http.StatusOK, res.StatusCode, body)
+		assert.Equal(t, expectedURI, gjson.Get(body, "registration_client_uri").String(), body)
+	})
+
 	t.Run("common", func(t *testing.T) {
 		adminTs, publicTs := newServer(t, true)
 		expected := createClient(t, &client.Client{
@@ -518,7 +545,8 @@ func TestHandler(t *testing.T) {
 				assert.Equal(t, http.StatusOK, res.StatusCode)
 				assert.Equal(t, id, gjson.Get(body, "client_id").String())
 				assert.False(t, gjson.Get(body, "metadata").Bool())
-				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.client_id", "body.created_at", "body.updated_at"))
+				assert.Equal(t, reg.Config().PublicURL(ctx).String()+"oauth2/register/"+id, gjson.Get(body, "registration_client_uri").String())
+				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.client_id", "body.created_at", "body.updated_at", "body.registration_client_uri"))
 			})
 		})
 
